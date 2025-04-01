@@ -361,12 +361,31 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 
 ## 4. 🛠️ 기술 스택
 
-| 분야 | 기술 |
-|------|------|
-| **DB** | MariaDB |
-| **OS/서버** | Ubuntu, Linux |
-| **툴** | GitHub, Notion, HeidiSQL, DA# |
-| **기획/설계** | Draw.io, ERD Cloud |
+
+<div>
+<img src="https://img.shields.io/badge/Java-007396?style=flat&logo=Java&logoColor=white" alt="">
+<img src="https://img.shields.io/badge/gradle-02303A?style=flat&logo=gradle&logoColor=white" alt="">
+<img src="https://img.shields.io/badge/SpringBoot-6DB33F?style=flat&logo=SpringBoot&logoColor=white" alt="">
+<img src="https://img.shields.io/badge/Spring_Data_JPA-6DB33F?style=flat&logo=Spring&logoColor=white" alt="">
+<img src="https://img.shields.io/badge/Spring Security-6DB33F?style=flat&logo=springsecurity&logoColor=white">
+<img src="https://img.shields.io/badge/swagger-85EA2D?style=flat&logo=swagger&logoColor=white&color" alt="">
+</div>
+
+### DataBase
+<div>
+<img src="https://img.shields.io/badge/MariaDB-181717?style=flat&logo=MariaDB&logoColor=white&color=003545" alt="">
+<img src="https://img.shields.io/badge/Amazon S3-569A31?style=flat&logo=AmazonS3&logoColor=white" alt="">
+</div>
+
+
+### Tool
+<div>
+<img src="https://img.shields.io/badge/Git-000?style=style=flat&logo=Git&logoColor=white&color=F05032" alt=""> 
+<img src="https://img.shields.io/badge/GitHub-181717?style=flat&logo=GitHub&logoColor=white&color=181717" alt="">
+<img src="https://img.shields.io/badge/postman-orange?style=flat&logo=postman&logoColor=white" alt="">
+<img src="https://img.shields.io/badge/notion-black?style=flat&logo=notion&logoColor=white" alt="">
+<img src="https://img.shields.io/badge/Discord-5865F2?style=flat&logo=Discord&logoColor=white" alt="">
+</div>
 
 <br>
 
