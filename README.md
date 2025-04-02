@@ -17,9 +17,9 @@
 5. [📁 파일 구조](#5--파일-구조)  
 6. [📊 WBS (작업 분배 및 일정)](#6--wbs-작업-분배-및-일정)  
 7. [📄 요구사항 정의](#7--요구사항-정의)  
-8. [🔄 플로우 차트](#8--플로우-차트)  
-9. [📌 ERD & UML](#9--erd--uml)    
-10. [📦 DDD](#10--DDD)  
+8. [🔄 플로우 차트](#8--플로우-차트--uml)  
+9. [📦 DDD](#9--ddd)  
+10. [📌 ERD](#10--erd--테이블-정의서)    
 11. [⚙️ 시스템 아키텍쳐](#11--시스템-아키텍쳐)  
 12. [📒 테스트 케이스 정의서](#12--테스트-케이스-정의서)  
 13. [🧪 테스트 케이스 상세](#13--테스트-케이스-상세)  
@@ -439,19 +439,166 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 
 ---
 
-## 8. 🔄 플로우 차트
+## 8. 🔄 플로우 차트 & UML
 
-> 사용자 흐름 시각화  
+### 사용자 흐름 시각화  
 <img src="assets/images/flowchart.png" alt="플로우차트" width="550"/>
+
+<br>
+
+### 유스케이스 다이어그램  
+<img src="assets/images/UML.png" alt="UML" width="700"/> 
+
+---
+
+## 9. 📦 DDD
+
+> 도메인 주도 설계(Domain-Driven Design) 기반의 구조와 설계 원칙 설명  
+(예: 도메인 계층 구성, 집합체, 엔티티, 서비스 분리 등)
+
+<br>
+
+<img src="assets/images/ddd-step8.png" alt="Step8 Policy" width="700"/>
+
+🔗 [DDD 전체 보기](https://miro.com/app/board/uXjVIIWm93c=/?share_link_id=312811606423)
+
+
+<br>
+
+<details>
+<summary>📌 단계별 DDD</summary>
+
+<details>
+<summary>🔹 Step 1. Domain Event 정의</summary>
+
+- 비즈니스 도메인 내에 발생하는 모든 이벤트를 과거형으로 기술(조회 기능 X)  
+- 이벤트는 Actor가 Action을 해서 발생한 결과  
+- 문장 형태: “XXX 됨”  
+- 상의 없이 각자 Event를 무작위로 작성  
+- 중복 제거 및 시간순 정렬  
+- 이슈/관심 사항은 빨간 포스트잇으로 표시  
+
+<img src="assets/images/ddd-step1.png" alt="Step1 Domain Event" width="700"/>
+
+<br>
+
+</details>
+
+<details>
+<summary>🔹 Step 2. External System 정의</summary>
+
+- 결제 시스템, 이메일 발송, SMS 등 외부 시스템 정의  
+- 명사형으로 작성  
+
+<img src="assets/images/ddd-step2.png" alt="Step2 External System" width="700"/>
+
+<br>
+
+</details>
+
+<details>
+<summary>🔹 Step 3. Command 정의</summary>
+
+- 각 Domain Event를 유발하는 명령  
+- 현재형 & 명령형으로 작성  
+
+<img src="assets/images/ddd-step3.png" alt="Step3 Command" width="700"/>
+
+<br>
+
+</details>
+
+<details>
+<summary>🔹 Step 4. HotSpot 정의</summary>
+
+- 궁금하거나 결정되지 않은 사항을 정리  
+
+<img src="assets/images/ddd-step4.png" alt="Step4 HotSpot" width="700"/>
+
+<br>
+
+</details>
+
+<details>
+<summary>🔹 Step 5. Actor 정의</summary>
+
+- 도메인 이벤트를 유발하는 주체  
+- 예: 사용자, 시스템, 외부 서비스 등  
+
+<img src="assets/images/ddd-step5.png" alt="Step5 Actor" width="700"/>
+
+<br>
+
+</details>
+
+<details>
+<summary>🔹 Step 6. 애그리거트 정의</summary>
+
+- 하나의 단위로 간주되는 도메인 객체 집합  
+- 관계와 제약을 관리하는 중심 단위  
+
+<img src="assets/images/ddd-step6.png" alt="Step6 Aggregate" width="700"/>
+
+<br>
+
+</details>
+
+<details>
+<summary>🔹 Step 7. Bounded Context 정의</summary>
+
+- 관련 애그리거트를 하나의 컨텍스트로 묶기  
+
+<img src="assets/images/ddd-step7.png" alt="Step7 Bounded Context" width="700"/>
+
+<br>
+
+</details>
+
+<details>
+<summary>🔹 Step 8. Policy 정의</summary>
+
+- 도메인 내 규칙 정의  
+- **액터별 정책 예시**  
+  - 사용자: 로그인 후 주문 가능  
+  - 관리자: 모든 주문 조회 및 수정  
+- **애그리거트별 정책 예시**  
+  - 주문: 취소 전 수정만 허용  
+  - 상품: 품절 시 주문 불가  
+- **이벤트별 정책 예시**  
+  - 주문 생성: 3일 이내 결제  
+  - 주문 취소: 상태 변경 + 재고 복구  
+
+<img src="assets/images/ddd-step8.png" alt="Step8 Policy" width="700"/>
+
+<br>
+
+</details>
+
+<details>
+<summary>🔹 Step 9. Context Mapping</summary>
+
+- Bounded Context 간 상호작용 & 경계 정의  
+- 도메인 설계의 명확성 확보  
+
+<img src="assets/images/ddd-step9.png" alt="Step9 Context Mapping" width="700"/>
+
+<br>
+
+</details>
+
+<br>
+
+
+
+</details>
+
+<br>
 
 <br>
 
 ---
 
-## 9. 📌 ERD & UML
-
-### 유스케이스 다이어그램  
-<img src="assets/images/UML.png" alt="UML" width="700"/>
+## 10. 📌 ERD & 테이블 정의서
 
 ### 논리 ERD  
 (이미지 또는 링크)
@@ -459,26 +606,9 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 ### 물리 ERD  
 (이미지 또는 링크)
 
+### 테이블 정의서
+(이미지 또는 링크)
 
-<br>
-
----
-
-## 10. 📦 DDD
-
-> 도메인 주도 설계(Domain-Driven Design) 기반의 구조와 설계 원칙 설명  
-(예: 도메인 계층 구성, 집합체, 엔티티, 서비스 분리 등)
-
-<br>
-
-- 핵심 도메인: 운동 모임, 사용자, 장소, 포인트
-- 서브 도메인: 알림, 후기, 결제, 관리자
-- 도메인 계층 간의 책임 분리 및 응집도 중심 설계
-- 추후 Bounded Context 및 이벤트 기반 연동 고려
-
-> 추가적으로 `assets/images/ddd.png` 등에 구조 다이어그램이 있다면 아래처럼 삽입 가능합니다:
-
-<img src="assets/images/ddd.png" alt="DDD 구조" width="700"/>
 
 <br>
 
