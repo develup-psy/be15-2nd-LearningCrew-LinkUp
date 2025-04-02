@@ -439,7 +439,7 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 ## 8. 🔄 플로우 차트
 
 > 사용자 흐름 시각화  
-(이미지 삽입 예정)
+<img src="assets/images/flowchart.png" alt="플로우차트" width="700"/>
 
 <br>
 
