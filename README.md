@@ -62,8 +62,6 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 
 <br>
 
----
-
 <details>
 <summary>📌 2. 프로젝트 소개</summary>
 
@@ -77,8 +75,6 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 </details>
 
 <br>
-
----
 
 <details>
 <summary>📌 3. 프로젝트 배경 및 필요성</summary>
@@ -140,8 +136,6 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 </details>
 
 <br>
-
----
 
 <details>
 <summary>📌 4. 타 서비스와의 차별점</summary>
@@ -208,8 +202,6 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 
 <br>
 
----
-
 <details>
 <summary>📌 5. 서비스 대상</summary>
 
@@ -229,8 +221,6 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 </details>
 
 <br>
-
----
 
 <details>
 <summary>📌 6. 기대효과</summary>
@@ -279,8 +269,6 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 
 <br>
 
----
-
 <details>
 <summary>📌 7. 향후 확장 방향</summary>
 
@@ -308,8 +296,6 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 </details>
 
 <br>
-
----
 
 <details>
 <summary>📌 8. 주요 기능</summary>
