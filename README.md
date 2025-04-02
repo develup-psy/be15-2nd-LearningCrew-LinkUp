@@ -442,7 +442,7 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 ## 8. 🔄 플로우 차트
 
 > 사용자 흐름 시각화  
-<img src="assets/images/flowchart.png" alt="플로우차트" width="700"/>
+<img src="assets/images/flowchart.png" alt="플로우차트" width="550"/>
 
 <br>
 
@@ -451,7 +451,7 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 ## 9. 📌 ERD & UML
 
 ### 유스케이스 다이어그램  
-(이미지 또는 링크)
+<img src="assets/images/UML.png" alt="UML" width="700"/>
 
 ### 논리 ERD  
 (이미지 또는 링크)
