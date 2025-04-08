@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/users")
-public class UserAuthController {
+public class UserAuthCommandController {
     private final UserCommandService userCommandService;
 
     /* 회원 가입 */
