@@ -1,10 +1,14 @@
+<img src="assets/images/linkup_banner.png" alt="linkup_banner"/>
 <div align="center">
 
 <br>
+
 🤼‍♂️ LinkUP
 <br><br>모임이라는 소속에 구애받지 않고 언제든 원할 때 신청해 <br>여러 사람들과 운동을 즐길 수 있는 플랫폼
 
 </div>
+
+<br>
 
 ---
 
@@ -347,62 +351,105 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 
 ## 4. 🛠️ 기술 스택
 
-
 <div>
 <img src="https://img.shields.io/badge/Java-007396?style=flat&logo=Java&logoColor=white" alt="">
-<img src="https://img.shields.io/badge/gradle-02303A?style=flat&logo=gradle&logoColor=white" alt="">
+<img src="https://img.shields.io/badge/Gradle-02303A?style=flat&logo=Gradle&logoColor=white" alt="">
 <img src="https://img.shields.io/badge/SpringBoot-6DB33F?style=flat&logo=SpringBoot&logoColor=white" alt="">
-<img src="https://img.shields.io/badge/Spring_Data_JPA-6DB33F?style=flat&logo=Spring&logoColor=white" alt="">
-<img src="https://img.shields.io/badge/Spring Security-6DB33F?style=flat&logo=springsecurity&logoColor=white">
-<img src="https://img.shields.io/badge/swagger-85EA2D?style=flat&logo=swagger&logoColor=white&color" alt="">
+<img src="https://img.shields.io/badge/JPA-6DB33F?style=flat&logo=Hibernate&logoColor=white" alt="">
+<img src="https://img.shields.io/badge/MyBatis-000000?style=flat&logo=MyBatis&logoColor=white" alt="">
+<img src="https://img.shields.io/badge/Spring Security-6DB33F?style=flat&logo=springsecurity&logoColor=white" alt="">
+<img src="https://img.shields.io/badge/JWT-000000?style=flat&logo=JSON%20web%20tokens&logoColor=white" alt="">
+<img src="https://img.shields.io/badge/Junit5-25A162?style=flat&logo=JUnit5&logoColor=white" alt="">
+<img src="https://img.shields.io/badge/Swagger-85EA2D?style=flat&logo=swagger&logoColor=white" alt="">
 </div>
 
-### DataBase
+### 📦 DataBase
 <div>
-<img src="https://img.shields.io/badge/MariaDB-181717?style=flat&logo=MariaDB&logoColor=white&color=003545" alt="">
+<img src="https://img.shields.io/badge/MariaDB-003545?style=flat&logo=MariaDB&logoColor=white" alt="">
 <img src="https://img.shields.io/badge/Amazon S3-569A31?style=flat&logo=AmazonS3&logoColor=white" alt="">
 </div>
 
-
-### Tool
+### 🛠️ Tool
 <div>
-<img src="https://img.shields.io/badge/Git-000?style=style=flat&logo=Git&logoColor=white&color=F05032" alt=""> 
-<img src="https://img.shields.io/badge/GitHub-181717?style=flat&logo=GitHub&logoColor=white&color=181717" alt="">
-<img src="https://img.shields.io/badge/postman-orange?style=flat&logo=postman&logoColor=white" alt="">
-<img src="https://img.shields.io/badge/notion-black?style=flat&logo=notion&logoColor=white" alt="">
-<img src="https://img.shields.io/badge/Discord-5865F2?style=flat&logo=Discord&logoColor=white" alt="">
+<img src="https://img.shields.io/badge/Git-F05032?style=flat&logo=Git&logoColor=white" alt=""> 
+<img src="https://img.shields.io/badge/GitHub-181717?style=flat&logo=GitHub&logoColor=white" alt="">
+<img src="https://img.shields.io/badge/Postman-FF6C37?style=flat&logo=Postman&logoColor=white" alt="">
+<img src="https://img.shields.io/badge/Notion-000000?style=flat&logo=Notion&logoColor=white" alt="">
+<img src="https://img.shields.io/badge/Figma-F24E1E?style=flat&logo=Figma&logoColor=white" alt="">
+<img src="https://img.shields.io/badge/Miro-050038?style=flat&logo=Miro&logoColor=white" alt="">
 </div>
 
-<br>
 
 ---
 
 ## 5. 📁 파일 구조
 
-<details>
-<summary>📂 파일 구조</summary>
 
 ```
 📦 root
-├── 📁 assets                        # 프로젝트 부속 자료
-│   ├── 📁 api-docs                 # API 명세 관련 문서
-│   └── 📁 images                   # 이미지 자료 모음
-│   │   ├── 📄 uml                  # UML 다이어그램
-│   │   └── 📄 requirements         # 요구사항 명세서 등
-│   └── 📁 test_cases           # 테스트 케이스 카테고리별 정리
-│
-├── 📁 src                           # 프로젝트 소스 코드
+├── 📁 assets                       # 프로젝트 부속 자료
+│   ├── 📁 api-docs                 # 외부 API 명세 관련 문서
 │   ├── 📁 ddl                      # DDL 스크립트 (테이블 생성 등)
-│   ├── 📁 dummy_data              # 더미 데이터 삽입 SQL
-│   ├── 📁
-│   │   └── 📁 
-│   │
-│   └── 📁 LinkUP                   # Java 백엔드 프로젝트
-│       └── 📁 src.main.java
-│           └── 📁 com.LearningCrew.LinkUP
-│               └── 📁 [기능 카테고리명]   # 예: member, trip 등
+│   │   └── 📄 linkup_ddL.sql
+│   ├── 📁 images                   # 이미지 자료 모음
+│   │   └── 📄 requirements         # UML 다이어그램, 요구사항 명세서 등
+│   └── 📁 test_cases               # 테스트 케이스 카테고리별 정리
+│       └── 📁 ...
+│
+├── 📁 LinkUP                       # Java 백엔드 프로젝트
+│   ├── 📁 ...
 │
 └── 📄 README.md                     # 프로젝트 소개 및 사용법
+
+```
+
+
+<details>
+<summary>📂 세부 파일 구조</summary>
+
+```
+📦 LinkUp.src.main
+├── 📁 java.com.learningcrew.linkup
+│   ├── 📁 common
+│   │   ├── 📁 util ( 논의 )
+│   │   ├── 📁 dto
+│   │   └── 📁 service
+│   │   
+│   ├── 📁 config
+│   │   └── 📄 ...
+│   │   
+│   ├── 📁 exception
+│   │   └── 📄 ...
+│   │   
+│   ├── 📁 기능별 파일
+│   │   ├── 📁 command
+│   │   │   ├── 📁 application
+│   │   │   │   ├── 📁 controller
+│   │   │   │   ├── 📁 dto
+│   │   │   │   └── 📁 service
+│   │   │   ├── 📁 domain
+│   │   │   │   ├── 📁 aggregate
+│   │   │   │   └── 📁 repository
+│   │   │   └── 📁 infrastructure
+│   │   │       └── 📄 ...
+│   │   │
+│   │   └── 📁 query
+│   │       ├── 📁 controller
+│   │       │   └── 📄 ...
+│   │       ├── 📁 dto
+│   │       │   ├── 📁 request
+│   │       │   └── 📁 response
+│   │       ├── 📁 mapper
+│   │       │   └── 📄 ...
+│   │       └── 📁 service
+│   │           └── 📄 ...
+│   └── 📄 Application.java
+│
+└── 📁 resources
+    ├── 📁 mappers.기능별
+    │   └── 📄 기능별_Mapper.xml  
+    └── 📄 application.yml  
+
 ```
 
 
@@ -424,16 +471,10 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 
 ## 7. 📄 요구사항 정의
 
-▶ [요구사항 명세서 링크](#)
+🔗 [요구사항 명세서 링크](https://docs.google.com/spreadsheets/d/e/2PACX-1vR5o5viDNitHaRwGwl4o1biS6vLC52SPAyREVK2vDS9y13eXPo8N7CumbLhWDeejayHAh0Ji5Cmf2tf/pubhtml?gid=1583571973&single=true)
 
-<details>
-<summary>📑 요약 보기</summary>
 
-| 기능명 | 설명 | 담당자 |
-|--------|------|--------|
-| OPU 관리 | 체크/달성 통계 기능 포함 | ㅇㅇㅇ |
-| 후기게시판 | 글 작성/좋아요/신고 등 포함 | ㅇㅇㅇ |
-</details>
+<img src="assets/images/requirement_statement.png" alt="requirement_statement"/>
 
 <br>
 
@@ -448,6 +489,8 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 
 ### 유스케이스 다이어그램  
 <img src="assets/images/UML.png" alt="UML" width="700"/> 
+
+<br>
 
 ---
 
@@ -601,14 +644,24 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 ## 10. 📌 ERD & 테이블 정의서
 
 ### 논리 ERD  
-(이미지 또는 링크)
+
+<img src="assets/images/logical_ERD.png" alt="logical_ERD"/>
+
+<br>
 
 ### 물리 ERD  
-(이미지 또는 링크)
+
+<img src="assets/images/physical_ERD.png" alt="physical_ERD"/>
+
+<br>
 
 ### 테이블 정의서
-(이미지 또는 링크)
 
+🔗 [테이블 정의서 링크](https://docs.google.com/spreadsheets/d/e/2PACX-1vRunQplhnLkZI3XVY3Phoj7wQVirdkzOMEnkMLMfItG7qATPKMGKVSAPNOodzxhBgE6C86Ax5my7o9p/pubhtml?gid=763788645&single=true)
+
+<img src="assets/images/table_definition.png" alt="table_definition"/>
+
+<br>
 
 <br>
 
@@ -625,8 +678,9 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 
 ## 12. 📒 테스트 케이스 정의서
 
-> 각 기능별 테스트 시나리오, 입력값 및 기대 결과 정리  
-(표, 이미지 혹은 Notion 링크 삽입)
+🔗 [테스트 케이스 정의서 링크](# )
+
+<img src="assets/images/test_case_definition.png" alt="test_case_definition"/>
 
 <br>
 
