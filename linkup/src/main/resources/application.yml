@@ -1,0 +1,36 @@
+spring:
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://localhost:3306/linkupdb
+    username : learningcrew
+    password : linkup
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+  mapper-locations: mappers/*/.xml
+  type-aliases-package: com.learningcrew.linkup
+
+
+jwt:
+  secret: Msrwyz/2xzZm0CkoRTWAg+9clCPiJVk5o+SUIKaImAJN539XmXe88IyrRnRTeO3amDO9ik4gM3kTHpTcl41S9A==
+  expiration: 1800000 # 30분 - 밀리세컨초 (access token)
+  refresh-expiration: 604800000 # 7일 (refresh token)
+
+
+springdoc:
+  packages-to-scan: com.learningcrew.linkup
+  default-consumes-media-type: application/json;charset=UTF-8
+  default-produces-media-type: application/json;charset=UTF-8
+
+image:
+#  image-dir:
+  image-url: http://localhost:8080/productimgs/
+#  default-profile:
