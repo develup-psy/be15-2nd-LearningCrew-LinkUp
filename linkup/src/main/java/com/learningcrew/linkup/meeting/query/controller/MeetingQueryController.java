@@ -11,17 +11,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-//import jinwoong.cqrs.common.dto.ApiResponse;
-//import jinwoong.cqrs.product.query.dto.request.ProductSearchRequest;
-//import jinwoong.cqrs.product.query.dto.response.ProductDetailResponse;
-//import jinwoong.cqrs.product.query.dto.response.ProductListResponse;
-//import jinwoong.cqrs.product.query.service.ProductQueryService;
-//import lombok.RequiredArgsConstructor;
-//import org.springframework.http.ResponseEntity;
-//import org.springframework.web.bind.annotation.GetMapping;
-//import org.springframework.web.bind.annotation.PathVariable;
-//import org.springframework.web.bind.annotation.RestController;
-//
 @RestController
 @RequiredArgsConstructor
 public class MeetingQueryController {

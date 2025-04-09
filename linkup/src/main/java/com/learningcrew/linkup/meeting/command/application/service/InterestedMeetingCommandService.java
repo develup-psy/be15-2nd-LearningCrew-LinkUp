@@ -5,7 +5,6 @@ import com.learningcrew.linkup.meeting.command.domain.aggregate.InterestedMeetin
 import com.learningcrew.linkup.meeting.command.domain.aggregate.InterestedMeetingId;
 import com.learningcrew.linkup.meeting.command.domain.aggregate.Meeting;
 import com.learningcrew.linkup.meeting.command.domain.aggregate.Member;
-import com.learningcrew.linkup.meeting.query.dto.response.InterestedMeetingDTO;
 import com.learningcrew.linkup.meeting.command.domain.repository.InterestedMeetingRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;

@@ -1,9 +1,8 @@
 package com.learningcrew.linkup.meeting.query.dto.response;
 
-import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 
 public class MemberProfileDTO {
 

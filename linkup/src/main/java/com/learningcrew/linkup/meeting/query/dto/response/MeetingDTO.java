@@ -1,14 +1,11 @@
 package com.learningcrew.linkup.meeting.query.dto.response;
 
 import com.learningcrew.linkup.meeting.command.domain.aggregate.Gender;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.List;
 
 @Getter
 @Setter

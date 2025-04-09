@@ -1,13 +1,9 @@
 package com.learningcrew.linkup.meeting.query.controller;
 
 import com.learningcrew.linkup.meeting.common.dto.ApiResponse;
-import com.learningcrew.linkup.meeting.query.dto.request.MeetingSearchRequest;
-import com.learningcrew.linkup.meeting.query.dto.response.MeetingDetailResponse;
-import com.learningcrew.linkup.meeting.query.dto.response.MeetingListResponse;
 import com.learningcrew.linkup.meeting.query.dto.response.MeetingParticipationResponse;
 import com.learningcrew.linkup.meeting.query.dto.response.ParticipantsResponse;
 import com.learningcrew.linkup.meeting.query.service.MeetingParticipationQueryService;
-import com.learningcrew.linkup.meeting.query.service.MeetingQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

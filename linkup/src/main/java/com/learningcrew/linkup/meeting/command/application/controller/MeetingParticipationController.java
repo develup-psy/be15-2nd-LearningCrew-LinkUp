@@ -6,7 +6,6 @@ import com.learningcrew.linkup.meeting.command.application.dto.response.MeetingP
 import com.learningcrew.linkup.meeting.command.application.service.MeetingParticipationCommandService;
 import com.learningcrew.linkup.meeting.common.dto.ApiResponse;
 import com.learningcrew.linkup.meeting.query.dto.response.MemberDTO;
-import com.learningcrew.linkup.meeting.query.dto.response.ParticipantsResponse;
 import com.learningcrew.linkup.meeting.query.service.MeetingParticipationQueryService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
 import java.util.List;
 
 @RestController
