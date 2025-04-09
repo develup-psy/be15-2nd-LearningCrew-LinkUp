@@ -5,6 +5,9 @@ import com.learningcrew.linkup.meeting.command.application.dto.request.MeetingPa
 import com.learningcrew.linkup.meeting.command.application.dto.response.MeetingParticipationCommandResponse;
 import com.learningcrew.linkup.meeting.command.application.service.MeetingParticipationCommandService;
 import com.learningcrew.linkup.meeting.common.dto.ApiResponse;
+import com.learningcrew.linkup.meeting.query.dto.response.MemberDTO;
+import com.learningcrew.linkup.meeting.query.dto.response.ParticipantsResponse;
+import com.learningcrew.linkup.meeting.query.service.MeetingParticipationQueryService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -12,10 +15,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 public class MeetingParticipationController {
     private final MeetingParticipationCommandService service;
+    private final MeetingParticipationQueryService queryService;
 
     @Operation(
             summary = "모임 참가 신청",
@@ -47,6 +54,12 @@ public class MeetingParticipationController {
             @PathVariable int meetingId,
             @PathVariable int memberId
     ) {
+        List<MemberDTO> participants = queryService.getParticipants(meetingId).getParticipants();
+
+        if (!participants.stream().anyMatch(x -> x.getMemberId() == (memberId) )) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
         MeetingParticipationDeleteRequest request = MeetingParticipationDeleteRequest.builder()
                 .meetingId(meetingId)
                 .memberId(memberId)
@@ -56,8 +69,6 @@ public class MeetingParticipationController {
         service.deleteMeetingParticipation(request);
 
         MeetingParticipationCommandResponse response = MeetingParticipationCommandResponse.builder().build();
-
-        System.out.println(request.toString());
 
         return ResponseEntity.ok(ApiResponse.success(response));
 
