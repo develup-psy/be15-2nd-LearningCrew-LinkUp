@@ -1,5 +1,7 @@
 package com.learningcrew.linkup.security.jwt;
 
+import com.learningcrew.linkup.common.exception.CustomJwtException;
+import com.learningcrew.linkup.common.exception.ErrorCode;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -64,13 +66,13 @@ public class JwtTokenProvider {
             Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token);
             return true;
         }catch (SecurityException | MalformedJwtException e) {
-            throw new BadCredentialsException("Invalid JWT Token", e);
+            throw new CustomJwtException(ErrorCode.INVALID_JWT);
         } catch (ExpiredJwtException e) {
-            throw new BadCredentialsException("Expired JWT Token", e);
+            throw new CustomJwtException(ErrorCode.EXPIRED_JWT);
         } catch (UnsupportedJwtException e) {
-            throw new BadCredentialsException("Unsupported JWT Token", e);
+            throw new CustomJwtException(ErrorCode.UNSUPPORTED_JWT);
         } catch (IllegalArgumentException e) {
-            throw new BadCredentialsException("JWT Token claims empty", e);
+            throw new CustomJwtException(ErrorCode.EMPTY_JWT);
         }
     }
 

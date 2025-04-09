@@ -1,8 +1,11 @@
 package com.learningcrew.linkup.security.jwt;
 
-import jakarta.servlet.ServletException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.learningcrew.linkup.common.exception.ErrorCode;
+import com.learningcrew.linkup.common.exception.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
@@ -11,14 +14,13 @@ import java.io.IOException;
 
 @Component
 public class RestAccessDeniedHandler implements AccessDeniedHandler {
-
     @Override
-    public void handle(HttpServletRequest request,
-                       HttpServletResponse response,
-                       AccessDeniedException accessDeniedException) throws IOException, ServletException {
-        response.setContentType("application/json;charset=UTF-8");
+    public void handle(HttpServletRequest request, HttpServletResponse response,
+                       AccessDeniedException accessDeniedException) throws IOException {
+        ErrorResponse errorResponse = ErrorResponse.of(ErrorCode.FORBIDDEN);
+
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-        String jsonResponse = "{\"error\": \"Forbidden\", \"message\": \"" + accessDeniedException.getMessage() + "\"}";
-        response.getWriter().write(jsonResponse);
+        response.setContentType("application/json;charset=UTF-8");
+        response.getWriter().write(new ObjectMapper().writeValueAsString(errorResponse));
     }
 }

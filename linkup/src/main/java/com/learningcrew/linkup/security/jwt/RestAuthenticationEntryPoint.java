@@ -1,5 +1,9 @@
 package com.learningcrew.linkup.security.jwt;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.learningcrew.linkup.common.exception.CustomJwtException;
+import com.learningcrew.linkup.common.exception.ErrorCode;
+import com.learningcrew.linkup.common.exception.ErrorResponse;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -16,9 +20,19 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
     public void commence(HttpServletRequest request,
                          HttpServletResponse response,
                          AuthenticationException authException) throws IOException, ServletException {
+
+        /* jwtException 헤더로 exception 추가한 것 가져오기 */
+        CustomJwtException jwtEx = (CustomJwtException) request.getAttribute("jwtException");
+
+        /* ErrorResponse 생성 */
+        ErrorResponse errorResponse = (jwtEx != null)
+                ? ErrorResponse.of(jwtEx.getErrorCode())
+                : ErrorResponse.of(ErrorCode.UNAUTHORIZED);
+
         response.setContentType("application/json;charset=UTF-8");
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        String jsonResponse = "{\"error\": \"Unauthorized\", \"message\": \"" + authException.getMessage() + "\"}";
-        response.getWriter().write(jsonResponse);
+
+        /* ErrorResponse 직렬화후 에러 응답 전송 */
+        response.getWriter().write(new ObjectMapper().writeValueAsString(errorResponse));
     }
 }
