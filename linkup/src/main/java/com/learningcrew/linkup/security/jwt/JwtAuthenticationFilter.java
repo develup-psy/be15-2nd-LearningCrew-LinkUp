@@ -1,7 +1,5 @@
 package com.learningcrew.linkup.security.jwt;
 
-import com.learningcrew.linkup.security.command.application.service.CustomUserDetailsService;
-import com.learningcrew.linkup.security.model.CustomUserDetails;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

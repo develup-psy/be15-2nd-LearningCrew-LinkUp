@@ -7,6 +7,7 @@ import com.learningcrew.linkup.security.command.application.dto.response.TokenRe
 import com.learningcrew.linkup.security.command.domain.aggregate.RefreshToken;
 import com.learningcrew.linkup.security.command.domain.repository.RefreshtokenRepository;
 import com.learningcrew.linkup.security.jwt.JwtTokenProvider;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -58,5 +59,48 @@ public class AuthService {
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
+    }
+
+    public TokenResponse refreshToken(String providedRefreshToken) {
+        jwtTokenProvider.validateToken(providedRefreshToken);
+        String email = jwtTokenProvider.getEmailFromJWT(providedRefreshToken);
+        String role = jwtTokenProvider.getRoleFromJWT(providedRefreshToken);
+
+        RefreshToken storedToken = refreshtokenRepository.findById(email).orElseThrow(()->new BadCredentialsException("해당 유저로 조회되는 리프레시 토큰 없음"));
+
+        if(!storedToken.getToken().equals(providedRefreshToken)) {
+            throw new BadCredentialsException("refresh 토큰 일치하지 않음");
+        }
+
+        if(storedToken.getExpiryDate().before(new Date())) {
+            throw new BadCredentialsException("refresh Token 유효시간 만료");
+        }
+
+        //토큰 발급
+        String accessToken = jwtTokenProvider.createToken(email, role);
+        String refreshToken = jwtTokenProvider.createRefreshToken(email, role);
+
+        //refresh token 저장
+        RefreshToken refreshTokenEntity = RefreshToken
+                .builder()
+                .userEmail(email)
+                .token(refreshToken)
+                .expiryDate(new Date(System.currentTimeMillis() + jwtTokenProvider.getRefreshTokenExpiration()))
+                .build();
+
+        refreshtokenRepository.save(refreshTokenEntity);
+
+        return TokenResponse
+                .builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
+    }
+
+    /* 로그아웃 */
+    public void logout(@NotBlank(message = "refreshToken을 포함해주세요") String refreshToken) {
+        jwtTokenProvider.validateToken(refreshToken);
+        String email = jwtTokenProvider.getEmailFromJWT(refreshToken);
+        refreshtokenRepository.deleteById(email);
     }
 }
