@@ -1,6 +1,8 @@
 package com.learningcrew.linkup.meeting.command.application.controller;
 
+import com.learningcrew.linkup.meeting.command.application.dto.request.MeetingDeleteRequest;
 import com.learningcrew.linkup.meeting.command.application.dto.request.MeetingParticipationCreateRequest;
+import com.learningcrew.linkup.meeting.command.application.dto.response.ManageParticipationResponse;
 import com.learningcrew.linkup.meeting.command.application.service.MeetingParticipationCommandService;
 import com.learningcrew.linkup.meeting.common.dto.ApiResponse;
 import com.learningcrew.linkup.meeting.command.application.dto.request.MeetingCreateRequest;
@@ -37,7 +39,21 @@ public class MeetingCommandController {
                 .body(ApiResponse.success(response));
     }
 
-    @PutMapping("/api/v1/meetings/{meetingId}")
+    @PutMapping("/api/v1/meetings/{meetingId}/participation/{memberId}/accept")
+    public ResponseEntity<ApiResponse<ManageParticipationResponse>> acceptParticipation(
+            @PathVariable int meetingId, @PathVariable int memberId, int requestedMemberId
+    ) {
+        return null;
+    }
+
+    @PutMapping("/api/v1/meetings/{meetingId}/participation/{memberId}/reject")
+    public ResponseEntity<ApiResponse<ManageParticipationResponse>> rejectParticipation(
+            @PathVariable int meetingId, @PathVariable int memberId, int requestedMemberId
+    ) {
+        return null;
+    }
+
+    @PutMapping("/api/v1/meetings/{meetingId}/change-leader/{memberId}")
     public ResponseEntity<ApiResponse<LeaderUpdateResponse>> updateLeader(
             @RequestBody @Validated LeaderUpdateRequest leaderUpdateRequest,
             @PathVariable int meetingId
@@ -47,5 +63,14 @@ public class MeetingCommandController {
 
         return ResponseEntity.ok(ApiResponse.success(response));
     }
+
+    @DeleteMapping("/api/v1/meetings/{meetingId}/cancel")
+    public ResponseEntity<ApiResponse<MeetingCommandResponse>> deleteMeeting(
+            @PathVariable int meetingId, int memberId
+    ) {
+        return null;
+    }
+
+
 
 }
