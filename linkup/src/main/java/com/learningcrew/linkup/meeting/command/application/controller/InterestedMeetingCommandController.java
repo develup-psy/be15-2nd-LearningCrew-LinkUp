@@ -26,11 +26,16 @@ public class InterestedMeetingCommandController {
             @PathVariable int memberId,
             @RequestBody @Validated InterestedMeetingCommandRequest request
     ) {
+        if (memberId != request.getMemberId()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
         int meetingId = service.createInterestedMeeting(request);
         InterestedMeetingCommandResponse response
                 = InterestedMeetingCommandResponse
                 .builder()
                 .meetingId(meetingId)
+                .memberId(request.getMemberId())
                 .build();
 
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -46,6 +51,10 @@ public class InterestedMeetingCommandController {
             @PathVariable int memberId,
             @RequestBody @Validated InterestedMeetingCommandRequest request
     ) {
+        if (memberId != request.getMemberId()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
         service.deleteInterestedMeeting(request);
 
         return ResponseEntity.ok(ApiResponse.success(null));
