@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -22,6 +23,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @RequiredArgsConstructor
+@EnableMethodSecurity //컨트롤 메서드 제어 가능하도록 활성화
 @EnableWebSecurity
 public class SecurityConfig {
     private final JwtTokenProvider jwtTokenProvider;
@@ -44,9 +46,9 @@ public class SecurityConfig {
                 )
                 // 요청 http method, url 기준으로 인증, 인가 필요 여부 설정
                 .authorizeHttpRequests(auth ->
-                        auth.requestMatchers(HttpMethod.POST, "/api/v1/users/register", "/api/v1/auth/login").permitAll()
+                        auth.requestMatchers(HttpMethod.POST, "/api/v1/users/register", "/api/v1/auth/login", "/api/v1/auth/refresh").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/v1/users/me").hasAuthority("USER") //추후에 hasRole로 수정
-                                .requestMatchers(HttpMethod.GET, "/api/v1/admin").hasAuthority("ADMIN")
+                                .requestMatchers(HttpMethod.GET, "/api/v1/admin/**").hasAuthority("ADMIN")
                                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                                 .anyRequest().authenticated()
                 )
