@@ -1,21 +1,44 @@
 package com.learningcrew.linkup.linker.command.domain.service;
 
+import com.learningcrew.linkup.linker.command.domain.aggregate.Role;
+import com.learningcrew.linkup.linker.command.domain.aggregate.Status;
+import com.learningcrew.linkup.linker.command.domain.aggregate.User;
+import com.learningcrew.linkup.linker.command.domain.repository.RoleRepository;
+import com.learningcrew.linkup.linker.command.domain.repository.StatusRepository;
+import com.learningcrew.linkup.linker.command.domain.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+@Service
+@RequiredArgsConstructor
 public class UserDomainService {
+    private final RoleRepository roleRepository;
+    private final StatusRepository statusRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
 
-    /* 닉네임 임의자동생성 */
+    /* 비밀번호 암호화 */
+    public void encryptPassword(User user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+    }
 
-    /* 이메일 중복체크 */
+    /* 권한 설정 */
+    public void assignRole(User user, String roleName) {
+        Role role = roleRepository.findByRoleName(roleName);
+        user.setRole(role);
+    }
 
-    /* 전화번호 중복체크 */
+    /* 초기 상태 설정 */
+    public void assignStatus(User user, String statusName) {
+        Status status = statusRepository.findByStatusType(statusName);
+        user.setStatus(status);
+    }
 
-    /* 닉네임 중복체크 */
+    /* 회원 삽입 */
+    public void saveUser(User user) {
+        userRepository.save(user);
+    }
 
-    /* 이메일로 회원유무 확인 */
-
-    /* 회원정보 수정 */
-
-    /* 회원 삭제 */
-
-    /* 비밀번호 확인 */
 
 }

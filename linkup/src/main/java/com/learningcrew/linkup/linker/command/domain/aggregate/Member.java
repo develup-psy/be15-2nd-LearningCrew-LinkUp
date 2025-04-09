@@ -35,4 +35,8 @@ public class Member {
     public void setMemberId(int userId) {
         this.memberId = userId;
     }
+
+    public void setNickName(String nickname) {
+        this.nickname = nickname;
+    }
 }
