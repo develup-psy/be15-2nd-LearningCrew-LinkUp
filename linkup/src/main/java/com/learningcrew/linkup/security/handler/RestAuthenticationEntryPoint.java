@@ -1,4 +1,4 @@
-package com.learningcrew.linkup.security.jwt;
+package com.learningcrew.linkup.security.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.learningcrew.linkup.common.exception.CustomJwtException;

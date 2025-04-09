@@ -1,48 +1,43 @@
 package com.learningcrew.linkup.linker.command.application.controller;
 
-import com.learningcrew.linkup.linker.command.application.dto.UserCreateRequest;
-import com.learningcrew.linkup.linker.command.application.service.UserCommandService;
 import com.learningcrew.linkup.common.dto.ApiResponse;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import com.learningcrew.linkup.linker.command.application.dto.LoginRequest;
+import com.learningcrew.linkup.linker.command.application.dto.RefreshTokenRequest;
+import com.learningcrew.linkup.linker.command.application.dto.TokenResponse;
+import com.learningcrew.linkup.linker.command.application.service.UserAuthCommandService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-
-@Tag(name = "User API", description = "회원 관련 API")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/users")
+@RequestMapping("/api/v1/auth")
 public class UserAuthCommandController {
-    private final UserCommandService userCommandService;
+    private final UserAuthCommandService userAuthCommandService;
 
-    /* 회원 가입 */
-    @PostMapping("/register")
-    @Operation(
-            summary = "회원가입", description = "이메일과 비밀번호, 전화번호 등의 정보를 입력하여 회원으로 가입할 수 있다."
-    )
-    public ResponseEntity<ApiResponse<Void>> register(@Valid @RequestBody UserCreateRequest request) {
-        userCommandService.registerUser(request);
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(ApiResponse.success(null));
+    /* 자체 로그인 */
+    @PostMapping("/login")
+    public ResponseEntity<ApiResponse<TokenResponse>> login(@Valid @RequestBody LoginRequest request){
+        TokenResponse token = userAuthCommandService.login(request);
+        return ResponseEntity.ok(ApiResponse.success(token));
     }
 
-    /* 이메일 찾기 */
-
-    /* 비밀번호 찾기 - 비밀번호 재설정 url 발송 */
-
-    /* 비밀번호 찾기 - 비밀번호 재설정 */
+    /* 토큰 재발급 */
+    @PostMapping("/refresh")
+    public ResponseEntity<ApiResponse<TokenResponse>> getAccessTokenByRefreshToken(@Valid @RequestBody RefreshTokenRequest request){
+        TokenResponse response = userAuthCommandService.refreshToken(request.getRefreshToken());
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
 
     /* 로그아웃 */
-
-
-
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponse<Void>> logout(@Valid @RequestBody RefreshTokenRequest request){
+        userAuthCommandService.logout(request.getRefreshToken());
+        return ResponseEntity.ok(ApiResponse.success(null));
+    }
 
 }

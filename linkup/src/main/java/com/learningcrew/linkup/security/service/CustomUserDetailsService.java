@@ -1,10 +1,9 @@
-package com.learningcrew.linkup.security.command.application.service;
+package com.learningcrew.linkup.security.service;
 
 import com.learningcrew.linkup.linker.command.domain.aggregate.User;
 import com.learningcrew.linkup.linker.command.domain.repository.UserRepository;
-import com.learningcrew.linkup.security.model.CustomUserDetails;
+import com.learningcrew.linkup.security.jwt.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;

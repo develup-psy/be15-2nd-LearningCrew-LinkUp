@@ -1,4 +1,4 @@
-package com.learningcrew.linkup.security.command.application.dto.request;
+package com.learningcrew.linkup.linker.command.application.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;

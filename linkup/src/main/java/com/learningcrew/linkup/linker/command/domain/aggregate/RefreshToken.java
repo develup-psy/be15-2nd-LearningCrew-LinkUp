@@ -1,4 +1,4 @@
-package com.learningcrew.linkup.security.command.domain.aggregate;
+package com.learningcrew.linkup.linker.command.domain.aggregate;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;

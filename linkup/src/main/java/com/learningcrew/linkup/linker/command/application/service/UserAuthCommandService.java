@@ -1,11 +1,11 @@
-package com.learningcrew.linkup.security.command.application.service;
+package com.learningcrew.linkup.linker.command.application.service;
 
+import com.learningcrew.linkup.linker.command.application.dto.LoginRequest;
+import com.learningcrew.linkup.linker.command.application.dto.TokenResponse;
+import com.learningcrew.linkup.linker.command.domain.aggregate.RefreshToken;
 import com.learningcrew.linkup.linker.command.domain.aggregate.User;
+import com.learningcrew.linkup.linker.command.domain.repository.RefreshtokenRepository;
 import com.learningcrew.linkup.linker.command.domain.repository.UserRepository;
-import com.learningcrew.linkup.security.command.application.dto.request.LoginRequest;
-import com.learningcrew.linkup.security.command.application.dto.response.TokenResponse;
-import com.learningcrew.linkup.security.command.domain.aggregate.RefreshToken;
-import com.learningcrew.linkup.security.command.domain.repository.RefreshtokenRepository;
 import com.learningcrew.linkup.security.jwt.JwtTokenProvider;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +18,7 @@ import java.util.Date;
 
 @Service
 @RequiredArgsConstructor
-public class AuthService {
+public class UserAuthCommandService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
