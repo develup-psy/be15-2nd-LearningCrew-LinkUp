@@ -1,0 +1,43 @@
+spring:
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://${DB_HOST}:${DB_PORT}/${DB_NAME}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+  mapper-locations: classpath*:mappers/**/*.xml
+  type-aliases-package: >
+    com.learningcrew.linkup.linker.query.dto,
+    com.learningcrew.linkup.community.query.dto,
+    com.learningcrew.linkup.meeting.query.dto,
+    com.learningcrew.linkup.notification.query.dto,
+    com.learningcrew.linkup.place.query.dto,
+    com.learningcrew.linkup.point.query.dto,
+    com.learningcrew.linkup.report.query.dto,
+    com.learningcrew.linkup.security
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: ${JWT_ACCESS_EXPIRATION}
+  refresh-expiration: ${JWT_REFRESH_EXPIRATION}
+
+springdoc:
+  packages-to-scan: com.learningcrew.linkup
+  default-consumes-media-type: application/json;charset=UTF-8
+  default-produces-media-type: application/json;charset=UTF-8
+
+image:
+  image-dir: ${IMAGE_DIR}
+  image-url: ${IMAGE_URL}
+  default-profile: ${DEFAULT_PROFILE_IMAGE}
