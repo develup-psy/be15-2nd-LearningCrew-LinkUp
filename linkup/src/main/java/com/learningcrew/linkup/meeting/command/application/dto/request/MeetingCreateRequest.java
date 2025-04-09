@@ -1,8 +1,6 @@
 package com.learningcrew.linkup.meeting.command.application.dto.request;
 
 import com.learningcrew.linkup.meeting.command.domain.aggregate.Gender;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
