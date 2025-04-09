@@ -1,5 +1,6 @@
 package com.learningcrew.linkup.meeting.command.application.service;
 
+import com.learningcrew.linkup.meeting.command.application.dto.request.MeetingParticipationDeleteRequest;
 import com.learningcrew.linkup.meeting.command.domain.aggregate.MeetingParticipationHistory;
 import com.learningcrew.linkup.meeting.command.domain.repository.MeetingParticipationHistoryRepository;
 import com.learningcrew.linkup.meeting.command.application.dto.request.MeetingParticipationCreateRequest;
@@ -25,4 +26,16 @@ public class MeetingParticipationCommandService {
         return history.getParticipationId();
     }
 
+    public long deleteMeetingParticipation(MeetingParticipationDeleteRequest request) {
+//        MeetingParticipationHistory history = repository.findByMemberIdAndMeetingId(
+//                request.getMemberId(), request.getMeetingId()
+//        ).orElseThrow(() -> new NotFoundException("참여 정보가 없습니다."));
+
+//        history.setStatusId(request.getStatusId()); // soft delete
+//
+//        repository.save(history);
+
+//        return history.getParticipationId();
+        return 0;
+    }
 }

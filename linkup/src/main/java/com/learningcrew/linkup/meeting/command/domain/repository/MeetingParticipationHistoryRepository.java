@@ -4,4 +4,6 @@ import com.learningcrew.linkup.meeting.command.domain.aggregate.MeetingParticipa
 
 public interface MeetingParticipationHistoryRepository {
     MeetingParticipationHistory save(MeetingParticipationHistory history);
+
+    void delete(MeetingParticipationHistory history);
 }

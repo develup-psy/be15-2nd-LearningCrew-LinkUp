@@ -5,17 +5,16 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.apache.ibatis.annotations.Update;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
-import java.sql.Time;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Entity
 @Table(name = "meeting_participation_history")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@Setter
 public class MeetingParticipationHistory {
 
     @Id
