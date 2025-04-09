@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 
 @Service
@@ -17,9 +18,26 @@ public class MeetingParticipationQueryService {
 
     private final MeetingParticipationMapper mapper;
 
+    /* 모임에 속한 참가자 전체 조회 */
     @Transactional(readOnly = true)
     public ParticipantsResponse getParticipants(int meetingId) {
         List<MemberDTO> response = mapper.selectParticipantsByMeetingId(meetingId);
+
+        return ParticipantsResponse.builder()
+                .participants(response)
+                .build();
+    }
+
+
+    @Transactional(readOnly = true)
+    public ParticipantsResponse getParticipants(int meetingId, int memberId) {
+        List<MemberDTO> response = mapper.selectParticipantsByMeetingId(meetingId);
+        MeetingParticipationDTO participation = mapper.selectMeetingParticipationByMeetingIdAndMemberId(meetingId, memberId);
+
+        // TODO: 커스텀 예외로 변경
+//        if (participation == null) {
+//            throw new AccessDeniedException("해당 모임에 참여하지 않은 회원입니다.");
+//        }
 
         return ParticipantsResponse.builder()
                 .participants(response)
