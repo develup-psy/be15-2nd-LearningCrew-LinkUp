@@ -5,6 +5,32 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 public enum ErrorCode {
+    /* 400 BAD_REQUEST: 잘못된 요청 */
+    BAD_REQUEST(HttpStatus.BAD_REQUEST, "Invalid request."),
+
+    /* 409 CONFLICT : 서버와의 충돌 */
+    NOT_SAVED(HttpStatus.CONFLICT, "Not saved."),
+
+    /* 401 UNAUTHORIZED: 인증되지 않은 사용자의 요청 */
+    UNAUTHORIZED_REQUEST(HttpStatus.UNAUTHORIZED, "Unauthorized."),
+
+    /* 403 FORBIDDEN: 권한이 없는 사용자의 요청 */
+    FORBIDDEN_ACCESS(HttpStatus.FORBIDDEN, "Forbidden."),
+
+    /* 404 NOT_FOUND: 리소스를 찾을 수 없음 */
+    NOT_FOUND(HttpStatus.NOT_FOUND, "Not found."),
+
+    /* 405 METHOD_NOT_ALLOWED: 허용되지 않은 Request Method 호출 */
+    METHOD_NOT_ALLOWED(HttpStatus.METHOD_NOT_ALLOWED, "Not allowed method."),
+
+    /* 409 DUPLICATE_ENTRY: 이미 값이 존재 */
+    CONFLICT(HttpStatus.CONFLICT, "Data Conflict"),
+
+    /* 422 UNPROCESSABLE_ENTITY: 요청은 잘 만들어졌지만, 문법 오류로 인하여 따를 수 없습니다. */
+    UNPROCESSABLE_ENTITY(HttpStatus.UNPROCESSABLE_ENTITY, "Unprocessable Entity"),
+
+    /* 500 INTERNAL_SERVER_ERROR: 내부 서버 오류 */
+    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Server error."),
 
     // 인증 & 인가 관련
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "인증이 필요합니다."),
@@ -20,6 +46,18 @@ public enum ErrorCode {
     DUPLICATE_CONTACT_NUMBER(HttpStatus.BAD_REQUEST, "이미 존재하는 번호입니다."),
     DUPLICATE_NICKNAME(HttpStatus.BAD_REQUEST, "이미 존재하는 닉네임입니다."),
     INVALID_CREDENTIALS(HttpStatus.BAD_REQUEST, "아이디 혹은 비밀번호가 올바르지 않습니다."),
+    ALREADY_VERIFIED(HttpStatus.BAD_REQUEST, "이미 인증을 거친 계정입니다"),
+    INVALID_STATUS(HttpStatus.BAD_REQUEST, "유효하지 않은 상태입니다."),
+
+
+    //메일
+    SEND_MAIL_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "메일 발송에 실패했습니다."),
+    NOT_AUTHORIZED_USER_EMAIL(HttpStatus.BAD_REQUEST, "이메일이 인증되지 않아 회원 가입에 실패했습니다."),
+    EXPIRE_VERIFICATION_CODE(HttpStatus.NOT_FOUND, "인증시간이 만료되었습니다. 다시 요청해주세요."),
+    TOKEN_ALREADY_SENT(HttpStatus.CONFLICT, "이미 비밀번호 재설정 이메일이 전송되었습니다. 잠시 후 다시 시도해 주세요."),
+    INVALID_VERIFICATION_TOKEN(HttpStatus.BAD_REQUEST, "이메일 인증코드가 일치하지 않습니다. "),
+    INVALID_TOKEN_TYPE(HttpStatus.BAD_REQUEST, "이메일 타입이 일치하지 않습니다."),
+
 
     // 토큰
     REFRESH_TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "refresh 토큰이 존재하지 않습니다."),
@@ -58,11 +96,8 @@ public enum ErrorCode {
     REVIEW_NOT_FOUND(HttpStatus.NOT_FOUND, "후기를 찾을 수 없습니다."),
     REVIEW_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "이미 후기를 작성하셨습니다."),
     UNAUTHORIZED_REVIEW_EDIT(HttpStatus.FORBIDDEN, "해당 후기를 수정할 수 없습니다."),
-    INVALID_REVIEW_SCORE(HttpStatus.BAD_REQUEST, "유효하지 않은 평점입니다."),
+    INVALID_REVIEW_SCORE(HttpStatus.BAD_REQUEST, "유효하지 않은 평점입니다.");
 
-    // 공통
-    INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST, "잘못된 입력입니다."),
-    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 오류가 발생했습니다.");
 
     private final HttpStatus status;
     private final String message;
