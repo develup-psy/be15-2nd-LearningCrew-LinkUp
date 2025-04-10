@@ -102,7 +102,7 @@ public class MeetingCommandController {
     public ResponseEntity<ApiResponse<LeaderUpdateResponse>> updateLeader(
             @PathVariable int meetingId, @PathVariable int memberId, @RequestParam int requestedMemberId
     ) {
-        meetingCommandService.updateLeader(meetingId, memberId, requestedMemberId);
+         meetingCommandService.updateLeader(meetingId, memberId, requestedMemberId);
         LeaderUpdateResponse response = new LeaderUpdateResponse(meetingId);
 
         return ResponseEntity.ok(ApiResponse.success(response));
