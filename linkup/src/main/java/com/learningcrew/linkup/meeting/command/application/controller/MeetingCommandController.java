@@ -1,17 +1,14 @@
 package com.learningcrew.linkup.meeting.command.application.controller;
 
-import com.learningcrew.linkup.meeting.command.application.dto.request.MeetingDeleteRequest;
+import com.learningcrew.linkup.meeting.command.application.dto.request.MeetingCreateRequest;
 import com.learningcrew.linkup.meeting.command.application.dto.request.MeetingParticipationCreateRequest;
+import com.learningcrew.linkup.meeting.command.application.dto.response.LeaderUpdateResponse;
 import com.learningcrew.linkup.meeting.command.application.dto.response.ManageParticipationResponse;
+import com.learningcrew.linkup.meeting.command.application.dto.response.MeetingCommandResponse;
+import com.learningcrew.linkup.meeting.command.application.service.MeetingCommandService;
 import com.learningcrew.linkup.meeting.command.application.service.MeetingParticipationCommandService;
 import com.learningcrew.linkup.meeting.common.dto.ApiResponse;
-import com.learningcrew.linkup.meeting.command.application.dto.request.MeetingCreateRequest;
-import com.learningcrew.linkup.meeting.command.application.dto.request.LeaderUpdateRequest;
-import com.learningcrew.linkup.meeting.command.application.service.MeetingCommandService;
-import com.learningcrew.linkup.meeting.command.application.dto.response.MeetingCommandResponse;
-import com.learningcrew.linkup.meeting.command.application.dto.response.LeaderUpdateResponse;
 import com.learningcrew.linkup.meeting.query.dto.response.MeetingParticipationDTO;
-import com.learningcrew.linkup.meeting.query.dto.response.MemberDTO;
 import com.learningcrew.linkup.meeting.query.service.MeetingParticipationQueryService;
 import com.learningcrew.linkup.meeting.query.service.MeetingQueryService;
 import lombok.RequiredArgsConstructor;
@@ -50,7 +47,9 @@ public class MeetingCommandController {
     public ResponseEntity<ApiResponse<ManageParticipationResponse>> acceptParticipation(
             @PathVariable int meetingId, @PathVariable int memberId, @RequestParam int requestedMemberId
     ) {
-        int leaderId = meetingQueryService.getMeeting(meetingId).getMeeting().getLeaderId();
+        int leaderId = meetingQueryService.getMeeting(meetingId)
+                .getMeeting()
+                .getLeaderId();
         if (leaderId != requestedMemberId) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
@@ -110,9 +109,20 @@ public class MeetingCommandController {
 
     @DeleteMapping("/api/v1/meetings/{meetingId}/cancel")
     public ResponseEntity<ApiResponse<MeetingCommandResponse>> deleteMeeting(
-            @PathVariable int meetingId, int memberId
+            @PathVariable int meetingId, @RequestParam int memberId
     ) {
-        return null;
+        int leaderId = meetingQueryService.getMeeting(meetingId)
+                .getMeeting()
+                .getLeaderId();
+
+        if (leaderId != memberId) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        MeetingCommandResponse response = new MeetingCommandResponse(meetingId);
+
+        meetingCommandService.deleteMeeting(meetingId);
+        return ResponseEntity.ok().body(ApiResponse.success(response));
     }
 
 

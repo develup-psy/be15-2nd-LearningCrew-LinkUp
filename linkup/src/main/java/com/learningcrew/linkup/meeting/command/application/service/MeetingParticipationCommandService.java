@@ -52,15 +52,12 @@ public class MeetingParticipationCommandService {
     }
 
     @Transactional
-    public long deleteMeetingParticipation(MeetingParticipationDeleteRequest request) {
-        MeetingParticipationDTO history = mapper.selectMeetingParticipationByMeetingIdAndMemberId(
-                request.getMeetingId(), request.getMemberId());
-
+    public long deleteMeetingParticipation(MeetingParticipationDTO history) {
 //        if (history == null) {
 //            throw new NotFoundException("참여 정보가 없습니다.");
 //        }
 
-        history.setStatusId(request.getStatusId()); // soft delete
+        history.setStatusId(4); // soft delete
 
         repository.save(modelMapper.map(history, MeetingParticipationHistory.class));
 
