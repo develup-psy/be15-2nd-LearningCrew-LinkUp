@@ -1,9 +1,10 @@
 package com.learningcrew.linkup.linker.command.application.service;
 
+import com.learningcrew.linkup.linker.command.application.dto.response.RegisterResponse;
 import com.learningcrew.linkup.linker.command.domain.aggregate.Member;
 import com.learningcrew.linkup.linker.command.domain.aggregate.User;
 import com.learningcrew.linkup.linker.command.domain.repository.UserRepository;
-import com.learningcrew.linkup.linker.command.application.dto.UserCreateRequest;
+import com.learningcrew.linkup.linker.command.application.dto.request.UserCreateRequest;
 import com.learningcrew.linkup.linker.command.domain.service.MemberDomainService;
 import com.learningcrew.linkup.linker.command.domain.service.UserDomainService;
 import com.learningcrew.linkup.linker.command.domain.service.UserValidatorService;
@@ -22,11 +23,12 @@ public class UserAccountCommandService {
     private final UserValidatorService userValidatorService;
     private final UserDomainService userDomainService;
     private final MemberDomainService memberDomainService;
+    private final EmailService emailService;
 
 
     /* 유저 생성 - 회원 가입 */
     @Transactional
-    public void registerUser(@Valid UserCreateRequest request) {
+    public RegisterResponse registerUser(@Valid UserCreateRequest request) {
         User user = modelMapper.map(request, User.class);
 
         // 중복 체크
@@ -58,7 +60,19 @@ public class UserAccountCommandService {
 
         // Member 엔티티 생성 및 저장
         memberDomainService.saveMember(member, user.getUserId());
+
+        // 이메일 전송 및 저장
+        emailService.sendVerificationCode(user.getUserId(), user.getEmail(), user.getUserName());
+
+        return RegisterResponse
+                .builder()
+                .userId(user.getUserId())
+                .email(user.getEmail())
+                .status("PENDING")
+                .build();
     }
+
+    /* 이메일 인증 */
 
     /* 회원 정보 수정 - 닉네임, 휴대폰, 비밀번호 */
 

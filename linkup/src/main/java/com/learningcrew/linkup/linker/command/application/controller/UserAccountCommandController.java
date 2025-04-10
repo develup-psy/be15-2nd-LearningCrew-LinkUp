@@ -1,7 +1,9 @@
 package com.learningcrew.linkup.linker.command.application.controller;
 
-import com.learningcrew.linkup.linker.command.application.dto.LoginRequest;
-import com.learningcrew.linkup.linker.command.application.dto.UserCreateRequest;
+import com.learningcrew.linkup.linker.command.application.dto.request.FindPasswordRequest;
+import com.learningcrew.linkup.linker.command.application.dto.request.LoginRequest;
+import com.learningcrew.linkup.linker.command.application.dto.request.UserCreateRequest;
+import com.learningcrew.linkup.linker.command.application.dto.response.RegisterResponse;
 import com.learningcrew.linkup.linker.command.application.service.UserAuthCommandService;
 import com.learningcrew.linkup.linker.command.application.service.UserAccountCommandService;
 import com.learningcrew.linkup.common.dto.ApiResponse;
@@ -27,13 +29,12 @@ public class UserAccountCommandController {
     @Operation(
             summary = "회원가입", description = "이메일과 비밀번호, 전화번호 등의 정보를 입력하여 회원으로 가입할 수 있다."
     )
-    public ResponseEntity<ApiResponse<Void>> register(@Valid @RequestBody UserCreateRequest request) {
-        userCommandService.registerUser(request);
+    public ResponseEntity<ApiResponse<RegisterResponse>> register(@Valid @RequestBody UserCreateRequest request) {
+        RegisterResponse response = userCommandService.registerUser(request);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(ApiResponse.success(null));
+                .body(ApiResponse.success(response, "회원 가입 요청에 성공했습니다. 이메일 인증을 완료해주세요."));
     }
-
 
     /* 회원 탈퇴 */
     @DeleteMapping("/withdraw")
@@ -47,9 +48,10 @@ public class UserAccountCommandController {
         return null;
     }
 
-    /* 비밀번호 찾기 */
-    @PostMapping("/find-password")
-    public ResponseEntity<ApiResponse<Void>> findPassword(@Valid @RequestBody LoginRequest request) {
+    /* 비밀번호 찾기 - 비밀번호 재설정 url 발송 */
+    @PostMapping("/send-pw-reset-url")
+    @Operation(summary = "비밀번호 재설정 URL 발송", description = "이메일과 휴대폰로 비밀번호 재설정 url을 이메일로 발송")
+    public ResponseEntity<ApiResponse<Void>> sendPasswordResetUrl(@Valid @RequestBody FindPasswordRequest request) {
         return null;
     }
 
