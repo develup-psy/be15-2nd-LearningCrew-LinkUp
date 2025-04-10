@@ -1,9 +1,9 @@
 package com.learningcrew.linkup.meeting.command.application.controller;
 
+import com.learningcrew.linkup.common.dto.ApiResponse;
 import com.learningcrew.linkup.meeting.command.application.dto.request.InterestedMeetingCommandRequest;
 import com.learningcrew.linkup.meeting.command.application.dto.response.InterestedMeetingCommandResponse;
 import com.learningcrew.linkup.meeting.command.application.service.InterestedMeetingCommandService;
-import com.learningcrew.linkup.meeting.common.dto.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
