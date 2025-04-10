@@ -64,9 +64,11 @@ public class MeetingParticipationController {
                 .statusId(4)
                 .build();
 
-        service.deleteMeetingParticipation(request);
+        long participationId = service.deleteMeetingParticipation(request);
 
-        MeetingParticipationCommandResponse response = MeetingParticipationCommandResponse.builder().build();
+        MeetingParticipationCommandResponse response = MeetingParticipationCommandResponse.builder()
+                .participationId(participationId)
+                .build();
 
         return ResponseEntity.ok(ApiResponse.success(response));
 

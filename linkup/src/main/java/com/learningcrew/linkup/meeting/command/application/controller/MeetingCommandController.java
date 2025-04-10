@@ -100,10 +100,9 @@ public class MeetingCommandController {
 
     @PutMapping("/api/v1/meetings/{meetingId}/change-leader/{memberId}")
     public ResponseEntity<ApiResponse<LeaderUpdateResponse>> updateLeader(
-            @RequestBody @Validated LeaderUpdateRequest leaderUpdateRequest,
-            @PathVariable int meetingId
+            @PathVariable int meetingId, @PathVariable int memberId, @RequestParam int requestedMemberId
     ) {
-        meetingCommandService.updateLeader(leaderUpdateRequest);
+        meetingCommandService.updateLeader(meetingId, memberId, requestedMemberId);
         LeaderUpdateResponse response = new LeaderUpdateResponse(meetingId);
 
         return ResponseEntity.ok(ApiResponse.success(response));

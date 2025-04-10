@@ -26,17 +26,13 @@ public class MeetingCommandService {
         return meeting.getMeetingId();
     }
 
-    /* 주최자 변경 (모임 수정) */
-    @Transactional
-    public void updateLeader(LeaderUpdateRequest request) {
-        Meeting meeting = meetingRepository.findById(request.getMeetingId())
-                .orElseThrow(() -> new IllegalArgumentException("해당 모임이 존재하지 않습니다."));
-
-        meeting.setLeaderId(request.getLeaderId());
-    }
-
     /* 모임 삭제 */
     @Transactional
     public void deleteMeeting(int meetingId) {}
 
+    /* 주최자 변경 */
+    @Transactional
+    public void updateLeader(int meetingId, int memberId, int requestedMemberId) {
+
+    }
 }
