@@ -1,4 +1,4 @@
-package com.learningcrew.linkup.linker.command.application.dto;
+package com.learningcrew.linkup.linker.command.application.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;

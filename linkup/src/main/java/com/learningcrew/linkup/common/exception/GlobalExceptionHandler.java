@@ -60,8 +60,8 @@ public class GlobalExceptionHandler {
 
         log.warn("[ValidationException] {}", errorMessage);
         return ResponseEntity
-                .status(ErrorCode.INVALID_INPUT_VALUE.getStatus())
-                .body(ErrorResponse.of(ErrorCode.INVALID_INPUT_VALUE, errorMessage));
+                .status(ErrorCode.BAD_REQUEST.getStatus())
+                .body(ErrorResponse.of(ErrorCode.BAD_REQUEST, errorMessage));
     }
 
     /* 예상하지 못한 모든 예외 처리 */

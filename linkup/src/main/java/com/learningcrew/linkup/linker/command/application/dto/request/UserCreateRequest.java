@@ -1,4 +1,4 @@
-package com.learningcrew.linkup.linker.command.application.dto;
+package com.learningcrew.linkup.linker.command.application.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Getter
 @RequiredArgsConstructor
@@ -36,7 +35,6 @@ public class UserCreateRequest {
 
     @Size(max = 30, message = "닉네임은 최대 30자까지 가능합니다.")
     @Schema(description="닉네임", example = "닉네임", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotBlank(message = "닉네임은 필수입니다.")
     private final String nickname;
 
     @Past(message = "생년월일이 유효하지 않습니다. ")

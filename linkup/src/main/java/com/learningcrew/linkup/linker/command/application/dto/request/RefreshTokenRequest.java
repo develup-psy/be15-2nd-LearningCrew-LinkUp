@@ -1,4 +1,4 @@
-package com.learningcrew.linkup.linker.command.application.dto;
+package com.learningcrew.linkup.linker.command.application.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
