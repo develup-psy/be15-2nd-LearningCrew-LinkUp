@@ -1,5 +1,6 @@
 package com.learningcrew.linkup.meeting.command.application.controller;
 
+import com.learningcrew.linkup.common.dto.ApiResponse;
 import com.learningcrew.linkup.meeting.command.application.dto.request.MeetingCreateRequest;
 import com.learningcrew.linkup.meeting.command.application.dto.request.MeetingParticipationCreateRequest;
 import com.learningcrew.linkup.meeting.command.application.dto.response.LeaderUpdateResponse;
@@ -7,7 +8,6 @@ import com.learningcrew.linkup.meeting.command.application.dto.response.ManagePa
 import com.learningcrew.linkup.meeting.command.application.dto.response.MeetingCommandResponse;
 import com.learningcrew.linkup.meeting.command.application.service.MeetingCommandService;
 import com.learningcrew.linkup.meeting.command.application.service.MeetingParticipationCommandService;
-import com.learningcrew.linkup.meeting.common.dto.ApiResponse;
 import com.learningcrew.linkup.meeting.query.dto.response.MeetingParticipationDTO;
 import com.learningcrew.linkup.meeting.query.service.MeetingParticipationQueryService;
 import com.learningcrew.linkup.meeting.query.service.MeetingQueryService;
@@ -57,7 +57,7 @@ public class MeetingCommandController {
         List<MeetingParticipationDTO> appliers = participationQueryService.getHistories(meetingId, 1).getMeetingParticipations();
 
         if (appliers.stream().noneMatch(applier -> applier.getMemberId() == memberId)) {
-            return ResponseEntity.badRequest().body(ApiResponse.failure(HttpStatus.BAD_REQUEST.name(), "참가 신청하지 않은 회원입니다."));
+            return ResponseEntity.badRequest().body(ApiResponse.failure( "참가 신청하지 않은 회원입니다."));
         }
 
         long participationId = service.acceptParticipation(meetingId, memberId);
@@ -83,7 +83,7 @@ public class MeetingCommandController {
         List<MeetingParticipationDTO> appliers = participationQueryService.getHistories(meetingId, 1).getMeetingParticipations();
 
         if (appliers.stream().noneMatch(applier -> applier.getMemberId() == memberId)) {
-            return ResponseEntity.badRequest().body(ApiResponse.failure(HttpStatus.BAD_REQUEST.name(), "참가 신청하지 않은 회원입니다."));
+            return ResponseEntity.badRequest().body(ApiResponse.failure("참가 신청하지 않은 회원입니다."));
         }
 
         long participationId = service.rejectParticipation(meetingId, memberId);
@@ -101,7 +101,7 @@ public class MeetingCommandController {
     public ResponseEntity<ApiResponse<LeaderUpdateResponse>> updateLeader(
             @PathVariable int meetingId, @PathVariable int memberId, @RequestParam int requestedMemberId
     ) {
-         meetingCommandService.updateLeader(meetingId, memberId, requestedMemberId);
+        meetingCommandService.updateLeader(meetingId, memberId, requestedMemberId);
         LeaderUpdateResponse response = new LeaderUpdateResponse(meetingId);
 
         return ResponseEntity.ok(ApiResponse.success(response));

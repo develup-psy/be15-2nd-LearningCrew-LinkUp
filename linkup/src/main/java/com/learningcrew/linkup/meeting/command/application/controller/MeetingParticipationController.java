@@ -1,5 +1,6 @@
 package com.learningcrew.linkup.meeting.command.application.controller;
 
+import com.learningcrew.linkup.common.dto.ApiResponse;
 import com.learningcrew.linkup.meeting.command.application.dto.request.MeetingParticipationCreateRequest;
 import com.learningcrew.linkup.meeting.command.application.dto.request.MeetingParticipationDeleteRequest;
 import com.learningcrew.linkup.meeting.command.application.dto.response.MeetingParticipationCommandResponse;
