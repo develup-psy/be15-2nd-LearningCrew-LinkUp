@@ -20,7 +20,7 @@
         <if test="address != null and address != ''">
             AND p.address LIKE CONCAT('%', #{address}, '%')
         </if>
-        AND p.is_active = "Y"
+        AND p.is_active = 'Y'
         GROUP BY p.place_id, p.place_name, p.address
         ORDER BY p.place_id DESC
         LIMIT #{limit} OFFSET #{offset}
