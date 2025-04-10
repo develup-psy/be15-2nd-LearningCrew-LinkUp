@@ -1,26 +1,31 @@
 package com.learningcrew.linkup.meeting.command.domain.aggregate;
 
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.EmbeddedId;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "interested_meeting")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
 @Getter
 public class InterestedMeeting {
 
     @EmbeddedId
     private InterestedMeetingId interestedMeetingId;
 
-    @ManyToOne
-    @MapsId("meetingId") // EmbeddedId의 필드명
-    @JoinColumn(name = "meeting_id")
-    private Meeting meeting;
+    public InterestedMeeting(InterestedMeetingId id) {
+        this.interestedMeetingId = id;
+    }
 
-    @ManyToOne
-    @MapsId("memberId") // EmbeddedId의 필드명
-    @JoinColumn(name = "member_id")
-    private Member member;
+    // 편의 메서드 추가 (필요할 경우)
+    public int getMeetingId() {
+        return interestedMeetingId.getMeetingId();
+    }
 
+    public int getMemberId() {
+        return interestedMeetingId.getMemberId();
+    }
 }

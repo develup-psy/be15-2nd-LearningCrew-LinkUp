@@ -1,7 +1,6 @@
 package com.learningcrew.linkup.meeting.command.application.service;
 
 import com.learningcrew.linkup.meeting.command.application.dto.request.MeetingCreateRequest;
-import com.learningcrew.linkup.meeting.command.application.dto.request.LeaderUpdateRequest;
 import com.learningcrew.linkup.meeting.command.domain.aggregate.Meeting;
 import com.learningcrew.linkup.meeting.command.domain.repository.MeetingRepository;
 import lombok.RequiredArgsConstructor;

@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Table(name = "interested_meeting")
@@ -15,15 +14,18 @@ public class BestPlayer {
     @EmbeddedId
     private BestPlayerId bestPlayerId;
 
-    @ManyToOne
-    @MapsId("meetingId") // EmbeddedId의 필드명
-    @JoinColumn(name = "meeting_id")
-    private Meeting meeting;
+    public BestPlayer(BestPlayerId id) {
+        this.bestPlayerId = id;
+    }
 
-    @ManyToOne
-    @MapsId("memberId") // EmbeddedId의 필드명
-    @JoinColumn(name = "member_id")
-    private Member member;
+    // 편의 메서드 추가 (필요할 경우)
+    public int getMeetingId() {
+        return bestPlayerId.getMeetingId();
+    }
+
+    public int getMemberId() {
+        return bestPlayerId.getMemberId();
+    }
 
 }
 
