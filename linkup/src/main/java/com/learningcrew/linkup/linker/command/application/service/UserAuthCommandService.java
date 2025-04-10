@@ -3,23 +3,23 @@ package com.learningcrew.linkup.linker.command.application.service;
 import com.learningcrew.linkup.common.exception.BusinessException;
 import com.learningcrew.linkup.common.exception.CustomJwtException;
 import com.learningcrew.linkup.common.exception.ErrorCode;
-import com.learningcrew.linkup.linker.command.application.dto.LoginRequest;
-import com.learningcrew.linkup.linker.command.application.dto.TokenResponse;
+import com.learningcrew.linkup.linker.command.application.dto.request.LoginRequest;
+import com.learningcrew.linkup.linker.command.application.dto.response.TokenResponse;
 import com.learningcrew.linkup.linker.command.domain.aggregate.RefreshToken;
 import com.learningcrew.linkup.linker.command.domain.aggregate.User;
+import com.learningcrew.linkup.linker.command.domain.aggregate.VerificationToken;
 import com.learningcrew.linkup.linker.command.domain.repository.RefreshtokenRepository;
 import com.learningcrew.linkup.linker.command.domain.repository.UserRepository;
+import com.learningcrew.linkup.linker.command.domain.repository.VerificationTokenRepository;
 import com.learningcrew.linkup.linker.command.domain.service.TokenDomainService;
+import com.learningcrew.linkup.linker.command.domain.service.UserDomainService;
 import com.learningcrew.linkup.linker.command.domain.service.UserValidatorService;
 import com.learningcrew.linkup.security.jwt.JwtTokenProvider;
-import io.jsonwebtoken.JwtException;
-import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Service
@@ -30,6 +30,8 @@ public class UserAuthCommandService {
     private final UserValidatorService userValidatorService;
     private final TokenDomainService tokenDomainService;
     private final UserRepository userRepository;
+    private final VerificationTokenRepository verificationTokenRepository;
+    private final UserDomainService userDomainService;
 
     /* 이메일 로직 구현 */
     @Transactional
@@ -41,7 +43,7 @@ public class UserAuthCommandService {
         // 비밀번호 확인
         userValidatorService.validatePassword(request.getPassword(), user.getPassword());
 
-        //토큰 발급
+        // 토큰 발급
         String accessToken = tokenDomainService.generateToken(user);
         String refreshToken = tokenDomainService.generateRefreshToken(user);
 
@@ -56,6 +58,7 @@ public class UserAuthCommandService {
     }
 
     /* 토큰 재발급 구현 */
+    @Transactional
     public TokenResponse refreshToken(String providedRefreshToken) {
         jwtTokenProvider.validateToken(providedRefreshToken);
         String email = jwtTokenProvider.getEmailFromJWT(providedRefreshToken);
@@ -89,9 +92,42 @@ public class UserAuthCommandService {
     }
 
     /* 로그아웃 기능 구현 */
+    @Transactional
     public void logout(String refreshToken) {
         jwtTokenProvider.validateToken(refreshToken);
         String email = jwtTokenProvider.getEmailFromJWT(refreshToken);
         refreshtokenRepository.deleteById(email);
+    }
+
+    /* 이메일 인증 구현 */
+    @Transactional
+    public void verifyEmail(String tokenCode) {
+        // 토큰 유효성 검사
+        VerificationToken verificationToken = verificationTokenRepository.findByCode(tokenCode).orElseThrow(
+                () -> new BusinessException(ErrorCode.INVALID_VERIFICATION_TOKEN)
+        );
+
+        // 토큰 만료시간 검사
+        if (verificationToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+            throw new BusinessException(ErrorCode.EXPIRE_VERIFICATION_CODE);
+        }
+
+        // 토큰 타입 검사
+        if (!verificationToken.getTokenType().equalsIgnoreCase("REGISTER")) {
+            throw new BusinessException(ErrorCode.INVALID_TOKEN_TYPE);
+        }
+
+        // 사용자 활성화 처리
+        User user = userRepository.findById(verificationToken.getUserId())
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+
+        if (!user.getStatus().getStatusType().equals("PENDING")) {
+            throw new BusinessException(ErrorCode.ALREADY_VERIFIED);
+        }
+
+        userDomainService.activateUser(user);
+
+        /* 토큰 삭제 */
+        verificationTokenRepository.delete(verificationToken);
     }
 }

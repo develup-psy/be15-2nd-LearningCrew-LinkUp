@@ -1,17 +1,14 @@
 package com.learningcrew.linkup.linker.command.application.controller;
 
 import com.learningcrew.linkup.common.dto.ApiResponse;
-import com.learningcrew.linkup.linker.command.application.dto.LoginRequest;
-import com.learningcrew.linkup.linker.command.application.dto.RefreshTokenRequest;
-import com.learningcrew.linkup.linker.command.application.dto.TokenResponse;
+import com.learningcrew.linkup.linker.command.application.dto.request.LoginRequest;
+import com.learningcrew.linkup.linker.command.application.dto.request.RefreshTokenRequest;
+import com.learningcrew.linkup.linker.command.application.dto.response.TokenResponse;
 import com.learningcrew.linkup.linker.command.application.service.UserAuthCommandService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,6 +21,13 @@ public class UserAuthCommandController {
     public ResponseEntity<ApiResponse<TokenResponse>> login(@Valid @RequestBody LoginRequest request){
         TokenResponse token = userAuthCommandService.login(request);
         return ResponseEntity.ok(ApiResponse.success(token));
+    }
+
+    /* 이메일 인증 */
+    @GetMapping("/verify-email")
+    public ResponseEntity<ApiResponse<Void>> verifyEmail(@RequestParam("token") String token) {
+        userAuthCommandService.verifyEmail(token);
+        return ResponseEntity.ok(ApiResponse.success(null, "이메일 인증이 성공했습니다"));
     }
 
     /* 토큰 재발급 */
