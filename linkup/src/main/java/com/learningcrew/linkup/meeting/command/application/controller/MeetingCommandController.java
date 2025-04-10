@@ -11,6 +11,7 @@ import com.learningcrew.linkup.meeting.command.application.service.MeetingPartic
 import com.learningcrew.linkup.meeting.query.dto.response.MeetingParticipationDTO;
 import com.learningcrew.linkup.meeting.query.service.MeetingParticipationQueryService;
 import com.learningcrew.linkup.meeting.query.service.MeetingQueryService;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +30,10 @@ public class MeetingCommandController {
     private final MeetingParticipationQueryService participationQueryService;
     private final MeetingQueryService meetingQueryService;
 
+    @Operation(
+            summary = "모임 생성",
+            description = "회원이 운동 종목, 날짜(최대 2주 이내), 시간(30분 단위), 장소, 최소/최대 인원을 입력하여 모임을 개설한다."
+    )
     @PostMapping("/api/v1/meetings")
     public ResponseEntity<ApiResponse<MeetingCommandResponse>> createMeeting(
             @RequestBody @Validated MeetingCreateRequest meetingCreateRequest
@@ -43,6 +48,10 @@ public class MeetingCommandController {
                 .body(ApiResponse.success(response));
     }
 
+    @Operation(
+            summary = "참가 승인",
+            description = "개설자가 모임 신청자 목록을 확인하여 참가 신청을 승인한다."
+    )
     @PutMapping("/api/v1/meetings/{meetingId}/participation/{memberId}/accept")
     public ResponseEntity<ApiResponse<ManageParticipationResponse>> acceptParticipation(
             @PathVariable int meetingId, @PathVariable int memberId, @RequestParam int requestedMemberId
@@ -71,6 +80,10 @@ public class MeetingCommandController {
         return ResponseEntity.ok().body(ApiResponse.success(response));
     }
 
+    @Operation(
+            summary = "참가 거절",
+            description = "개설자가 모임 신청자 목록을 확인하여 참가 신청을 거절한다."
+    )
     @PutMapping("/api/v1/meetings/{meetingId}/participation/{memberId}/reject")
     public ResponseEntity<ApiResponse<ManageParticipationResponse>> rejectParticipation(
             @PathVariable int meetingId, @PathVariable int memberId, @RequestParam int requestedMemberId
@@ -97,6 +110,10 @@ public class MeetingCommandController {
         return ResponseEntity.ok().body(ApiResponse.success(response));
     }
 
+    @Operation(
+            summary = "개설자 참가 취소",
+            description = "개설자가 모임 신청자 목록을 확인하여 참가 신청을 거절한다."
+    )
     @PutMapping("/api/v1/meetings/{meetingId}/change-leader/{memberId}")
     public ResponseEntity<ApiResponse<LeaderUpdateResponse>> updateLeader(
             @PathVariable int meetingId, @PathVariable int memberId, @RequestParam int requestedMemberId
@@ -107,6 +124,10 @@ public class MeetingCommandController {
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
+    @Operation(
+            summary = "모집 취소",
+            description = "개설자가 인원 모집을 취소한다."
+    )
     @DeleteMapping("/api/v1/meetings/{meetingId}/cancel")
     public ResponseEntity<ApiResponse<MeetingCommandResponse>> deleteMeeting(
             @PathVariable int meetingId, @RequestParam int memberId

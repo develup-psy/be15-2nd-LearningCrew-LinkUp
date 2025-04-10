@@ -38,13 +38,14 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(exception ->
-                    exception
-                            .authenticationEntryPoint(restAuthenticationEntryPoint)     // 인증 실패
-                            .accessDeniedHandler(restAccessDeniedHandler)          // 인가 실패
+                        exception
+                                .authenticationEntryPoint(restAuthenticationEntryPoint)     // 인증 실패
+                                .accessDeniedHandler(restAccessDeniedHandler)          // 인가 실패
                 )
                 // 요청 http method, url 기준으로 인증, 인가 필요 여부 설정
                 .authorizeHttpRequests(auth ->
                         auth.requestMatchers("/api/v1/users/register", "/api/v1/auth/login", "/api/v1/auth/refresh", "/api/v1/auth/verify-email").permitAll()
+                                .requestMatchers("/api/v1/**").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/v1/users/me").hasAuthority("USER") //추후에 hasRole로 수정
                                 .requestMatchers(HttpMethod.GET, "/api/v1/admin/**").hasAuthority("ADMIN")
                                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
