@@ -2,6 +2,7 @@ package com.learningcrew.linkup.linker.command.domain.service;
 
 import com.learningcrew.linkup.linker.command.domain.aggregate.RefreshToken;
 import com.learningcrew.linkup.linker.command.domain.aggregate.User;
+import com.learningcrew.linkup.linker.command.domain.aggregate.VerificationToken;
 import com.learningcrew.linkup.linker.command.domain.repository.RefreshtokenRepository;
 import com.learningcrew.linkup.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -31,5 +32,8 @@ public class TokenDomainService {
                 .build();
 
         refreshtokenRepository.save(refreshTokenEntity);
+    }
+
+    public void delete(VerificationToken verificationToken) {
     }
 }
