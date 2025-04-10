@@ -25,7 +25,10 @@ spring:
           starttls:
             enable: true        # starttls 활성화 여부
 
-mybatis:
+
+  main:
+    allow-bean-definition-overriding: true
+    mybatis:
   configuration:
     map-underscore-to-camel-case: true
   mapper-locations: classpath*:mappers/**/*.xml
@@ -53,3 +56,5 @@ image:
   image-dir: ${IMAGE_DIR}
   image-url: ${IMAGE_URL}
   default-profile: ${DEFAULT_PROFILE_IMAGE}
+
+

@@ -9,7 +9,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.Date;
 
-@Entity
+@Entity(name="place_user")
 @Table(name = "user")
 @NoArgsConstructor
 @Getter
@@ -18,7 +18,10 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int userId;
+
+    @Column(name="role_id")
     private int roleId;
+    @Column(name="status_id")
     private int statusId;
     private String userName;
     private String password;
