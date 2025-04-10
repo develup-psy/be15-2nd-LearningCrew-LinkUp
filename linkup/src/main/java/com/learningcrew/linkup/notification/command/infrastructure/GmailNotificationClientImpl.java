@@ -26,24 +26,6 @@ public class GmailNotificationClientImpl implements GmailNotificationClient {
 
     private final UserRepository userRepository;
 
-//        @Override
-//    public void sendEmailNotification(String userId, String subject, String body) {
-//        // 사용자 이메일 조회
-//        String to = userRepository.findById(Integer.valueOf(userId))
-//                .map(user -> user.getEmail())
-//                .orElseThrow(() -> new IllegalArgumentException("해당 사용자 이메일을 찾을 수 없습니다."));
-//
-//        // 이메일 메시지 구성
-//        SimpleMailMessage message = new SimpleMailMessage();
-//        message.setTo(to);
-//        message.setSubject(subject);
-//        message.setText(body);
-//        message.setFrom("your_email@gmail.com");
-//        // 이메일 전송
-//        mailSender.send(message);
-//        log.info("[Gmail] 이메일 전송 완료 → {}, 제목: {}", to, subject);
-//    }
-//}
 
     @Override
     public void sendEmailNotification(String userId, String subject, String content) {
