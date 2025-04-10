@@ -1,6 +1,6 @@
 package com.learningcrew.linkup.meeting.query.controller;
 
-import com.learningcrew.linkup.meeting.common.dto.ApiResponse;
+import com.learningcrew.linkup.common.dto.ApiResponse;
 import com.learningcrew.linkup.meeting.query.dto.request.MeetingSearchRequest;
 import com.learningcrew.linkup.meeting.query.dto.response.MeetingDetailResponse;
 import com.learningcrew.linkup.meeting.query.dto.response.MeetingListResponse;

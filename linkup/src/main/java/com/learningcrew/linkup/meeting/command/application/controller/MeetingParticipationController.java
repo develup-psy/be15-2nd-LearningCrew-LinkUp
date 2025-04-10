@@ -1,10 +1,10 @@
 package com.learningcrew.linkup.meeting.command.application.controller;
 
+import com.learningcrew.linkup.common.dto.ApiResponse;
 import com.learningcrew.linkup.meeting.command.application.dto.request.MeetingParticipationCreateRequest;
 import com.learningcrew.linkup.meeting.command.application.dto.request.MeetingParticipationDeleteRequest;
 import com.learningcrew.linkup.meeting.command.application.dto.response.MeetingParticipationCommandResponse;
 import com.learningcrew.linkup.meeting.command.application.service.MeetingParticipationCommandService;
-import com.learningcrew.linkup.meeting.common.dto.ApiResponse;
 import com.learningcrew.linkup.meeting.query.dto.response.MemberDTO;
 import com.learningcrew.linkup.meeting.query.service.MeetingParticipationQueryService;
 import io.swagger.v3.oas.annotations.Operation;

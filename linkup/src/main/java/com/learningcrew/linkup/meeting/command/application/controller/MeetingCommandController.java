@@ -1,17 +1,14 @@
 package com.learningcrew.linkup.meeting.command.application.controller;
 
-import com.learningcrew.linkup.meeting.command.application.dto.request.MeetingDeleteRequest;
+import com.learningcrew.linkup.common.dto.ApiResponse;
 import com.learningcrew.linkup.meeting.command.application.dto.request.MeetingParticipationCreateRequest;
 import com.learningcrew.linkup.meeting.command.application.dto.response.ManageParticipationResponse;
 import com.learningcrew.linkup.meeting.command.application.service.MeetingParticipationCommandService;
-import com.learningcrew.linkup.meeting.common.dto.ApiResponse;
 import com.learningcrew.linkup.meeting.command.application.dto.request.MeetingCreateRequest;
-import com.learningcrew.linkup.meeting.command.application.dto.request.LeaderUpdateRequest;
 import com.learningcrew.linkup.meeting.command.application.service.MeetingCommandService;
 import com.learningcrew.linkup.meeting.command.application.dto.response.MeetingCommandResponse;
 import com.learningcrew.linkup.meeting.command.application.dto.response.LeaderUpdateResponse;
 import com.learningcrew.linkup.meeting.query.dto.response.MeetingParticipationDTO;
-import com.learningcrew.linkup.meeting.query.dto.response.MemberDTO;
 import com.learningcrew.linkup.meeting.query.service.MeetingParticipationQueryService;
 import com.learningcrew.linkup.meeting.query.service.MeetingQueryService;
 import lombok.RequiredArgsConstructor;
@@ -58,7 +55,7 @@ public class MeetingCommandController {
         List<MeetingParticipationDTO> appliers = participationQueryService.getHistories(meetingId, 1).getMeetingParticipations();
 
         if (appliers.stream().noneMatch(applier -> applier.getMemberId() == memberId)) {
-            return ResponseEntity.badRequest().body(ApiResponse.failure(HttpStatus.BAD_REQUEST.name(), "참가 신청하지 않은 회원입니다."));
+            return ResponseEntity.badRequest().body(ApiResponse.failure( "참가 신청하지 않은 회원입니다."));
         }
 
         long participationId = service.acceptParticipation(meetingId, memberId);
@@ -84,7 +81,7 @@ public class MeetingCommandController {
         List<MeetingParticipationDTO> appliers = participationQueryService.getHistories(meetingId, 1).getMeetingParticipations();
 
         if (appliers.stream().noneMatch(applier -> applier.getMemberId() == memberId)) {
-            return ResponseEntity.badRequest().body(ApiResponse.failure(HttpStatus.BAD_REQUEST.name(), "참가 신청하지 않은 회원입니다."));
+            return ResponseEntity.badRequest().body(ApiResponse.failure("참가 신청하지 않은 회원입니다."));
         }
 
         long participationId = service.rejectParticipation(meetingId, memberId);

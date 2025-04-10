@@ -1,6 +1,6 @@
 package com.learningcrew.linkup.meeting.query.dto.response;
 
-import com.learningcrew.linkup.meeting.command.domain.aggregate.Gender;
+import com.learningcrew.linkup.common.constants.Gender;
 import lombok.Getter;
 import lombok.Setter;
 
