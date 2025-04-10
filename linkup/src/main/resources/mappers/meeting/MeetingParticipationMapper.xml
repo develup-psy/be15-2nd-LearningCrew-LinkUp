@@ -18,4 +18,18 @@
         AND status_id = 2
     </select>
 
+    <select id="selectHistoryByMeetingIdAndStatusId" resultType="MeetingParticipationDTO">
+        SELECT participation_id, status_id, meeting_id, member_id
+        FROM meeting_participation_history
+        WHERE meeting_id = #{ meetingId }
+        AND status_id = #{ statusId }
+    </select>
+
+    <select id="selectHistoryByMeetingIdAndMemberId" resultType="MeetingParticipationDTO">
+        SELECT participation_id, status_id, meeting_id, member_id
+        FROM meeting_participation_history
+        WHERE meeting_id = #{ meetingId }
+        AND member_id = #{ memberId }
+    </select>
+
 </mapper>

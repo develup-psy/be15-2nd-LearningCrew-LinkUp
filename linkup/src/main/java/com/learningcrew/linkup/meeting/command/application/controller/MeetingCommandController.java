@@ -10,6 +10,10 @@ import com.learningcrew.linkup.meeting.command.application.dto.request.LeaderUpd
 import com.learningcrew.linkup.meeting.command.application.service.MeetingCommandService;
 import com.learningcrew.linkup.meeting.command.application.dto.response.MeetingCommandResponse;
 import com.learningcrew.linkup.meeting.command.application.dto.response.LeaderUpdateResponse;
+import com.learningcrew.linkup.meeting.query.dto.response.MeetingParticipationDTO;
+import com.learningcrew.linkup.meeting.query.dto.response.MemberDTO;
+import com.learningcrew.linkup.meeting.query.service.MeetingParticipationQueryService;
+import com.learningcrew.linkup.meeting.query.service.MeetingQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +21,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,6 +29,8 @@ public class MeetingCommandController {
 
     private final MeetingCommandService meetingCommandService;
     private final MeetingParticipationCommandService service;
+    private final MeetingParticipationQueryService participationQueryService;
+    private final MeetingQueryService meetingQueryService;
 
     @PostMapping("/api/v1/meetings")
     public ResponseEntity<ApiResponse<MeetingCommandResponse>> createMeeting(
@@ -41,16 +48,54 @@ public class MeetingCommandController {
 
     @PutMapping("/api/v1/meetings/{meetingId}/participation/{memberId}/accept")
     public ResponseEntity<ApiResponse<ManageParticipationResponse>> acceptParticipation(
-            @PathVariable int meetingId, @PathVariable int memberId, int requestedMemberId
+            @PathVariable int meetingId, @PathVariable int memberId, @RequestParam int requestedMemberId
     ) {
-        return null;
+        int leaderId = meetingQueryService.getMeeting(meetingId).getMeeting().getLeaderId();
+        if (leaderId != requestedMemberId) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        List<MeetingParticipationDTO> appliers = participationQueryService.getHistories(meetingId, 1).getMeetingParticipations();
+
+        if (appliers.stream().noneMatch(applier -> applier.getMemberId() == memberId)) {
+            return ResponseEntity.badRequest().body(ApiResponse.failure(HttpStatus.BAD_REQUEST.name(), "참가 신청하지 않은 회원입니다."));
+        }
+
+        long participationId = service.acceptParticipation(meetingId, memberId);
+
+        ManageParticipationResponse response
+                = ManageParticipationResponse.builder()
+                .participationId(participationId)
+                .statusId(2)
+                .build();
+
+        return ResponseEntity.ok().body(ApiResponse.success(response));
     }
 
     @PutMapping("/api/v1/meetings/{meetingId}/participation/{memberId}/reject")
     public ResponseEntity<ApiResponse<ManageParticipationResponse>> rejectParticipation(
-            @PathVariable int meetingId, @PathVariable int memberId, int requestedMemberId
+            @PathVariable int meetingId, @PathVariable int memberId, @RequestParam int requestedMemberId
     ) {
-        return null;
+        int leaderId = meetingQueryService.getMeeting(meetingId).getMeeting().getLeaderId();
+        if (leaderId != requestedMemberId) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        List<MeetingParticipationDTO> appliers = participationQueryService.getHistories(meetingId, 1).getMeetingParticipations();
+
+        if (appliers.stream().noneMatch(applier -> applier.getMemberId() == memberId)) {
+            return ResponseEntity.badRequest().body(ApiResponse.failure(HttpStatus.BAD_REQUEST.name(), "참가 신청하지 않은 회원입니다."));
+        }
+
+        long participationId = service.rejectParticipation(meetingId, memberId);
+
+        ManageParticipationResponse response
+                = ManageParticipationResponse.builder()
+                .participationId(participationId)
+                .statusId(3)
+                .build();
+
+        return ResponseEntity.ok().body(ApiResponse.success(response));
     }
 
     @PutMapping("/api/v1/meetings/{meetingId}/change-leader/{memberId}")

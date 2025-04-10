@@ -1,9 +1,6 @@
 package com.learningcrew.linkup.meeting.query.service;
 
-import com.learningcrew.linkup.meeting.query.dto.response.MeetingParticipationDTO;
-import com.learningcrew.linkup.meeting.query.dto.response.MeetingParticipationResponse;
-import com.learningcrew.linkup.meeting.query.dto.response.MemberDTO;
-import com.learningcrew.linkup.meeting.query.dto.response.ParticipantsResponse;
+import com.learningcrew.linkup.meeting.query.dto.response.*;
 import com.learningcrew.linkup.meeting.query.mapper.MeetingParticipationMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,6 +22,16 @@ public class MeetingParticipationQueryService {
 
         return ParticipantsResponse.builder()
                 .participants(response)
+                .build();
+    }
+
+    /* 모임에 속한 참가 내역 status별 조회 */
+    @Transactional(readOnly = true)
+    public MeetingParticipationListResponse getHistories(int meetingId, int statusId) {
+        List<MeetingParticipationDTO> response = mapper.selectHistoryByMeetingIdAndStatusId(meetingId, statusId);
+
+        return MeetingParticipationListResponse.builder()
+                .meetingParticipations(response)
                 .build();
     }
 

@@ -7,7 +7,6 @@ import com.learningcrew.linkup.meeting.command.application.dto.request.MeetingPa
 import com.learningcrew.linkup.meeting.query.dto.response.MeetingParticipationDTO;
 import com.learningcrew.linkup.meeting.query.mapper.MeetingParticipationMapper;
 import lombok.RequiredArgsConstructor;
-import org.apache.ibatis.javassist.NotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +29,29 @@ public class MeetingParticipationCommandService {
         return history.getParticipationId();
     }
 
+    @Transactional
+    public long acceptParticipation(int meetingId, int memberId) {
+        MeetingParticipationDTO participation = mapper.selectHistoryByMeetingIdAndMemberId(meetingId, memberId);
+
+        participation.setStatusId(2);
+
+        repository.save(modelMapper.map(participation, MeetingParticipationHistory.class));
+
+        return participation.getParticipationId();
+    }
+
+    @Transactional
+    public long rejectParticipation(int meetingId, int memberId) {
+        MeetingParticipationDTO participation = mapper.selectHistoryByMeetingIdAndMemberId(meetingId, memberId);
+
+        participation.setStatusId(3);
+
+        repository.save(modelMapper.map(participation, MeetingParticipationHistory.class));
+
+        return participation.getParticipationId();
+    }
+
+    @Transactional
     public long deleteMeetingParticipation(MeetingParticipationDeleteRequest request) {
         MeetingParticipationDTO history = mapper.selectMeetingParticipationByMeetingIdAndMemberId(
                 request.getMeetingId(), request.getMemberId());
@@ -44,4 +66,5 @@ public class MeetingParticipationCommandService {
 
         return history.getParticipationId();
     }
+
 }
