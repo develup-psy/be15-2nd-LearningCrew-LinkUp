@@ -38,9 +38,9 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(exception ->
-                    exception
-                            .authenticationEntryPoint(restAuthenticationEntryPoint)     // 인증 실패
-                            .accessDeniedHandler(restAccessDeniedHandler)          // 인가 실패
+                        exception
+                                .authenticationEntryPoint(restAuthenticationEntryPoint)     // 인증 실패
+                                .accessDeniedHandler(restAccessDeniedHandler)          // 인가 실패
                 )
                 // 요청 http method, url 기준으로 인증, 인가 필요 여부 설정
                 .authorizeHttpRequests(auth ->

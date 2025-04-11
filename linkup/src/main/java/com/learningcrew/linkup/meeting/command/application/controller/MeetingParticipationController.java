@@ -2,10 +2,11 @@ package com.learningcrew.linkup.meeting.command.application.controller;
 
 import com.learningcrew.linkup.common.dto.ApiResponse;
 import com.learningcrew.linkup.meeting.command.application.dto.request.MeetingParticipationCreateRequest;
-import com.learningcrew.linkup.meeting.command.application.dto.request.MeetingParticipationDeleteRequest;
 import com.learningcrew.linkup.meeting.command.application.dto.response.MeetingParticipationCommandResponse;
 import com.learningcrew.linkup.meeting.command.application.service.MeetingParticipationCommandService;
+import com.learningcrew.linkup.meeting.query.dto.response.MeetingParticipationDTO;
 import com.learningcrew.linkup.meeting.query.dto.response.MemberDTO;
+import com.learningcrew.linkup.meeting.query.mapper.MeetingParticipationMapper;
 import com.learningcrew.linkup.meeting.query.service.MeetingParticipationQueryService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ import java.util.List;
 public class MeetingParticipationController {
     private final MeetingParticipationCommandService service;
     private final MeetingParticipationQueryService queryService;
+    private final MeetingParticipationMapper participationMapper;
 
     @Operation(
             summary = "모임 참가 신청",
@@ -51,21 +53,20 @@ public class MeetingParticipationController {
     public ResponseEntity<ApiResponse<MeetingParticipationCommandResponse>> deleteMeetingParticipation(
             @PathVariable int meetingId,
             @PathVariable int memberId
-    ) {
+    ) { // 1. 참여자 확인
         List<MemberDTO> participants = queryService.getParticipants(meetingId).getParticipants();
 
         if (!participants.stream().anyMatch(x -> x.getMemberId() == (memberId) )) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
-        MeetingParticipationDeleteRequest request = MeetingParticipationDeleteRequest.builder()
-                .meetingId(meetingId)
-                .memberId(memberId)
-                .statusId(4)
-                .build();
+        // 2. 참여 이력 조회
+        MeetingParticipationDTO requestedParticipation = participationMapper.selectHistoryByMeetingIdAndMemberId(meetingId, memberId);
 
-        long participationId = service.deleteMeetingParticipation(request);
+        // 3. soft delete 수행
+        long participationId = service.deleteMeetingParticipation(requestedParticipation);
 
+        // 4. 응답 반환
         MeetingParticipationCommandResponse response = MeetingParticipationCommandResponse.builder()
                 .participationId(participationId)
                 .build();

@@ -1,6 +1,6 @@
 package com.learningcrew.linkup.meeting.query.dto.response;
 
-import com.learningcrew.linkup.meeting.common.dto.Pagination;
+import com.learningcrew.linkup.common.dto.Pagination;
 import lombok.Builder;
 import lombok.Getter;
 
