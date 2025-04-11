@@ -3,10 +3,12 @@ package com.learningcrew.linkup.linker.command.application.controller;
 import com.learningcrew.linkup.linker.command.application.dto.request.FindPasswordRequest;
 import com.learningcrew.linkup.linker.command.application.dto.request.LoginRequest;
 import com.learningcrew.linkup.linker.command.application.dto.request.UserCreateRequest;
+import com.learningcrew.linkup.linker.command.application.dto.request.WithdrawUserRequest;
 import com.learningcrew.linkup.linker.command.application.dto.response.RegisterResponse;
 import com.learningcrew.linkup.linker.command.application.service.AccountCommandService;
 import com.learningcrew.linkup.linker.command.application.service.AccountCommandServiceImpl;
 import com.learningcrew.linkup.common.dto.ApiResponse;
+import com.learningcrew.linkup.security.jwt.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -14,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -43,8 +46,12 @@ public class UserAccountCommandController {
 
     /* 회원 탈퇴 */
     @DeleteMapping("/withdraw")
-    public ResponseEntity<ApiResponse<Void>> deleteUser(){
-        return null;
+    public ResponseEntity<ApiResponse<Void>> deleteUser(@AuthenticationPrincipal CustomUserDetails userDetails, WithdrawUserRequest request) {
+        log.info("회원탈퇴 요청: password={}",
+                request.getPassword());
+        userCommandService.withdrawUser(request.getPassword(), userDetails.getUserId());
+        log.info("회원탈퇴 요청 성공");
+        return ResponseEntity.ok(ApiResponse.success(null,"회원이 탈퇴되었습니다."));
     }
 
     /* 계정 복구 */

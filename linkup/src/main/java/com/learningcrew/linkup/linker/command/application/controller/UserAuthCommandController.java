@@ -9,6 +9,7 @@ import com.learningcrew.linkup.linker.command.application.service.AuthCommandSer
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,7 +35,10 @@ public class UserAuthCommandController {
         log.info("이메일 인증 요청: token={}", token);
         userAuthCommandService.verifyEmail(token);
         log.info("이메일 인증 성공");
-        return ResponseEntity.ok(ApiResponse.success(null, "이메일 인증이 성공했습니다"));
+        // 리다이렉트 주소를 헤더로 반환
+        return ResponseEntity.status(HttpStatus.FOUND) // 302
+                .header("Location", "http://localhost:8080/api/v1/register/success")
+                .build();
     }
 
     /* 토큰 재발급 */

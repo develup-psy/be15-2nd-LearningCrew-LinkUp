@@ -14,6 +14,7 @@ import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Service
 @Slf4j
@@ -46,7 +47,10 @@ public class EmailServiceImpl implements EmailService {
             Context context = new org.thymeleaf.context.Context();
             context.setVariable("userName", userName);
             context.setVariable("verificationCode", verificationCode);
-            context.setVariable("expireTime", expireMinute + "분");
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+            context.setVariable("expireTime", expireMinute.format(formatter) + "분");
 
             String htmlContent = templateEngine.process("email/verification-code", context);
             helper.setText(htmlContent, true);

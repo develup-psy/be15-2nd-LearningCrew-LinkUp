@@ -46,7 +46,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth ->
                         auth.requestMatchers("/api/v1/**").permitAll()
 //                                .requestMatchers("/api/v1/users/register", "/api/v1/auth/login", "/api/v1/auth/refresh", "/api/v1/auth/verify-email").permitAll()
-//                                .requestMatchers(HttpMethod.GET, "/api/v1/users/me").hasAuthority("USER") //추후에 hasRole로 수정
+//                                .requestMatchers(HttpMethod.GET, "/api/v1/users/**").hasAuthority("USER") //추후에 hasRole로 수정
+                                .requestMatchers(HttpMethod.DELETE, "/api/v1/users/**").hasAuthority("USER")
 //                                .requestMatchers(HttpMethod.GET, "/api/v1/admin/**").hasAuthority("ADMIN")
 //                                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                                 .anyRequest().authenticated()
