@@ -1,9 +1,7 @@
 package com.learningcrew.linkup.common.exception;
 
 
-import com.learningcrew.linkup.common.dto.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -73,12 +71,5 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(ErrorCode.INTERNAL_SERVER_ERROR.getStatus())
                 .body(ErrorResponse.of(ErrorCode.INTERNAL_SERVER_ERROR));
-    }
-
-    @ExceptionHandler(com.learningcrew.linkup.exception.BusinessException.class)
-    public ResponseEntity<ApiResponse<?>> handleBusinessException(com.learningcrew.linkup.exception.BusinessException ex) {
-        // ErrorCode에서 설정한 HttpStatus를 사용할 수도 있습니다.
-        return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(ApiResponse.failure(ex.getMessage()));
     }
 }

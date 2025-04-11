@@ -6,8 +6,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 @SpringBootApplication
-@EnableJpaAuditing
-@MapperScan(basePackages = "com.learningcrew.linkup")
 public class LinkupApplication {
 
 	public static void main(String[] args) {

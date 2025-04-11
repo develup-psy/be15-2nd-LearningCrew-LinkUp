@@ -1,10 +1,9 @@
 package com.learningcrew.linkup.linker.command.domain.service;
 
+import ch.qos.logback.core.status.Status;
 import com.learningcrew.linkup.common.constants.StatusType;
 import com.learningcrew.linkup.common.exception.BusinessException;
 import com.learningcrew.linkup.common.exception.ErrorCode;
-import com.learningcrew.linkup.linker.command.domain.aggregate.Role;
-import com.learningcrew.linkup.linker.command.domain.aggregate.Status;
 import com.learningcrew.linkup.linker.command.domain.aggregate.User;
 import com.learningcrew.linkup.linker.command.domain.repository.RoleRepository;
 import com.learningcrew.linkup.linker.command.domain.repository.StatusRepository;
@@ -13,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.management.relation.Role;
 
 @Service
 @RequiredArgsConstructor
