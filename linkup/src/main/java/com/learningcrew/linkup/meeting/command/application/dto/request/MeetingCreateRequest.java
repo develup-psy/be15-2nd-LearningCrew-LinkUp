@@ -1,6 +1,6 @@
 package com.learningcrew.linkup.meeting.command.application.dto.request;
 
-import com.learningcrew.linkup.common.constants.Gender;
+import com.learningcrew.linkup.linker.command.domain.constants.LinkerGender;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
@@ -27,7 +27,7 @@ public class MeetingCreateRequest {
     private LocalTime endTime;
     private int minUser;
     private int maxUser;
-    private Gender gender;
+    private LinkerGender gender;
     @NotBlank
     private String ageGroup;
     @NotBlank
