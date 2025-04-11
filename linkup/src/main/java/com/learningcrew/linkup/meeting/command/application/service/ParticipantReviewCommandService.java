@@ -29,7 +29,6 @@ public class ParticipantReviewCommandService {
                 .toList();
 
         if (!participants.contains(reviewerId) || !participants.contains(revieweeId)) {
-            log.warn("Invalid participant: reviewerId={}, revieweeId={}, participants={}", reviewerId, revieweeId, participants);
             throw new BusinessException(ErrorCode.BAD_REQUEST, "유효하지 않은 참가자 평가 요청입니다.");
         }
 
