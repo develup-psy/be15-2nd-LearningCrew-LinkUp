@@ -1,4 +1,4 @@
-package com.learningcrew.linkup.place.command.domain.aggregate.entity;
+package com.learningcrew.linkup.common.domain;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;

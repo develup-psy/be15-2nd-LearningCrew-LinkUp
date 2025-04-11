@@ -1,7 +1,6 @@
 package com.learningcrew.linkup.linker.command.domain.service;
 
 import ch.qos.logback.core.status.Status;
-import com.learningcrew.linkup.common.constants.StatusType;
 import com.learningcrew.linkup.common.exception.BusinessException;
 import com.learningcrew.linkup.common.exception.ErrorCode;
 import com.learningcrew.linkup.linker.command.domain.aggregate.User;
