@@ -1,8 +1,8 @@
 package com.learningcrew.linkup.linker.command.application.service;
 
-import com.learningcrew.linkup.common.exception.BusinessException;
-import com.learningcrew.linkup.common.exception.CustomJwtException;
-import com.learningcrew.linkup.common.exception.ErrorCode;
+import com.learningcrew.linkup.exception.BusinessException;
+import com.learningcrew.linkup.exception.security.CustomJwtException;
+import com.learningcrew.linkup.exception.ErrorCode;
 import com.learningcrew.linkup.linker.command.application.dto.request.LoginRequest;
 import com.learningcrew.linkup.linker.command.application.dto.response.TokenResponse;
 import com.learningcrew.linkup.linker.command.domain.aggregate.RefreshToken;
