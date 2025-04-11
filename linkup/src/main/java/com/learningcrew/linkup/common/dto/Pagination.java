@@ -1,4 +1,4 @@
-package com.learningcrew.linkup.meeting.common.dto;
+package com.learningcrew.linkup.common.dto;
 
 import lombok.Builder;
 import lombok.Getter;
