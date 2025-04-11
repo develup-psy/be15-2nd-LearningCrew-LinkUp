@@ -76,6 +76,8 @@ public enum ErrorCode {
     RESERVATION_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "이미 예약이 존재합니다."),
     RESERVATION_TIME_CONFLICT(HttpStatus.CONFLICT, "예약 시간이 중복됩니다."),
     RESERVATION_CANNOT_CANCEL(HttpStatus.BAD_REQUEST, "현재 예약은 취소할 수 없습니다."),
+    PLACE_NOT_FOUND(HttpStatus.BAD_REQUEST, "현재 예약은 취소할 수 없습니다."),
+    INVALID_OPERATION_TIME(HttpStatus.BAD_REQUEST, "현재 예약은 취소할 수 없습니다."),
 
     // 신고
     REPORT_NOT_FOUND(HttpStatus.NOT_FOUND, "신고 내역을 찾을 수 없습니다."),
