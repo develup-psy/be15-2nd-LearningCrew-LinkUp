@@ -4,8 +4,8 @@ import com.learningcrew.linkup.linker.command.application.dto.request.FindPasswo
 import com.learningcrew.linkup.linker.command.application.dto.request.LoginRequest;
 import com.learningcrew.linkup.linker.command.application.dto.request.UserCreateRequest;
 import com.learningcrew.linkup.linker.command.application.dto.response.RegisterResponse;
-import com.learningcrew.linkup.linker.command.application.service.UserAuthCommandService;
-import com.learningcrew.linkup.linker.command.application.service.UserAccountCommandService;
+import com.learningcrew.linkup.linker.command.application.service.AccountCommandService;
+import com.learningcrew.linkup.linker.command.application.service.AccountCommandServiceImpl;
 import com.learningcrew.linkup.common.dto.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -21,8 +21,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/users")
 public class UserAccountCommandController {
-    private final UserAccountCommandService userCommandService;
-    private final UserAuthCommandService userAuthCommandService;
+    private final AccountCommandService userCommandService;
 
     /* 회원 가입 */
     @PostMapping("/register")

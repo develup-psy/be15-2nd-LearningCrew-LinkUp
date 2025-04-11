@@ -4,7 +4,8 @@ import com.learningcrew.linkup.common.dto.ApiResponse;
 import com.learningcrew.linkup.linker.command.application.dto.request.LoginRequest;
 import com.learningcrew.linkup.linker.command.application.dto.request.RefreshTokenRequest;
 import com.learningcrew.linkup.linker.command.application.dto.response.TokenResponse;
-import com.learningcrew.linkup.linker.command.application.service.UserAuthCommandService;
+import com.learningcrew.linkup.linker.command.application.service.AuthCommandService;
+import com.learningcrew.linkup.linker.command.application.service.AuthCommandServiceImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/auth")
 public class UserAuthCommandController {
-    private final UserAuthCommandService userAuthCommandService;
+    private final AuthCommandService userAuthCommandService;
 
     /* 자체 로그인 */
     @PostMapping("/login")
