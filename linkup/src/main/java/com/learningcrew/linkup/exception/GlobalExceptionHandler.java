@@ -1,6 +1,7 @@
-package com.learningcrew.linkup.common.exception;
+package com.learningcrew.linkup.exception;
 
 
+import com.learningcrew.linkup.exception.security.CustomJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;

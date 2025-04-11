@@ -1,5 +1,6 @@
-package com.learningcrew.linkup.common.exception;
+package com.learningcrew.linkup.exception.security;
 
+import com.learningcrew.linkup.exception.ErrorCode;
 import lombok.Getter;
 
 @Getter
