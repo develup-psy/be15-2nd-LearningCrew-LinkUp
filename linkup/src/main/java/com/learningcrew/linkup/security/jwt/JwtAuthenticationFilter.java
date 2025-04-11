@@ -1,7 +1,6 @@
 package com.learningcrew.linkup.security.jwt;
 
-import com.learningcrew.linkup.common.exception.CustomJwtException;
-import com.learningcrew.linkup.common.exception.ErrorCode;
+import com.learningcrew.linkup.exception.security.CustomJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

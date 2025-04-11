@@ -1,4 +1,4 @@
-package com.learningcrew.linkup.common.exception;
+package com.learningcrew.linkup.exception;
 
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
