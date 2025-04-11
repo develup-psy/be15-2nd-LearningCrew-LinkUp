@@ -22,5 +22,7 @@ public class PlaceDetailResponse {
     private List<String> imageUrl;
     // 요일별 운영 시간
     private List<OperationTimeResponse> operationTimes;
+    // 장소 후기
+    private List<PlaceReviewResponse> placeReviews;
 }
 
