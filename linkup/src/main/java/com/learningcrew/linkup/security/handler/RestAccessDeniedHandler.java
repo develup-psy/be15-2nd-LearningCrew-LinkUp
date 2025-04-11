@@ -1,8 +1,8 @@
 package com.learningcrew.linkup.security.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.learningcrew.linkup.common.exception.ErrorCode;
-import com.learningcrew.linkup.common.exception.ErrorResponse;
+import com.learningcrew.linkup.exception.ErrorCode;
+import com.learningcrew.linkup.exception.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.access.AccessDeniedException;

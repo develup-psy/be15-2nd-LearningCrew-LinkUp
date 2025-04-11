@@ -1,6 +1,6 @@
 package com.learningcrew.linkup.meeting.query.service;
 
-import com.learningcrew.linkup.meeting.common.dto.Pagination;
+import com.learningcrew.linkup.common.dto.Pagination;
 import com.learningcrew.linkup.meeting.query.dto.request.MeetingSearchRequest;
 import com.learningcrew.linkup.meeting.query.dto.response.MeetingDTO;
 import com.learningcrew.linkup.meeting.query.dto.response.MeetingDetailResponse;

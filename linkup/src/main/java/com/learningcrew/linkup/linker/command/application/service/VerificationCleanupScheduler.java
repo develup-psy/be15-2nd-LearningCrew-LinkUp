@@ -1,6 +1,6 @@
 package com.learningcrew.linkup.linker.command.application.service;
 
-import com.learningcrew.linkup.common.constants.StatusType;
+import com.learningcrew.linkup.linker.command.domain.constants.LinkerStatusType;
 import com.learningcrew.linkup.linker.command.domain.aggregate.VerificationToken;
 import com.learningcrew.linkup.linker.command.domain.repository.UserRepository;
 import com.learningcrew.linkup.linker.command.domain.repository.VerificationTokenRepository;
@@ -29,7 +29,7 @@ public class VerificationCleanupScheduler {
 
         for (VerificationToken token : expiredTokens) {
             userRepository.findById(token.getUserId()).ifPresent(user -> {
-                if (user.getStatus().getStatusType().equals(StatusType.PENDING.name())) {
+                if (user.getStatus().getStatusType().equals(LinkerStatusType.PENDING.name())) {
                     log.info("만료된 미인증 유저 삭제: {}", user.getEmail());
                     userRepository.delete(user); // CASCADE 걸려있다면 token도 자동 삭제
                 }

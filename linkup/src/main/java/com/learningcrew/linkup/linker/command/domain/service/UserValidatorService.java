@@ -1,12 +1,11 @@
 package com.learningcrew.linkup.linker.command.domain.service;
 
-import com.learningcrew.linkup.common.exception.BusinessException;
-import com.learningcrew.linkup.common.exception.ErrorCode;
+import com.learningcrew.linkup.exception.BusinessException;
+import com.learningcrew.linkup.exception.ErrorCode;
 import com.learningcrew.linkup.linker.command.domain.aggregate.User;
 import com.learningcrew.linkup.linker.command.domain.repository.MemberRepository;
 import com.learningcrew.linkup.linker.command.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 

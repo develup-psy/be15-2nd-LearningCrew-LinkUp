@@ -1,6 +1,7 @@
 package com.learningcrew.linkup.linker.command.domain.aggregate;
 
-import ch.qos.logback.core.status.Status;
+import com.learningcrew.linkup.common.domain.Role;
+import com.learningcrew.linkup.common.domain.Status;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -9,7 +10,6 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.management.relation.Role;
 import java.time.LocalDateTime;
 
 @Entity
@@ -23,6 +23,7 @@ public class User {
     private int userId;
 
 
+    @ManyToOne
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;
 
@@ -37,6 +38,7 @@ public class User {
     @LastModifiedDate
     private LocalDateTime deletedAt;
 
+    @ManyToOne
     @JoinColumn(name="status_id", nullable = false)
     private Status status;
 
