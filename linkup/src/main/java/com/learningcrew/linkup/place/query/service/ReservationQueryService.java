@@ -31,7 +31,7 @@ public class ReservationQueryService {
                 .pagination(Pagination.builder()
                         .currentPage(page)
                         .totalPage(totalPage)
-                        .totalList(totalItems)
+                        .totalItems(totalItems)
                         .build())
                 .build();
     }

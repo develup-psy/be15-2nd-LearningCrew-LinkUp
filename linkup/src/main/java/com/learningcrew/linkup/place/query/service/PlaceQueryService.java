@@ -29,7 +29,7 @@ public class PlaceQueryService {
                 .pagination(Pagination.builder()
                         .currentPage(page)
                         .totalPage(totalPage)
-                        .totalList(totalItems)
+                        .totalItems(totalItems)
                         .build())
                 .build();
     }
@@ -48,7 +48,7 @@ public class PlaceQueryService {
                 .pagination(Pagination.builder()
                         .currentPage(page)
                         .totalPage(totalPage)
-                        .totalList(totalItems)
+                        .totalItems(totalItems)
                         .build())
                 .build();
     }

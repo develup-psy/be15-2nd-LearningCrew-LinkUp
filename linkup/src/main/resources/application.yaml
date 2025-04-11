@@ -28,10 +28,10 @@ spring:
 
   main:
     allow-bean-definition-overriding: true
-    mybatis:
+mybatis:
   configuration:
     map-underscore-to-camel-case: true
-  mapper-locations: classpath*:mappers/**/*.xml
+  mapper-locations: classpath:/mappers/**/*.xml
   type-aliases-package: >
     com.learningcrew.linkup.linker.query.dto,
     com.learningcrew.linkup.community.query.dto,
@@ -41,6 +41,7 @@ spring:
     com.learningcrew.linkup.point.query.dto,
     com.learningcrew.linkup.report.query.dto,
     com.learningcrew.linkup.security
+
 
 jwt:
   secret: ${JWT_SECRET}

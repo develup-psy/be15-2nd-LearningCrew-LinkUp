@@ -27,13 +27,13 @@ public class FileStorage {
             Files.createDirectories(this.uploadDir);
         } catch (IOException e) {
             log.error("업로드 디렉터리 생성 실패: {}", e.getMessage());
-            throw new BusinessException(ErrorCode.FILE_SAVE_ERROR);
+            throw new BusinessException(ErrorCode.NOT_SAVED);
         }
     }
 
     public String storeFile(MultipartFile file) {
         if (file.isEmpty()) {
-            throw new BusinessException(ErrorCode.FILE_SAVE_ERROR);
+            throw new BusinessException(ErrorCode.NOT_SAVED);
         }
 
         String originalFilename = file.getOriginalFilename();
@@ -46,7 +46,7 @@ public class FileStorage {
             Files.copy(inputStream, targetLocation, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException ex) {
             log.error("파일 저장 실패 [{}]: {}", fileName, ex.getMessage());
-            throw new BusinessException(ErrorCode.FILE_SAVE_ERROR);
+            throw new BusinessException(ErrorCode.NOT_SAVED);
         }
 
         return fileName; // 저장해야될 파일 이름
@@ -60,7 +60,7 @@ public class FileStorage {
             }
         } catch (IOException ex) {
             log.error("파일 삭제 실패 [{}]: {}", fileName, ex.getMessage());
-            throw new BusinessException(ErrorCode.FILE_DELETE_ERROR);
+            throw new BusinessException(ErrorCode.NOT_FOUND);
         }
     }
 }
