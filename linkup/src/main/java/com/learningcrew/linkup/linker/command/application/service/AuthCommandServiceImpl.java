@@ -8,6 +8,7 @@ import com.learningcrew.linkup.linker.command.application.dto.response.TokenResp
 import com.learningcrew.linkup.linker.command.domain.aggregate.RefreshToken;
 import com.learningcrew.linkup.linker.command.domain.aggregate.User;
 import com.learningcrew.linkup.linker.command.domain.aggregate.VerificationToken;
+import com.learningcrew.linkup.linker.command.domain.constants.LinkerStatusType;
 import com.learningcrew.linkup.linker.command.domain.repository.RefreshtokenRepository;
 import com.learningcrew.linkup.linker.command.domain.repository.UserRepository;
 import com.learningcrew.linkup.linker.command.domain.repository.VerificationTokenRepository;
@@ -40,6 +41,11 @@ public class AuthCommandServiceImpl implements AuthCommandService {
 
         // 이메일로 회원 조회
         User user = userValidatorService.validateEmail(request.getEmail());
+
+        // 활성화 상태 확인
+        if(!(user.getStatus().getStatusType().equals(LinkerStatusType.ACCEPTED.name()))){
+            throw new BusinessException(ErrorCode.NOT_AUTHORIZED_USER_EMAIL);
+        }
 
         // 비밀번호 확인
         userValidatorService.validatePassword(request.getPassword(), user.getPassword());

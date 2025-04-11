@@ -56,11 +56,12 @@ public class UserDomainServiceImpl {
         userRepository.save(user);
     }
 
-
+    /* 이메일 유무 확인 */
     public boolean existsByUserEmail(String email) {
         return userRepository.existsByEmail(email);
     }
 
+    /* 활성화 상태 처리 */
     @Transactional
     public void activateUser(User user) {
         StatusDTO statusDTO = statusMapper.statusByStatusType(LinkerStatusType.ACCEPTED.name()).orElseThrow(

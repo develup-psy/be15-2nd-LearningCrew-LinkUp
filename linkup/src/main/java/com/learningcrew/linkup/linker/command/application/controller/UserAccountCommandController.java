@@ -11,11 +11,12 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-
+@Slf4j
 @Tag(name = "User API", description = "회원 관련 API")
 @RestController
 @RequiredArgsConstructor
@@ -29,7 +30,12 @@ public class UserAccountCommandController {
             summary = "회원가입", description = "이메일과 비밀번호, 전화번호 등의 정보를 입력하여 회원으로 가입할 수 있다."
     )
     public ResponseEntity<ApiResponse<RegisterResponse>> register(@Valid @RequestBody UserCreateRequest request) {
+        log.info("회원가입 요청: email={}, nickname={}, contact={}",
+                request.getEmail(), request.getNickname(), request.getContactNumber());
+
         RegisterResponse response = userCommandService.registerUser(request);
+
+        log.info("회원가입 완료: userId={}, email={}", response.getUserId(), response.getEmail());
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(ApiResponse.success(response, "회원 가입 요청에 성공했습니다. 이메일 인증을 완료해주세요."));
@@ -57,6 +63,7 @@ public class UserAccountCommandController {
     /* 비밀번호 재설정 */
     @PostMapping("/reset-password")
     public ResponseEntity<ApiResponse<Void>> resetPassword(@Valid @RequestBody LoginRequest request) {
+        log.info("비밀번호 재설정 URL 요청: email={}, contact={}", request.getEmail());
         return null;
     }
 
