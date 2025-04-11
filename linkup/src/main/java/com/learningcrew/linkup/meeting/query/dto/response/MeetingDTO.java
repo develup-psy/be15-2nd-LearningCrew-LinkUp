@@ -1,6 +1,6 @@
 package com.learningcrew.linkup.meeting.query.dto.response;
 
-import com.learningcrew.linkup.common.constants.Gender;
+import com.learningcrew.linkup.linker.command.domain.constants.LinkerGender;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,7 +22,7 @@ public class MeetingDTO {
     private LocalTime endTime;
     private int minUser;
     private int maxUser;
-    private Gender gender;
+    private LinkerGender gender;
     private String ageGroup;
     private String level;
     private String customPlaceAddress;

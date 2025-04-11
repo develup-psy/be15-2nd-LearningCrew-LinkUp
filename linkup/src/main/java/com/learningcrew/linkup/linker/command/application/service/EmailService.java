@@ -1,7 +1,7 @@
 package com.learningcrew.linkup.linker.command.application.service;
 
-import com.learningcrew.linkup.common.exception.BusinessException;
-import com.learningcrew.linkup.common.exception.ErrorCode;
+import com.learningcrew.linkup.exception.BusinessException;
+import com.learningcrew.linkup.exception.ErrorCode;
 import com.learningcrew.linkup.linker.command.domain.service.UserDomainService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -14,9 +14,6 @@ import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 
 @Service
 @Slf4j

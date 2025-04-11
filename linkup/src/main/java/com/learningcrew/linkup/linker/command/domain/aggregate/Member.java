@@ -1,16 +1,14 @@
 package com.learningcrew.linkup.linker.command.domain.aggregate;
 
-import com.learningcrew.linkup.common.constants.Gender;
+import com.learningcrew.linkup.linker.command.domain.constants.LinkerGender;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.apache.ibatis.type.Alias;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-@Alias("UserMember")
 @Entity(name = "UserMember")
 @Table(name = "member")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -20,7 +18,7 @@ public class Member {
     private int memberId;
 
     @Enumerated(EnumType.STRING)
-    private Gender gender;
+    private LinkerGender gender;
 
     private String nickname;
 

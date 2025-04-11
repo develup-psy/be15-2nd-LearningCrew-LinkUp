@@ -1,6 +1,6 @@
 package com.learningcrew.linkup.linker.query.dto.query;
 
-import com.learningcrew.linkup.common.constants.Gender;
+import com.learningcrew.linkup.linker.command.domain.constants.LinkerGender;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,7 +12,7 @@ import java.time.LocalDate;
 public class MemberProfileDTO {
     private UserProfileDTO user;
     private String nickname;
-    private Gender gender;
+    private LinkerGender gender;
     private String introduction;
     private BigDecimal mannerTemperature;
     private LocalDate birthdate;
