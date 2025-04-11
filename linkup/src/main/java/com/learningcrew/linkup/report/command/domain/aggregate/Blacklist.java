@@ -1,11 +1,7 @@
 package com.learningcrew.linkup.report.command.domain.aggregate;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
-
 import java.time.LocalDateTime;
 
 // 블랙리스트

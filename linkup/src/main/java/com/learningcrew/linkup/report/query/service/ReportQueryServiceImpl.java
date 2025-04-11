@@ -2,8 +2,8 @@ package com.learningcrew.linkup.report.query.service;
 
 import com.learningcrew.linkup.common.dto.Pagination;
 import com.learningcrew.linkup.report.query.dto.request.ReportSearchRequest;
-import com.learningcrew.linkup.report.query.dto.request.ReporteeSearchRequest;
 import com.learningcrew.linkup.report.query.dto.request.ReporterSearchRequest;
+import com.learningcrew.linkup.report.query.dto.request.ReporteeSearchRequest;
 import com.learningcrew.linkup.report.query.dto.response.*;
 import com.learningcrew.linkup.report.query.mapper.ReportMapper;
 import lombok.RequiredArgsConstructor;

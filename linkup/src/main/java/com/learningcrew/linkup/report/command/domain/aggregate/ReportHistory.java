@@ -17,7 +17,7 @@ public class ReportHistory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "report_id")
-    private Integer id;
+    private Long id;
 
     @Column(name = "reporter_member_id", nullable = false)
     private Integer reporterId;
@@ -41,10 +41,16 @@ public class ReportHistory {
     private String reason;
 
     @Column(name = "created_at", nullable = false)
+    @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();
 
     @PrePersist
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
     }
+
+    public void updateStatus(int statusId) {
+        this.statusId = statusId;
+    }
+
 }

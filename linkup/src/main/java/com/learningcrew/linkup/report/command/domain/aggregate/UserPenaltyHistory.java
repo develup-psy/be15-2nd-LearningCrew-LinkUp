@@ -2,7 +2,6 @@ package com.learningcrew.linkup.report.command.domain.aggregate;
 
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.time.LocalDateTime;
 
 // 사용자 제재 이력
@@ -38,16 +37,15 @@ public class UserPenaltyHistory {
     @Column(name = "reason", nullable = false, columnDefinition = "TEXT")
     private String reason;
 
+    @Builder.Default
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
     @Column(name = "expired_at")
     private LocalDateTime expiredAt;
 
+    @Builder.Default
     @Column(name = "is_active", columnDefinition = "ENUM('Y','N')")
     private String isActive = "Y";
 
-    public enum PenaltyType {
-        post, comment, review
-    }
 }
