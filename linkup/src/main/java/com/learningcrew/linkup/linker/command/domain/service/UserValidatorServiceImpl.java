@@ -40,7 +40,7 @@ public class UserValidatorServiceImpl {
         }
     }
 
-    /* 비밀번호 중복 검사 */
+    /* 비밀번호 유효성 검사 */
     public void validatePassword(String rawPassword, String encodedPassword) {
         if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
             throw new BusinessException(ErrorCode.INVALID_CREDENTIALS);

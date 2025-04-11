@@ -31,5 +31,4 @@ public class UserAuthQueryController {
         return ResponseEntity.ok(ApiResponse.success(userProfileResponse));
     }
 
-
 }
