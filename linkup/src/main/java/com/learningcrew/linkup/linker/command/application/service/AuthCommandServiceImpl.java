@@ -12,8 +12,9 @@ import com.learningcrew.linkup.linker.command.domain.repository.RefreshtokenRepo
 import com.learningcrew.linkup.linker.command.domain.repository.UserRepository;
 import com.learningcrew.linkup.linker.command.domain.repository.VerificationTokenRepository;
 import com.learningcrew.linkup.linker.command.domain.service.TokenDomainService;
-import com.learningcrew.linkup.linker.command.domain.service.UserDomainService;
-import com.learningcrew.linkup.linker.command.domain.service.UserValidatorService;
+import com.learningcrew.linkup.linker.command.domain.service.TokenDomainServiceImpl;
+import com.learningcrew.linkup.linker.command.domain.service.UserDomainServiceImpl;
+import com.learningcrew.linkup.linker.command.domain.service.UserValidatorServiceImpl;
 import com.learningcrew.linkup.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,14 +25,14 @@ import java.util.Date;
 
 @Service
 @RequiredArgsConstructor
-public class UserAuthCommandService {
+public class AuthCommandServiceImpl implements AuthCommandService {
     private final JwtTokenProvider jwtTokenProvider;
     private final RefreshtokenRepository refreshtokenRepository;
-    private final UserValidatorService userValidatorService;
+    private final UserValidatorServiceImpl userValidatorService;
     private final TokenDomainService tokenDomainService;
     private final UserRepository userRepository;
     private final VerificationTokenRepository verificationTokenRepository;
-    private final UserDomainService userDomainService;
+    private final UserDomainServiceImpl userDomainService;
 
     /* 이메일 로직 구현 */
     @Transactional

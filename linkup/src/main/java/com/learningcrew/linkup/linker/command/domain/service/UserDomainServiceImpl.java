@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class UserDomainService {
+public class UserDomainServiceImpl {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final StatusMapper statusMapper;

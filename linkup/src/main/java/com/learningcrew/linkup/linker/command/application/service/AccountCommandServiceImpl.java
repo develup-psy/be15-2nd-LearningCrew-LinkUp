@@ -5,9 +5,9 @@ import com.learningcrew.linkup.linker.command.domain.aggregate.Member;
 import com.learningcrew.linkup.linker.command.domain.aggregate.User;
 import com.learningcrew.linkup.linker.command.domain.repository.UserRepository;
 import com.learningcrew.linkup.linker.command.application.dto.request.UserCreateRequest;
-import com.learningcrew.linkup.linker.command.domain.service.MemberDomainService;
-import com.learningcrew.linkup.linker.command.domain.service.UserDomainService;
-import com.learningcrew.linkup.linker.command.domain.service.UserValidatorService;
+import com.learningcrew.linkup.linker.command.domain.service.MemberDomainServiceImpl;
+import com.learningcrew.linkup.linker.command.domain.service.UserDomainServiceImpl;
+import com.learningcrew.linkup.linker.command.domain.service.UserValidatorServiceImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -17,12 +17,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class UserAccountCommandService {
+public class AccountCommandServiceImpl implements AccountCommandService {
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
-    private final UserValidatorService userValidatorService;
-    private final UserDomainService userDomainService;
-    private final MemberDomainService memberDomainService;
+    private final UserValidatorServiceImpl userValidatorService;
+    private final UserDomainServiceImpl userDomainService;
+    private final MemberDomainServiceImpl memberDomainService;
     private final EmailService emailService;
 
 
