@@ -2,8 +2,8 @@ package com.learningcrew.linkup.report.query.service;
 
 import com.learningcrew.linkup.common.dto.Pagination;
 import com.learningcrew.linkup.report.query.dto.request.ReportSearchRequest;
-import com.learningcrew.linkup.report.query.dto.request.ReporterSearchRequest;
 import com.learningcrew.linkup.report.query.dto.request.ReporteeSearchRequest;
+import com.learningcrew.linkup.report.query.dto.request.ReporterSearchRequest;
 import com.learningcrew.linkup.report.query.dto.response.*;
 import com.learningcrew.linkup.report.query.mapper.ReportMapper;
 import lombok.RequiredArgsConstructor;
@@ -19,10 +19,7 @@ public class ReportQueryServiceImpl implements ReportQueryService {
 
     private final ReportMapper reportMapper;
 
-    /**
-     * TEST-099, TEST-100, TEST-103, TEST-104
-     * 전체 및 조건별 신고 내역 조회
-     */
+    // 전체 및 조건별 신고 내역 조회
     @Override
     public ReportListResponse getReports(ReportSearchRequest request) {
         List<ReportDTO> reports = reportMapper.selectReports(request);
@@ -40,10 +37,7 @@ public class ReportQueryServiceImpl implements ReportQueryService {
                 .build();
     }
 
-    /**
-     * TEST-101
-     * 누적 신고 횟수별 신고자 목록 조회 (페이징)
-     */
+    // 누적 신고 횟수별 신고자 목록 조회 (페이징)
     @Override
     public ReportUserListResponse<ReportUserCountDTO> getReporterListByCount(ReporterSearchRequest request) {
         List<ReportUserCountDTO> users = reportMapper.selectReporterListByCount(request);
@@ -61,10 +55,7 @@ public class ReportQueryServiceImpl implements ReportQueryService {
                 .build();
     }
 
-    /**
-     * TEST-102
-     * 누적 신고 점수별 피신고자 목록 조회 (페이징)
-     */
+    // 누적 신고 점수별 피신고자 목록 조회 (페이징)
     @Override
     public ReportUserListResponse<ReportUserScoreDTO> getReporteeListByScore(ReporteeSearchRequest request) {
         List<ReportUserScoreDTO> users = reportMapper.selectReporteeListByScore(request);

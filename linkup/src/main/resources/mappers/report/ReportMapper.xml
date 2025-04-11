@@ -2,32 +2,31 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.learningcrew.linkup.report.query.mapper.ReportMapper">
 
-    <!-- 1. 전체 신고 내역 조회 (페이징 + 필터) -->
+    <!-- 전체 신고 내역 조회 (페이징 + 필터) -->
     <select id="selectReports" resultType="com.learningcrew.linkup.report.query.dto.response.ReportDTO">
         SELECT
-        rh.report_id,
-        rh.reporter_member_id,
-        ru.user_name AS reporter_name,
-        rh.target_member_id,
-        tu.user_name AS target_name,
-        rh.report_type_id,
-        rt.report_type AS report_type,
-        CASE rh.status_id
-        WHEN 1 THEN '처리중'
-        WHEN 2 THEN '처리완료'
-        WHEN 3 THEN '거절됨'
-        ELSE '알 수 없음'
-        END AS status,
-        rh.reason,
-        rh.post_id,
-        rh.comment_id,
-        rh.created_at
+            rh.report_id,
+            rh.reporter_member_id,
+            ru.user_name AS reporter_name,
+            rh.target_member_id,
+            tu.user_name AS target_name,
+            rh.report_type_id,
+            rt.report_type AS report_type,
+            CASE rh.status_id
+                WHEN 1 THEN '처리중'
+                WHEN 2 THEN '처리완료'
+                WHEN 3 THEN '거절됨'
+                ELSE '알 수 없음'
+            END AS status,
+            rh.reason,
+            rh.post_id,
+            rh.comment_id,
+            rh.created_at
         FROM report_history rh
         JOIN report_type rt ON rh.report_type_id = rt.report_type_id
         JOIN member rm ON rh.reporter_member_id = rm.member_id
-        JOIN user ru ON rm.member_id = ru.user_id
-        JOIN member tm ON rh.target_member_id = tm.member_id
-        JOIN user tu ON tm.member_id = tu.user_id
+        JOIN user ru ON rh.reporter_member_id = ru.user_id
+        JOIN user tu ON rh.target_member_id = tu.user_id
         WHERE 1=1
         <if test="req.reporterMemberId != null">
             AND rh.reporter_member_id = #{req.reporterMemberId}
@@ -45,7 +44,6 @@
         LIMIT #{req.size} OFFSET #{req.offset}
     </select>
 
-    <!-- 2. 전체 신고 건수 -->
     <select id="countReports" resultType="long">
         SELECT COUNT(*)
         FROM report_history rh
@@ -64,15 +62,14 @@
         </if>
     </select>
 
-    <!-- 3. 누적 신고 횟수 기준 신고자 목록 -->
+    <!-- 누적 신고 횟수 기준 신고자 목록 -->
     <select id="selectReporterListByCount" resultType="com.learningcrew.linkup.report.query.dto.response.ReportUserCountDTO">
         SELECT
-        rh.reporter_member_id AS memberId,
-        ru.user_name AS memberName,
-        COUNT(*) AS reportCount
+            rh.reporter_member_id AS memberId,
+            ru.user_name AS memberName,
+            COUNT(*) AS reportCount
         FROM report_history rh
-        JOIN member m ON rh.reporter_member_id = m.member_id
-        JOIN user ru ON m.member_id = ru.user_id
+        JOIN user ru ON rh.reporter_member_id = ru.user_id
         GROUP BY rh.reporter_member_id
         ORDER BY reportCount DESC
         LIMIT #{req.size} OFFSET #{req.offset}
@@ -84,16 +81,15 @@
     </select>
 
 
-    <!-- 4. 누적 신고 점수 기준 피신고자 목록 -->
+    <!-- 누적 신고 점수 기준 피신고자 목록 -->
     <select id="selectReporteeListByScore" resultType="com.learningcrew.linkup.report.query.dto.response.ReportUserScoreDTO">
         SELECT
-        rh.target_member_id AS memberId,
-        tu.user_name AS memberName,
-        SUM(rt.report_level) AS reportScore
+            rh.target_member_id AS memberId,
+            tu.user_name AS memberName,
+            SUM(rt.report_level) AS reportScore
         FROM report_history rh
         JOIN report_type rt ON rh.report_type_id = rt.report_type_id
-        JOIN member m ON rh.target_member_id = m.member_id
-        JOIN user tu ON m.member_id = tu.user_id
+        JOIN user tu ON rh.target_member_id = tu.user_id
         GROUP BY rh.target_member_id
         ORDER BY reportScore DESC
         LIMIT #{req.size} OFFSET #{req.offset}
@@ -102,6 +98,23 @@
     <select id="countReporteeListByScore" resultType="long">
         SELECT COUNT(DISTINCT target_member_id)
         FROM report_history
+    </select>
+
+    <!-- 중복 신고 여부 확인 -->
+    <select id="isDuplicateReport" resultType="boolean">
+        SELECT EXISTS (
+        SELECT 1
+        FROM report_history
+        WHERE reporter_member_id = #{reporterId}
+        AND target_member_id = #{targetId}
+        AND report_type_id = #{reportTypeId}
+        <if test="postId != null">
+            AND post_id = #{postId}
+        </if>
+        <if test="commentId != null">
+            AND comment_id = #{commentId}
+        </if>
+        )
     </select>
 
 </mapper>

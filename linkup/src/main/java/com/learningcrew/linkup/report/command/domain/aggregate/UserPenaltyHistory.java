@@ -2,6 +2,7 @@ package com.learningcrew.linkup.report.command.domain.aggregate;
 
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.time.LocalDateTime;
 
 // 사용자 제재 이력

@@ -31,9 +31,8 @@ public class ReportHistory {
     @Column(name = "comment_id")
     private Long commentId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "report_type_id", nullable = false)
-    private ReportType reportType;
+    @Column(name = "report_type_id", nullable = false)
+    private Byte reportTypeId;
 
     @Column(name = "status_id", nullable = false)
     private Integer statusId;
@@ -43,4 +42,9 @@ public class ReportHistory {
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDateTime.now();
+    }
 }
