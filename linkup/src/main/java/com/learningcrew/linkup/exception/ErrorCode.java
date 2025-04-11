@@ -1,4 +1,4 @@
-package com.learningcrew.linkup.common.exception;
+package com.learningcrew.linkup.exception;
 
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
@@ -48,7 +48,7 @@ public enum ErrorCode {
     INVALID_CREDENTIALS(HttpStatus.BAD_REQUEST, "아이디 혹은 비밀번호가 올바르지 않습니다."),
     ALREADY_VERIFIED(HttpStatus.BAD_REQUEST, "이미 인증을 거친 계정입니다"),
     INVALID_STATUS(HttpStatus.BAD_REQUEST, "유효하지 않은 상태입니다."),
-
+    INVALID_ROLE(HttpStatus.BAD_REQUEST, "올바르지 않는 권한입니다. "),
 
     //메일
     SEND_MAIL_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "메일 발송에 실패했습니다."),
