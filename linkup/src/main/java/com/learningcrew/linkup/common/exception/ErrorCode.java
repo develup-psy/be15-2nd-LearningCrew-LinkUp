@@ -80,6 +80,7 @@ public enum ErrorCode {
     // 신고
     REPORT_NOT_FOUND(HttpStatus.NOT_FOUND, "신고 내역을 찾을 수 없습니다."),
     REPORT_ALREADY_EXISTS(HttpStatus.CONFLICT, "해당 항목은 이미 신고되었습니다."),
+    REPORT_ALREADY_SUBMITTED(HttpStatus.BAD_REQUEST, "이미 신고한 사용자입니다."),
     REPORT_REASON_REQUIRED(HttpStatus.BAD_REQUEST, "신고 사유는 필수입니다."),
 
     // 알림
