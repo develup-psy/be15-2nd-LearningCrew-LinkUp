@@ -2,7 +2,6 @@ package com.learningcrew.linkup.meeting.command.application.controller;
 
 import com.learningcrew.linkup.common.dto.ApiResponse;
 import com.learningcrew.linkup.meeting.command.application.dto.request.MeetingCreateRequest;
-import com.learningcrew.linkup.meeting.command.application.dto.request.MeetingParticipationCreateRequest;
 import com.learningcrew.linkup.meeting.command.application.dto.response.LeaderUpdateResponse;
 import com.learningcrew.linkup.meeting.command.application.dto.response.ManageParticipationResponse;
 import com.learningcrew.linkup.meeting.command.application.dto.response.MeetingCommandResponse;
@@ -18,7 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -41,9 +39,6 @@ public class MeetingCommandController {
         int meetingId = meetingCommandService.createMeeting(meetingCreateRequest);
         MeetingCommandResponse response = new MeetingCommandResponse(meetingId);
 
-        MeetingParticipationCreateRequest request = new MeetingParticipationCreateRequest(meetingCreateRequest.getLeaderId(), meetingId, 2, LocalDateTime.now());
-        service.createMeetingParticipation(request);
-
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success(response));
     }
@@ -57,13 +52,12 @@ public class MeetingCommandController {
             @PathVariable int meetingId, @PathVariable int memberId, @RequestParam int requestedMemberId
     ) {
         int leaderId = meetingQueryService.getMeeting(meetingId)
-                .getMeeting()
                 .getLeaderId();
         if (leaderId != requestedMemberId) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
-        List<MeetingParticipationDTO> appliers = participationQueryService.getHistories(meetingId, 1).getMeetingParticipations();
+        List<MeetingParticipationDTO> appliers = participationQueryService.getHistories(meetingId, 1);
 
         if (appliers.stream().noneMatch(applier -> applier.getMemberId() == memberId)) {
             return ResponseEntity.badRequest().body(ApiResponse.failure( "참가 신청하지 않은 회원입니다."));
@@ -88,12 +82,12 @@ public class MeetingCommandController {
     public ResponseEntity<ApiResponse<ManageParticipationResponse>> rejectParticipation(
             @PathVariable int meetingId, @PathVariable int memberId, @RequestParam int requestedMemberId
     ) {
-        int leaderId = meetingQueryService.getMeeting(meetingId).getMeeting().getLeaderId();
+        int leaderId = meetingQueryService.getMeeting(meetingId).getLeaderId();
         if (leaderId != requestedMemberId) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
-        List<MeetingParticipationDTO> appliers = participationQueryService.getHistories(meetingId, 1).getMeetingParticipations();
+        List<MeetingParticipationDTO> appliers = participationQueryService.getHistories(meetingId, 1);
 
         if (appliers.stream().noneMatch(applier -> applier.getMemberId() == memberId)) {
             return ResponseEntity.badRequest().body(ApiResponse.failure("참가 신청하지 않은 회원입니다."));
@@ -133,7 +127,6 @@ public class MeetingCommandController {
             @PathVariable int meetingId, @RequestParam int memberId
     ) {
         int leaderId = meetingQueryService.getMeeting(meetingId)
-                .getMeeting()
                 .getLeaderId();
 
         if (leaderId != memberId) {
