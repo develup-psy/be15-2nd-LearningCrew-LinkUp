@@ -97,6 +97,7 @@ public class AccountCommandServiceImpl implements AccountCommandService {
         userRepository.save(user);
     }
 
+    /* 회원 계정 복구 */
     @Override
     @Transactional
     public void recoverUser(String email, String password) {

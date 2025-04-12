@@ -49,13 +49,14 @@ public enum ErrorCode {
     ALREADY_VERIFIED(HttpStatus.BAD_REQUEST, "이미 인증을 거친 계정입니다"),
     INVALID_STATUS(HttpStatus.BAD_REQUEST, "유효하지 않은 상태입니다."),
     INVALID_ROLE(HttpStatus.BAD_REQUEST, "올바르지 않는 권한입니다. "),
-    WITHDRAW_USER(HttpStatus.BAD_REQUEST, "이미 탈퇴한 계정입니다."),
+    WITHDRAW_USER(HttpStatus.UNAUTHORIZED, "이미 탈퇴한 계정입니다."),
     ACCOUNT_NOT_RECOVERABLE(HttpStatus.BAD_REQUEST, "복구 가능한 계정이 아닙니다. "),
+    DUPLICATE_PASSWORD(HttpStatus.BAD_REQUEST, "기존 비밀번호와 동일한 비밀번호는 사용할 수 없습니다. "),
 
     //메일
     SEND_MAIL_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "메일 발송에 실패했습니다."),
     NOT_AUTHORIZED_USER_EMAIL(HttpStatus.BAD_REQUEST, "이메일이 인증되지 않아 회원 가입에 실패했습니다."),
-    EXPIRE_VERIFICATION_CODE(HttpStatus.NOT_FOUND, "인증시간이 만료되었습니다. 다시 요청해주세요."),
+    EXPIRE_VERIFICATION_CODE(HttpStatus.BAD_REQUEST, "인증시간이 만료되었습니다. 다시 요청해주세요."),
     TOKEN_ALREADY_SENT(HttpStatus.CONFLICT, "이미 비밀번호 재설정 이메일이 전송되었습니다. 잠시 후 다시 시도해 주세요."),
     INVALID_VERIFICATION_TOKEN(HttpStatus.BAD_REQUEST, "이메일 인증코드가 일치하지 않습니다. "),
     INVALID_TOKEN_TYPE(HttpStatus.BAD_REQUEST, "이메일 타입이 일치하지 않습니다."),
