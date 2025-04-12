@@ -1,13 +1,15 @@
 package com.learningcrew.linkup.report.command.domain.repository;
 
 import com.learningcrew.linkup.report.command.domain.aggregate.ReportHistory;
-import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface ReportHistoryRepository extends JpaRepository<ReportHistory, Integer> {
+public interface ReportHistoryRepository {
 
-    // 중복 신고 방지를 위한 조건
+    ReportHistory save(ReportHistory report);
+
+    Optional<ReportHistory> findById(Long id);
+
     Optional<ReportHistory> findByReporterIdAndTargetIdAndReportTypeIdAndPostIdAndCommentId(
             Integer reporterId,
             Integer targetId,
@@ -15,4 +17,11 @@ public interface ReportHistoryRepository extends JpaRepository<ReportHistory, In
             Integer postId,
             Long commentId
     );
+
+    void updateStatusByPostId(Integer postId);
+
+    void updateStatusByCommentId(Long commentId);
+
+    void markAllReportsHandledByMemberId(Integer memberId);
+
 }
