@@ -2,6 +2,8 @@ package com.learningcrew.linkup.linker.command.application.service;
 
 import com.learningcrew.linkup.linker.command.application.dto.request.LoginRequest;
 import com.learningcrew.linkup.linker.command.application.dto.response.TokenResponse;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 
 public interface AuthCommandService {
 
@@ -12,4 +14,6 @@ public interface AuthCommandService {
     void logout(String refreshToken);
 
     void verifyEmail(String tokenCode);
+
+    void sendPasswordResetLink(@Email @NotBlank String email);
 }

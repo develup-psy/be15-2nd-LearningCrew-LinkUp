@@ -8,6 +8,7 @@ import com.learningcrew.linkup.linker.command.application.dto.response.TokenResp
 import com.learningcrew.linkup.linker.command.domain.aggregate.RefreshToken;
 import com.learningcrew.linkup.linker.command.domain.aggregate.User;
 import com.learningcrew.linkup.linker.command.domain.aggregate.VerificationToken;
+import com.learningcrew.linkup.linker.command.domain.constants.EmailTokenType;
 import com.learningcrew.linkup.linker.command.domain.constants.LinkerStatusType;
 import com.learningcrew.linkup.linker.command.domain.repository.RefreshtokenRepository;
 import com.learningcrew.linkup.linker.command.domain.repository.UserRepository;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -34,8 +36,9 @@ public class AuthCommandServiceImpl implements AuthCommandService {
     private final UserRepository userRepository;
     private final VerificationTokenRepository verificationTokenRepository;
     private final UserDomainServiceImpl userDomainService;
+    private final EmailService emailService;
 
-    /* 이메일 로직 구현 */
+    /* 로그인 기능 */
     @Transactional
     public TokenResponse login(LoginRequest request) {
 
@@ -45,6 +48,8 @@ public class AuthCommandServiceImpl implements AuthCommandService {
         // 활성화 상태 확인
         if(!(user.getStatus().getStatusType().equals(LinkerStatusType.ACCEPTED.name()))){
             throw new BusinessException(ErrorCode.NOT_AUTHORIZED_USER_EMAIL);
+        }else if(Objects.nonNull(user.getDeletedAt())){
+            throw new CustomJwtException(ErrorCode.WITHDRAW_USER);
         }
 
         // 비밀번호 확인
@@ -55,7 +60,7 @@ public class AuthCommandServiceImpl implements AuthCommandService {
         String refreshToken = tokenDomainService.generateRefreshToken(user);
 
         //refresh token 저장
-        tokenDomainService.saveRefreshToken(user.getEmail(), refreshToken);
+        tokenDomainService.saveRefreshToken(user.getUserId(),user.getEmail(), refreshToken);
 
         return TokenResponse
                 .builder()
@@ -64,7 +69,7 @@ public class AuthCommandServiceImpl implements AuthCommandService {
                 .build();
     }
 
-    /* 토큰 재발급 구현 */
+    /* 토큰 재발급  */
     @Transactional
     public TokenResponse refreshToken(String providedRefreshToken) {
         jwtTokenProvider.validateToken(providedRefreshToken);
@@ -89,7 +94,7 @@ public class AuthCommandServiceImpl implements AuthCommandService {
         String refreshToken = tokenDomainService.generateRefreshToken(user);
 
         //refresh token 저장
-        tokenDomainService.saveRefreshToken(user.getEmail(), refreshToken);
+        tokenDomainService.saveRefreshToken(user.getUserId(), user.getEmail(), refreshToken);
 
         return TokenResponse
                 .builder()
@@ -98,7 +103,7 @@ public class AuthCommandServiceImpl implements AuthCommandService {
                 .build();
     }
 
-    /* 로그아웃 기능 구현 */
+    /* 로그아웃 */
     @Transactional
     public void logout(String refreshToken) {
         jwtTokenProvider.validateToken(refreshToken);
@@ -106,7 +111,7 @@ public class AuthCommandServiceImpl implements AuthCommandService {
         refreshtokenRepository.deleteById(email);
     }
 
-    /* 이메일 인증 구현 */
+    /* 이메일 인증 */
     @Transactional
     public void verifyEmail(String tokenCode) {
         // 토큰 유효성 검사
@@ -128,13 +133,30 @@ public class AuthCommandServiceImpl implements AuthCommandService {
         User user = userRepository.findById(verificationToken.getUserId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
-//        if (!user.getStatus().getStatusType().equals("PENDING")) {
-//            throw new BusinessException(ErrorCode.ALREADY_VERIFIED);
-//        }
+        if (!user.getStatus().getStatusType().equals("PENDING")) {
+            throw new BusinessException(ErrorCode.ALREADY_VERIFIED);
+        }
 
         userDomainService.activateUser(user);
 
         /* 토큰 삭제 */
         verificationTokenRepository.delete(verificationToken);
+    }
+
+    /* 비밀번호 재설정 링크 전송 */
+    @Override
+    public void sendPasswordResetLink(String email) {
+        // 유저 조회
+        User user = userRepository.findByEmail(email).orElseThrow(
+                () -> new BusinessException(ErrorCode.USER_NOT_FOUND)
+        );
+
+        //계정 상태 확인
+        if(!user.getStatus().getStatusType().equals(LinkerStatusType.ACCEPTED.name())){
+            throw new BusinessException(ErrorCode.INVALID_STATUS);
+        }
+
+        // 이메일 전송
+        emailService.sendVerificationCode(user.getUserId(), user.getEmail(), user.getUserName(), EmailTokenType.RESET_PASSWORD.name());
     }
 }

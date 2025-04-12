@@ -49,6 +49,8 @@ public enum ErrorCode {
     ALREADY_VERIFIED(HttpStatus.BAD_REQUEST, "이미 인증을 거친 계정입니다"),
     INVALID_STATUS(HttpStatus.BAD_REQUEST, "유효하지 않은 상태입니다."),
     INVALID_ROLE(HttpStatus.BAD_REQUEST, "올바르지 않는 권한입니다. "),
+    WITHDRAW_USER(HttpStatus.BAD_REQUEST, "이미 탈퇴한 계정입니다."),
+    ACCOUNT_NOT_RECOVERABLE(HttpStatus.BAD_REQUEST, "복구 가능한 계정이 아닙니다. "),
 
     //메일
     SEND_MAIL_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "메일 발송에 실패했습니다."),

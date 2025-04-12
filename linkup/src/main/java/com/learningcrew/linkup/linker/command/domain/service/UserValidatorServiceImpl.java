@@ -5,11 +5,15 @@ import com.learningcrew.linkup.common.query.mapper.StatusMapper;
 import com.learningcrew.linkup.exception.BusinessException;
 import com.learningcrew.linkup.exception.ErrorCode;
 import com.learningcrew.linkup.linker.command.domain.aggregate.User;
+import com.learningcrew.linkup.linker.command.domain.constants.LinkerStatusType;
 import com.learningcrew.linkup.linker.command.domain.repository.MemberRepository;
 import com.learningcrew.linkup.linker.command.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -53,6 +57,21 @@ public class UserValidatorServiceImpl {
                 .orElseThrow(
                         () -> new BusinessException(ErrorCode.INVALID_CREDENTIALS)
                 );
+    }
+
+    public void isWithinRecoveryPeriod(String statusType, LocalDateTime deletedAt) {
+        // 삭제된 회원인지 확인
+        if (Objects.isNull(deletedAt) || !statusType.equals(LinkerStatusType.DELETED.name())) {
+            throw new BusinessException(ErrorCode.ACCOUNT_NOT_RECOVERABLE);
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime expiry = deletedAt.plusDays(90);
+
+        // 복구 유효기간 내 회원인지 확인
+        if(!now.isBefore(expiry)){
+            throw new BusinessException(ErrorCode.ACCOUNT_NOT_RECOVERABLE);
+        }
     }
 }
 

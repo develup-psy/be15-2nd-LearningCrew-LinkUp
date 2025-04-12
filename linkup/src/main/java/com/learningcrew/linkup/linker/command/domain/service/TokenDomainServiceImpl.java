@@ -24,8 +24,9 @@ public class TokenDomainServiceImpl implements TokenDomainService {
         return jwtTokenProvider.createRefreshToken(user.getEmail(), user.getRole().getRoleName());
     }
 
-    public void saveRefreshToken(String email, String refreshToken) {
+    public void saveRefreshToken(int userId, String email, String refreshToken) {
         RefreshToken refreshTokenEntity = RefreshToken.builder()
+                .userId(userId)
                 .userEmail(email)
                 .token(refreshToken)
                 .expiryDate(new Date(System.currentTimeMillis() + jwtTokenProvider.getRefreshTokenExpiration()))

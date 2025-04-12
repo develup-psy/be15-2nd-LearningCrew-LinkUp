@@ -1,12 +1,12 @@
 package com.learningcrew.linkup.linker.command.application.controller;
 
+import com.learningcrew.linkup.linker.command.application.dto.request.UserRecoverRequestDTO;
 import com.learningcrew.linkup.linker.command.application.dto.request.FindPasswordRequest;
 import com.learningcrew.linkup.linker.command.application.dto.request.LoginRequest;
 import com.learningcrew.linkup.linker.command.application.dto.request.UserCreateRequest;
 import com.learningcrew.linkup.linker.command.application.dto.request.WithdrawUserRequest;
 import com.learningcrew.linkup.linker.command.application.dto.response.RegisterResponse;
 import com.learningcrew.linkup.linker.command.application.service.AccountCommandService;
-import com.learningcrew.linkup.linker.command.application.service.AccountCommandServiceImpl;
 import com.learningcrew.linkup.common.dto.ApiResponse;
 import com.learningcrew.linkup.security.jwt.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
@@ -56,22 +56,9 @@ public class UserAccountCommandController {
 
     /* 계정 복구 */
     @PostMapping("/recover")
-    public ResponseEntity<ApiResponse<Void>> recoverUser(){
-        return null;
-    }
-
-    /* 비밀번호 찾기 - 비밀번호 재설정 url 발송 */
-    @PostMapping("/send-pw-reset-url")
-    @Operation(summary = "비밀번호 재설정 URL 발송", description = "이메일과 휴대폰로 비밀번호 재설정 url을 이메일로 발송")
-    public ResponseEntity<ApiResponse<Void>> sendPasswordResetUrl(@Valid @RequestBody FindPasswordRequest request) {
-        return null;
-    }
-
-    /* 비밀번호 재설정 */
-    @PostMapping("/reset-password")
-    public ResponseEntity<ApiResponse<Void>> resetPassword(@Valid @RequestBody LoginRequest request) {
-        log.info("비밀번호 재설정 URL 요청: email={}, contact={}", request.getEmail());
-        return null;
+    public ResponseEntity<ApiResponse<Void>> recoverUser(@RequestBody UserRecoverRequestDTO request){
+        userCommandService.recoverUser(request.getEmail(),request.getPassword());
+        return ResponseEntity.ok(ApiResponse.success(null,"계정이 복구되었습니다."));
     }
 
 
