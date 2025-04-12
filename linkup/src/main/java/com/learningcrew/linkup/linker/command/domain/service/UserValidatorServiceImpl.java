@@ -4,6 +4,7 @@ import com.learningcrew.linkup.common.domain.Status;
 import com.learningcrew.linkup.common.query.mapper.StatusMapper;
 import com.learningcrew.linkup.exception.BusinessException;
 import com.learningcrew.linkup.exception.ErrorCode;
+import com.learningcrew.linkup.exception.security.CustomJwtException;
 import com.learningcrew.linkup.linker.command.domain.aggregate.User;
 import com.learningcrew.linkup.linker.command.domain.constants.LinkerStatusType;
 import com.learningcrew.linkup.linker.command.domain.repository.MemberRepository;
@@ -51,6 +52,12 @@ public class UserValidatorServiceImpl {
         }
     }
 
+    public void validateDuplicatePassword(String rawPassword, String encodedPassword) {
+        if (passwordEncoder.matches(rawPassword, encodedPassword)) {
+            throw new BusinessException(ErrorCode.DUPLICATE_PASSWORD);
+        }
+    }
+
     /* 이메일 인증 검사 */
     public User validateEmail(String email) {
         return userRepository.findByEmail(email)
@@ -71,6 +78,18 @@ public class UserValidatorServiceImpl {
         // 복구 유효기간 내 회원인지 확인
         if(!now.isBefore(expiry)){
             throw new BusinessException(ErrorCode.ACCOUNT_NOT_RECOVERABLE);
+        }
+    }
+
+    public void validateUserStatus(String providedStatus, String targetStatus) {
+        if(!(providedStatus.equals(targetStatus))) {
+            throw new BusinessException(ErrorCode.NOT_AUTHORIZED_USER_EMAIL);
+        }
+    }
+
+    public void isDeletedUser(LocalDateTime userDeletedAt){
+        if(Objects.nonNull(userDeletedAt)){
+            throw new BusinessException(ErrorCode.WITHDRAW_USER);
         }
     }
 }

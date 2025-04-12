@@ -56,7 +56,7 @@ public class UserAuthCommandController {
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<Void>> logout(@Valid @RequestBody RefreshTokenRequest request){
         log.info("로그아웃 요청: refreshToken={}", request.getRefreshToken());
-        userAuthCommandService.logout(request.getRefreshToken());
+        userAuthCommandService.logout(request);
         log.info("로그아웃 처리 완료: refreshToken 삭제됨");
         return ResponseEntity.ok(ApiResponse.success(null));
     }
@@ -65,14 +65,15 @@ public class UserAuthCommandController {
     @PostMapping("/password/reset-link")
     @Operation(summary = "비밀번호 재설정 URL 발송", description = "이메일 조회 후 재설정 url을 이메일로 발송")
     public ResponseEntity<ApiResponse<Void>> sendPasswordResetUrl(@Valid @RequestBody FindPasswordRequest request) {
-        userAuthCommandService.sendPasswordResetLink(request.getEmail());
+        userAuthCommandService.sendPasswordResetLink(request);
         return ResponseEntity.ok(ApiResponse.success(null, "비밀번호 재설정 메일을 전송했습니다."));
     }
 
     /* 비밀번호 재설정 */
     @PostMapping("/password/reset")
     public ResponseEntity<ApiResponse<Void>> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
-        log.info("비밀번호 재설정 요청: email={}, token={}", request.getEmail(), request.getToken());
+        log.info("비밀번호 재설정 요청: email={}, token={}, password={}", request.getEmail(), request.getToken(), request.getNewPassword());
+        userAuthCommandService.resetPassword(request);
         return ResponseEntity.ok(ApiResponse.success(null, "비밀번호가 변경되었습니다."));
     }
 
