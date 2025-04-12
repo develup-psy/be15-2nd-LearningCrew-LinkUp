@@ -12,6 +12,7 @@ import com.learningcrew.linkup.linker.command.application.dto.request.UserCreate
 import com.learningcrew.linkup.linker.command.domain.service.MemberDomainServiceImpl;
 import com.learningcrew.linkup.linker.command.domain.service.UserDomainServiceImpl;
 import com.learningcrew.linkup.linker.command.domain.service.UserValidatorServiceImpl;
+import com.learningcrew.linkup.linker.query.dto.query.UserDeleteDTO;
 import com.learningcrew.linkup.linker.query.mapper.UserMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -83,8 +84,8 @@ public class AccountCommandServiceImpl implements AccountCommandService {
     @Override
     public void withdrawUser(String requestPassword, int userId) {
         //유저 조회
-        User user = userMapper.findByUserUserId(userId).orElseThrow(
-                () -> new BusinessException(ErrorCode.INVALID_CREDENTIALS)
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new BusinessException(ErrorCode.USER_NOT_FOUND)
         );
 
         //비밀번호 검증
@@ -100,10 +101,7 @@ public class AccountCommandServiceImpl implements AccountCommandService {
         userRepository.save(user);
     }
 
-    /* 이메일 인증 */
-
     /* 회원 정보 수정 - 닉네임, 휴대폰, 비밀번호 */
-
 
     /* 이메일 찾기 */
 
