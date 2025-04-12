@@ -19,27 +19,22 @@ public class PostComment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "comment_id")
     private BigInteger postCommentId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id", referencedColumnName = "post_id", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "post_id")
     private Post post;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", referencedColumnName = "user_id", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(name = "content", nullable = false, columnDefinition = "TEXT")
     private String postCommentContent;
 
-    @Column(name = "is_deleted", nullable = false, columnDefinition = "ENUM('Y', 'N') DEFAULT 'N'")
     private String postCommentIsDeleted = "N";
 
-    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime postCommentCreatedAt;
 
-    @Column(name = "deleted_at")
     private LocalDateTime postCommentDeletedAt;
 
     @PrePersist
