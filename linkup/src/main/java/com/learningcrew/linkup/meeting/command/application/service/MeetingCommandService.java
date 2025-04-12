@@ -82,14 +82,11 @@ public class MeetingCommandService {
 
         /* 3. 개설자를 모임 참가자에 등록 */
         int leaderId = meetingCreateRequest.getLeaderId();
-        LocalDateTime createdAt = LocalDateTime.now();
 
         MeetingParticipationCreateRequest request
                 = MeetingParticipationCreateRequest.builder()
-                .memberId(leaderId) // request
-                .meetingId(savedMeeting.getMeetingId())
-                .leaderId(savedMeeting.getLeaderId()) // DB 조회
-                .participatedAt(createdAt)
+                .memberId(leaderId)
+//                .participatedAt(createdAt)
                 .build();
 
         participationCommandService.createMeetingParticipation(request, savedMeeting);

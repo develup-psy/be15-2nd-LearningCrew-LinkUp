@@ -43,6 +43,7 @@ public class MeetingParticipationController {
         Meeting meeting = modelMapper.map(meetingQueryService.getMeeting(meetingId), Meeting.class);
 
         long participationId = service.createMeetingParticipation(request, meeting);
+
         MeetingParticipationCommandResponse response
                 = MeetingParticipationCommandResponse
                 .builder()

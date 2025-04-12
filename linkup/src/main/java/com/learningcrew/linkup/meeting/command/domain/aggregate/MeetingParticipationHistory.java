@@ -19,12 +19,10 @@ public class MeetingParticipationHistory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long participationId;
     private int memberId;
+    @Setter
     private int meetingId;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @CreationTimestamp
-    @Column(updatable = false)
+    @Setter
     private LocalDateTime participatedAt;
     @Setter
     private int statusId;
-
 }
