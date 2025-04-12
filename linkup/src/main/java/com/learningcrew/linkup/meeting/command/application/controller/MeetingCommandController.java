@@ -52,7 +52,7 @@ public class MeetingCommandController {
                 meetingCreateRequest.getEndTime()
         );
         ReservationCommandResponse reservationResponse = reservationCommandService.createReservation(reservationCreateRequest);
-        System.out.println("예약 처리 결과 🔍: " + reservationResponse.getMessage());
+        System.out.println(reservationResponse.getMessage());
 
         MeetingCommandResponse response = new MeetingCommandResponse(meetingId);
 
