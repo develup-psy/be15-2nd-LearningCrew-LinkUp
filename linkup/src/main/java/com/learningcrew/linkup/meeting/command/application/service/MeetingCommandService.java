@@ -14,6 +14,8 @@ import com.learningcrew.linkup.meeting.query.mapper.MeetingMapper;
 import com.learningcrew.linkup.meeting.query.mapper.MeetingParticipationMapper;
 import com.learningcrew.linkup.meeting.query.service.MeetingParticipationQueryService;
 import com.learningcrew.linkup.meeting.query.service.MeetingQueryService;
+import com.learningcrew.linkup.place.command.application.service.ReservationCommandService;
+import com.learningcrew.linkup.place.command.domain.repository.ReservationRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -34,6 +36,9 @@ public class MeetingCommandService {
     private final MeetingParticipationCommandService commandService;
     private final MeetingQueryService meetingQueryService;
     private final MeetingParticipationQueryService meetingParticipationQueryService;
+
+    // 예약 서비스 ( 준서 )
+    private final ReservationCommandService reservationCommandService;
 
     /* 모임 등록 */
     @Transactional
