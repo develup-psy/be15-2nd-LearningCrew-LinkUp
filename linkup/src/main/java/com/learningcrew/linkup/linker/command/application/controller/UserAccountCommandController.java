@@ -46,7 +46,7 @@ public class UserAccountCommandController {
 
     /* 회원 탈퇴 */
     @DeleteMapping("/withdraw")
-    public ResponseEntity<ApiResponse<Void>> deleteUser(@AuthenticationPrincipal CustomUserDetails userDetails, WithdrawUserRequest request) {
+    public ResponseEntity<ApiResponse<Void>> deleteUser(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody WithdrawUserRequest request) {
         log.info("회원탈퇴 요청: password={}",
                 request.getPassword());
         userCommandService.withdrawUser(request.getPassword(), userDetails.getUserId());
