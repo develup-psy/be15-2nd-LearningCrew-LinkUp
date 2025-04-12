@@ -11,9 +11,8 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ReservationCreateRequest {
-    private int meetingId;
+    private Integer meetingId;
     private int placeId;
-    private int statusId;
     private Date reservationDate;
     private LocalTime startTime;
     private LocalTime endTime;

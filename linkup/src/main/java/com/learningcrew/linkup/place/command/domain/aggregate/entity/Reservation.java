@@ -32,6 +32,8 @@ public class Reservation {
     @Column(name = "status_id")
     private int statusId;
 
+    @Temporal(TemporalType.DATE)
+    @Column(name = "reservation_date")
     private Date reservationDate;
     private LocalTime startTime;
     private LocalTime endTime;

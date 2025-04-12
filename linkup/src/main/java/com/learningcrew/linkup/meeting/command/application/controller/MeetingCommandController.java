@@ -12,6 +12,7 @@ import com.learningcrew.linkup.meeting.query.dto.response.MeetingParticipationDT
 import com.learningcrew.linkup.meeting.query.service.MeetingParticipationQueryService;
 import com.learningcrew.linkup.meeting.query.service.MeetingQueryService;
 import com.learningcrew.linkup.place.command.application.dto.request.ReservationCreateRequest;
+import com.learningcrew.linkup.place.command.application.dto.response.ReservationCommandResponse;
 import com.learningcrew.linkup.place.command.application.service.ReservationCommandService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -46,12 +47,13 @@ public class MeetingCommandController {
         ReservationCreateRequest reservationCreateRequest = new ReservationCreateRequest(
                 meetingId,
                 meetingCreateRequest.getPlaceId(),
-                meetingCreateRequest.getStatusId(), // or 고정값 2
                 java.sql.Date.valueOf(meetingCreateRequest.getDate()),
                 meetingCreateRequest.getStartTime(),
                 meetingCreateRequest.getEndTime()
         );
-        reservationCommandService.createReservation(reservationCreateRequest);
+        ReservationCommandResponse reservationResponse = reservationCommandService.createReservation(reservationCreateRequest);
+        System.out.println("예약 처리 결과 🔍: " + reservationResponse.getMessage());
+
         MeetingCommandResponse response = new MeetingCommandResponse(meetingId);
 
         MeetingParticipationCreateRequest request = new MeetingParticipationCreateRequest(meetingCreateRequest.getLeaderId(), meetingId, 2, LocalDateTime.now());
