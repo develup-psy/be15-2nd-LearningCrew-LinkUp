@@ -1,5 +1,6 @@
 package com.learningcrew.linkup.linker.command.application.controller;
 
+import com.learningcrew.linkup.linker.command.application.dto.ProfileUpdateRequest;
 import com.learningcrew.linkup.linker.command.application.dto.request.UserRecoverRequestDTO;
 import com.learningcrew.linkup.linker.command.application.dto.request.FindPasswordRequest;
 import com.learningcrew.linkup.linker.command.application.dto.request.LoginRequest;
@@ -60,6 +61,14 @@ public class UserAccountCommandController {
         userCommandService.recoverUser(request.getEmail(),request.getPassword());
         return ResponseEntity.ok(ApiResponse.success(null,"계정이 복구되었습니다."));
     }
+
+    /* 프로필 수정 */
+    @PutMapping("/me/profile")
+    public ResponseEntity<ApiResponse<Void>> updateProfile(@AuthenticationPrincipal CustomUserDetails customUserDetails,@RequestBody ProfileUpdateRequest request){
+        userCommandService.updateProfile(customUserDetails.getUserId(), request);
+        return ResponseEntity.ok(ApiResponse.success(null, "프로필이 수정되었습니다. "));
+    }
+
 
 
 }

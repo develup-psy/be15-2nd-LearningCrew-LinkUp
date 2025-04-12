@@ -194,6 +194,11 @@ public class AuthCommandServiceImpl implements AuthCommandService {
                 () -> new BusinessException(ErrorCode.USER_NOT_FOUND)
         );
 
+        // 토큰 내 이메일이 있는지 확인
+        if (!verificationToken.getEmail().equals(user.getEmail())) {
+            throw new BusinessException(ErrorCode.INVALID_VERIFICATION_TOKEN);
+        }
+
         // 활성화 상태 확인
         userValidatorService.validateUserStatus(user.getStatus().getStatusType(),LinkerStatusType.ACCEPTED.name());
 
@@ -201,9 +206,10 @@ public class AuthCommandServiceImpl implements AuthCommandService {
         userValidatorService.isDeletedUser(user.getDeletedAt());
 
         // 이전 비밀번호 중복 검사
-        userValidatorService.validateDuplicatePassword(user.getPassword(), request.getNewPassword());
+        userValidatorService.validateDuplicatePassword(request.getNewPassword(), user.getPassword());
 
         // 비밀번호 암호화
+        user.setPassword(request.getNewPassword());
         userDomainService.encryptPassword(user);
 
         userRepository.save(user);

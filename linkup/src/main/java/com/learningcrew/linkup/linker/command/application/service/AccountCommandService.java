@@ -1,5 +1,6 @@
 package com.learningcrew.linkup.linker.command.application.service;
 
+import com.learningcrew.linkup.linker.command.application.dto.ProfileUpdateRequest;
 import com.learningcrew.linkup.linker.command.application.dto.request.UserCreateRequest;
 import com.learningcrew.linkup.linker.command.application.dto.request.WithdrawUserRequest;
 import com.learningcrew.linkup.linker.command.application.dto.response.RegisterResponse;
@@ -13,10 +14,7 @@ public interface AccountCommandService {
 
     void recoverUser(String email, String password);
 
-    // void verifyEmail(...);
-    // void updateProfile(...);
-    // void deleteUser(...);
-    // void sendResetToken(...);
-    // void resetPassword(...);
+    void updateProfile(int userId, ProfileUpdateRequest request);
+
 }
 

@@ -1,10 +1,13 @@
 package com.learningcrew.linkup.linker.command.domain.aggregate;
 
+import ch.qos.logback.core.util.StringUtil;
+import com.learningcrew.linkup.linker.command.application.dto.ProfileUpdateRequest;
 import com.learningcrew.linkup.linker.command.domain.constants.LinkerGender;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -38,5 +41,17 @@ public class Member {
 
     public void setNickName(String nickname) {
         this.nickname = nickname;
+    }
+
+    public void updateProfile(ProfileUpdateRequest request){
+        if(StringUtils.hasText(request.getNickname())){
+            this.nickname = request.getNickname();
+        }
+        if(StringUtils.hasText(request.getProfileImageUrl())){
+            this.profileImageUrl = request.getProfileImageUrl();
+        }
+        if(StringUtils.hasText(request.getIntroduction())){
+            this.introduction = request.getIntroduction();
+        }
     }
 }
