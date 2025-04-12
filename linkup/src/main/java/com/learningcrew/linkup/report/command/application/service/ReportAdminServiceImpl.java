@@ -4,7 +4,7 @@ import com.learningcrew.linkup.report.command.application.dto.request.HandleRepo
 import com.learningcrew.linkup.report.command.application.dto.response.ReportHandleResponse;
 import com.learningcrew.linkup.report.command.domain.aggregate.ReportHistory;
 import com.learningcrew.linkup.report.command.domain.aggregate.UserPenaltyHistory;
-import com.learningcrew.linkup.report.command.domain.repository.ReportRepository;
+import com.learningcrew.linkup.report.command.domain.repository.ReportHistoryRepository;
 import com.learningcrew.linkup.report.command.domain.repository.UserPenaltyHistoryRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -16,10 +16,10 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class ReportAdminServiceImpl implements ReportAdminService {
 
-    private final ReportRepository reportRepository;
+    private final ReportHistoryRepository reportRepository;
     private final UserPenaltyHistoryRepository userPenaltyHistoryRepository;
 
-    // 1. 허위 신고 처리 (상태만 변경)
+    // 허위 신고 처리 (상태만 변경)
     @Transactional
     @Override
     public ReportHandleResponse markAsFalseReport(Long reportId) {
@@ -36,7 +36,7 @@ public class ReportAdminServiceImpl implements ReportAdminService {
                 .build();
     }
 
-    // 2. 신고 처리 + 제재 등록
+    // 신고 처리 + 제재 등록
     @Transactional
     @Override
     public ReportHandleResponse completeReportAndPenalize(Long reportId, HandleReportRequest request) {
@@ -51,8 +51,8 @@ public class ReportAdminServiceImpl implements ReportAdminService {
         UserPenaltyHistory penalty = UserPenaltyHistory.builder()
                 .memberId(report.getTargetId())
                 .postId(report.getPostId())
-                .commentId(report.getCommentId()) // 이미 Long 타입
-                .penaltyType(request.getPenaltyType()) // Enum 직접 사용
+                .commentId(report.getCommentId())
+                .penaltyType(request.getPenaltyType())
                 .reason(request.getReason())
                 .createdAt(LocalDateTime.now())
                 .isActive("Y")

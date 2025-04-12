@@ -1,32 +1,45 @@
 package com.learningcrew.linkup.place.command.domain.aggregate.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Table(name = "place_review")
-@NoArgsConstructor()
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class PlaceReview {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "review_id")
-    private int reviewId;
+    private Integer reviewId;
 
-    @Column(name = "member_id")
-    private int memberId;
+    @Column(name = "member_id", nullable = false)
+    private Integer memberId;
 
-    @Column(name = "place_id")
-    private int placeId;
+    @Column(name = "place_id", nullable = false)
+    private Integer placeId;
 
-    @Column(name= "participation_id")
-    private int participationId;
+    @Column(name = "participation_id", nullable = false)
+    private Integer participationId;
 
+    @Column(name = "status_id", nullable = false)
+    private Integer statusId;
+
+    @Column(name = "review_content", columnDefinition = "TEXT")
     private String reviewContent;
+
+    @Column(name = "review_image_url", columnDefinition = "TEXT")
     private String reviewImageUrl;
-    private int ReviewScore;
-    private char isVisible;
+
+    @Column(name = "review_score", nullable = false)
+    private Integer reviewScore;
+
+    // 제재 처리 시 상태 ID 업데이트 메서드
+    public void updateStatus(Integer statusId) {
+        this.statusId = statusId;
+    }
 }
