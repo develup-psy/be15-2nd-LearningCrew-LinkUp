@@ -1,16 +1,18 @@
 package com.learningcrew.linkup.place.command.application.dto.request;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalTime;
 import java.util.Date;
 
 @Getter
-@RequiredArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
 public class ReservationCreateRequest {
-    private int placeId;
     private int meetingId;
+    private int placeId;
     private int statusId;
     private Date reservationDate;
     private LocalTime startTime;

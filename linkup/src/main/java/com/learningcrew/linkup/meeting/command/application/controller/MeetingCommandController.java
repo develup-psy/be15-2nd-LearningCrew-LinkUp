@@ -11,6 +11,8 @@ import com.learningcrew.linkup.meeting.command.application.service.MeetingPartic
 import com.learningcrew.linkup.meeting.query.dto.response.MeetingParticipationDTO;
 import com.learningcrew.linkup.meeting.query.service.MeetingParticipationQueryService;
 import com.learningcrew.linkup.meeting.query.service.MeetingQueryService;
+import com.learningcrew.linkup.place.command.application.dto.request.ReservationCreateRequest;
+import com.learningcrew.linkup.place.command.application.service.ReservationCommandService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -29,6 +31,7 @@ public class MeetingCommandController {
     private final MeetingParticipationCommandService service;
     private final MeetingParticipationQueryService participationQueryService;
     private final MeetingQueryService meetingQueryService;
+    private final ReservationCommandService reservationCommandService;
 
     @Operation(
             summary = "모임 생성",
@@ -39,6 +42,16 @@ public class MeetingCommandController {
             @RequestBody @Validated MeetingCreateRequest meetingCreateRequest
     ) {
         int meetingId = meetingCommandService.createMeeting(meetingCreateRequest);
+        // 2. 예약 생성
+        ReservationCreateRequest reservationCreateRequest = new ReservationCreateRequest(
+                meetingId,
+                meetingCreateRequest.getPlaceId(),
+                meetingCreateRequest.getStatusId(), // or 고정값 2
+                java.sql.Date.valueOf(meetingCreateRequest.getDate()),
+                meetingCreateRequest.getStartTime(),
+                meetingCreateRequest.getEndTime()
+        );
+        reservationCommandService.createReservation(reservationCreateRequest);
         MeetingCommandResponse response = new MeetingCommandResponse(meetingId);
 
         MeetingParticipationCreateRequest request = new MeetingParticipationCreateRequest(meetingCreateRequest.getLeaderId(), meetingId, 2, LocalDateTime.now());

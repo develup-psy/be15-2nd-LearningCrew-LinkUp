@@ -37,8 +37,6 @@ public class MeetingCommandService {
     private final MeetingQueryService meetingQueryService;
     private final MeetingParticipationQueryService meetingParticipationQueryService;
 
-    // 예약 서비스 ( 준서 )
-    private final ReservationCommandService reservationCommandService;
 
     /* 모임 등록 */
     @Transactional

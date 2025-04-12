@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class ReservationCommandService {
+
     private final ReservationRepository reservationRepository;
 
     public void createReservation(ReservationCreateRequest reservationCreateRequest) {
