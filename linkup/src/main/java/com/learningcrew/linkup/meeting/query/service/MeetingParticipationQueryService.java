@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.nio.file.AccessDeniedException;
 import java.util.List;
 
 @Service
@@ -57,6 +56,15 @@ public class MeetingParticipationQueryService {
 
         return MeetingParticipationResponse.builder()
                 .participationId(response.getParticipationId())
+                .build();
+    }
+
+    @Transactional(readOnly = true)
+    public MeetingParticipationListResponse getUserMeetingHistory(int userId) {
+        List<MeetingParticipationDTO> participations = mapper.selectMeetingParticipationsByUserId(userId);
+
+        return MeetingParticipationListResponse.builder()
+                .meetingParticipations(participations)
                 .build();
     }
 }

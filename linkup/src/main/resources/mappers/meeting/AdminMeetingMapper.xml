@@ -3,37 +3,10 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.learningcrew.linkup.meeting.query.mapper.MeetingMapper">
+<mapper namespace="com.learningcrew.linkup.meeting.query.mapper.AdminMeetingMapper">
 
-    <!-- TEST-051: 모임 상세 조회 -->
-    <select id="selectMeetingById" resultType="MeetingDTO">
-        SELECT
-        meeting_id AS meetingId,
-        leader_id AS leaderId,
-        place_id AS placeId,
-        sport_id AS sportId,
-        status_id AS statusId,
-        meeting_title AS meetingTitle,
-        meeting_content AS meetingContent,
-        date,
-        start_time AS startTime,
-        end_time AS endTime,
-        min_user AS minUser,
-        max_user AS maxUser,
-        created_at AS createdAt,
-        gender,
-        age_group AS ageGroup,
-        level,
-        custom_place_address AS customPlaceAddress,
-        latitude,
-        longitude
-        FROM meeting
-        WHERE meeting_id = #{meetingId}
-        AND status_id != 4
-    </select>
-
-    <!-- TEST-049, 050: 회원용 조건/목록 조회 -->
-    <select id="selectMeetings" resultType="MeetingDTO">
+    <!-- TEST-047: 관리자 - 전체 모임 목록 조회 -->
+    <select id="selectAllMeetings" resultType="MeetingDTO">
         SELECT
         meeting_id AS meetingId,
         leader_id AS leaderId,
@@ -54,8 +27,8 @@
         latitude,
         longitude
         FROM meeting
-        WHERE gender = #{gender}
-        AND status_id != 4
+        WHERE 1 = 1
+        <if test="gender != null">AND gender = #{gender}</if>
 
         <if test="ageGroups != null and ageGroups.size() > 0">
             AND (
@@ -95,11 +68,12 @@
         LIMIT #{limit} OFFSET #{offset}
     </select>
 
-    <select id="countMeetings" resultType="long">
+    <!-- TEST-047: 전체 모임 수 (페이징 카운트용) -->
+    <select id="countAllMeetings" resultType="long">
         SELECT COUNT(*)
         FROM meeting
-        WHERE gender = #{gender}
-        AND status_id != 4
+        WHERE 1 = 1
+        <if test="gender != null">AND gender = #{gender}</if>
 
         <if test="ageGroups != null and ageGroups.size() > 0">
             AND (

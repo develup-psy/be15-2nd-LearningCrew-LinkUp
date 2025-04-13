@@ -6,6 +6,7 @@ import com.learningcrew.linkup.meeting.query.dto.response.MeetingDetailResponse;
 import com.learningcrew.linkup.meeting.query.dto.response.MeetingListResponse;
 import com.learningcrew.linkup.meeting.query.service.MeetingQueryService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
+@Tag(name = "모임 상세 조회", description = "모임의 조건이나 장소 등 상세 정보 조회")
 public class MeetingQueryController {
 
     private final MeetingQueryService meetingQueryService;
