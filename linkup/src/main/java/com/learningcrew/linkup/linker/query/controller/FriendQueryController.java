@@ -1,6 +1,7 @@
 package com.learningcrew.linkup.linker.query.controller;
 
 import com.learningcrew.linkup.common.dto.ApiResponse;
+import com.learningcrew.linkup.linker.query.dto.query.UserMeetingDto;
 import com.learningcrew.linkup.linker.query.dto.response.FriendRequestResponse;
 import com.learningcrew.linkup.linker.query.dto.response.FriendInfoResponse;
 import com.learningcrew.linkup.linker.query.service.FriendQueryService;
@@ -11,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -37,5 +39,13 @@ public class FriendQueryController {
         List<FriendRequestResponse> responses = friendQueryService.getReceivedRequests(customUserDetails.getUserId());
         log.info("받은 친구 요청 조회 완료");
         return ResponseEntity.ok(ApiResponse.success(responses, "받은 친구 요청 조회 성공"));
+    }
+
+    /* 친구 개설 모임 조회 */
+    @GetMapping("/{userId}/friends/meetings")
+    @Operation(summary = "친구가 개설한 모임 조회", description = "사용자의 친구가 개설한 모임 목록을 조회합니다.")
+    public ResponseEntity<List<UserMeetingDto>> getMeetingsByFriends(@PathVariable int userId) {
+        List<UserMeetingDto> meetings = friendQueryService.findMeetingsCreatedByFriends(userId);
+        return ResponseEntity.ok(meetings);
     }
 }

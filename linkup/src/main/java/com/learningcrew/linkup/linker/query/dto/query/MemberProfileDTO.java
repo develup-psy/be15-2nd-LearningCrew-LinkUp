@@ -9,8 +9,8 @@ import java.time.LocalDate;
 
 @Setter
 @Getter
-public class MemberProfileDTO {
-    private UserProfileDTO user;
+public class MemberProfileDto {
+    private UserProfileDto user;
     private String nickname;
     private LinkerGender gender;
     private String introduction;

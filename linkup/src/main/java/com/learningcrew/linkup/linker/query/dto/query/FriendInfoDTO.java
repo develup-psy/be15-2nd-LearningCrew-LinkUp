@@ -4,11 +4,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
-
 @Getter
 @Builder
-public class FriendInfoDTO {
+public class FriendInfoDto {
 
     @Schema(description = "친구 회원 ID", example = "8")
     private Integer friendId;

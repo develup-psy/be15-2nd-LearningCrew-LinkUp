@@ -4,12 +4,11 @@ import com.learningcrew.linkup.common.dto.query.RoleDTO;
 import com.learningcrew.linkup.common.query.mapper.RoleMapper;
 import com.learningcrew.linkup.exception.BusinessException;
 import com.learningcrew.linkup.exception.ErrorCode;
-import com.learningcrew.linkup.linker.query.dto.query.MemberProfileDTO;
-import com.learningcrew.linkup.linker.query.dto.query.UserProfileDTO;
+import com.learningcrew.linkup.linker.query.dto.query.MemberProfileDto;
+import com.learningcrew.linkup.linker.query.dto.query.UserProfileDto;
 import com.learningcrew.linkup.linker.query.dto.response.UserListResponse;
 import com.learningcrew.linkup.linker.query.dto.response.UserProfileResponse;
 import com.learningcrew.linkup.linker.query.mapper.MemberMapper;
-import com.learningcrew.linkup.common.query.mapper.StatusMapper;
 import com.learningcrew.linkup.linker.query.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,7 +24,7 @@ public class UserQueryServiceImpl {
     private final RoleMapper roleMapper;
 
     public UserProfileResponse getUserProfile(int userId) {
-        MemberProfileDTO memberProfileDTO = Optional.ofNullable(memberMapper.getUserProfileByEmail(userId))
+        MemberProfileDto memberProfileDTO = Optional.ofNullable(memberMapper.getUserProfileByEmail(userId))
                 .orElseThrow(() -> new RuntimeException("유저 정보 찾지 못함"));
 
         return UserProfileResponse
@@ -36,7 +35,7 @@ public class UserQueryServiceImpl {
 
     public UserListResponse getUserList() {
         int roleId = getRoleIdByRoleName("USER");
-        List<UserProfileDTO> userProfileDTOList = userMapper.findAllUsers(roleId);
+        List<UserProfileDto> userProfileDTOList = userMapper.findAllUsers(roleId);
         return UserListResponse
                 .builder()
                 .userProfileDTOList(userProfileDTOList)

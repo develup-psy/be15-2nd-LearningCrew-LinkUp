@@ -5,11 +5,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
-
 @Getter
 @Builder
-public class FriendRequestStatusDTO {
+public class FriendRequestStatusDto {
 
     @Schema(description = "대상자 ID", example = "7")
     private Integer targetMemberId;
