@@ -145,7 +145,7 @@ public class MeetingCommandService {
         }
 
         MeetingDTO meeting = meetingMapper.selectMeetingById(meetingId);
-        meeting.setStatusId(4);
+        meeting.setStatusType("모임 취소");
         meetingRepository.save(modelMapper.map(meeting, Meeting.class));
     }
 }

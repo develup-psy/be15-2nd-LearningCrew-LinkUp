@@ -6,24 +6,28 @@ import com.learningcrew.linkup.meeting.query.dto.response.MeetingDTO;
 import com.learningcrew.linkup.meeting.query.dto.response.MeetingListResponse;
 import com.learningcrew.linkup.meeting.query.service.MeetingQueryService;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
+@Validated
 public class MeetingQueryController {
 
     private final MeetingQueryService meetingQueryService;
+    // statusType PENDING 등 수정?
 
     @Operation(
             summary = "모임 상세 조회",
             description = "회원이 개설된 모임 목록에서 특정 모임의 상세 정보를 조회한다"
     )
     @GetMapping("/api/v1/meetings/{meetingId}")
-    public ResponseEntity<ApiResponse<MeetingDTO>> getMeeting(@PathVariable int meetingId) {
+    public ResponseEntity<ApiResponse<MeetingDTO>> getMeetingDetails(@PathVariable int meetingId) {
         MeetingDTO response = meetingQueryService.getMeeting(meetingId);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
@@ -33,8 +37,8 @@ public class MeetingQueryController {
             description = "회원이 검색 조건을 설정하여 모임 목록을 조회한다."
     )
     @GetMapping("/api/v1/meetings")
-    public ResponseEntity<ApiResponse<MeetingListResponse>> getMeetings(
-            MeetingSearchRequest meetingSearchRequest
+    public ResponseEntity<ApiResponse<MeetingListResponse>> getMeetingsWithPaging(
+            @RequestBody MeetingSearchRequest meetingSearchRequest
     ) {
         MeetingListResponse response = meetingQueryService.getMeetings(meetingSearchRequest);
 

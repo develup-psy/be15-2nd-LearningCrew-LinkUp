@@ -4,95 +4,143 @@
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.learningcrew.linkup.meeting.query.mapper.MeetingMapper">
     <select id="selectMeetingById" resultType="MeetingDTO">
-        SELECT meeting_id, leader_id, place_id, sport_id, status_id,
-        meeting_title, meeting_content, date, start_time, end_time,
-        min_user, max_user, created_at, gender, age_group,
-        level, custom_place_address, latitude, longitude
-        FROM meeting
-        WHERE meeting_id = #{ meetingId }
-        AND status_id != 4 -- DELETED
+        SELECT a.meeting_id,
+        a.leader_id,
+        b.nickname AS leaderNickname,
+        a.place_id,
+        c.place_name AS placeName,
+        c.address AS placeAddress,
+        a.sport_id,
+        d.sport_name AS sportName,
+        a.status_id,
+        e.status_type AS statusType,
+        a.meeting_title,
+        a.meeting_content,
+        a.date,
+        a.start_time,
+        a.end_time,
+        a.min_user,
+        a.max_user,
+        a.created_at,
+        a.gender AS meetingGender,
+        a.age_group,
+        a.level,
+        a.custom_place_address
+        FROM meeting a
+        JOIN member b ON a.leader_id = b.member_id
+        LEFT JOIN place c ON COALESCE(a.place_id, 0) = COALESCE(c.place_id, 0)
+        JOIN sport_type d ON a.sport_id = d.sport_id
+        JOIN status e ON a.status_id = e.status_id
+        WHERE a.meeting_id = #{meetingId}
     </select>
+    <select id="selectMeetings" resultType="MeetingSummaryDTO">
+        SELECT a.meeting_id,
+        b.nickname AS leaderNickname,
+        c.place_name AS placeName,
+        c.address AS placeAddress,
+        d.sport_name AS sportName,
+        e.status_type AS statusType,
+        a.meeting_title,
+        a.date,
+        a.start_time,
+        a.end_time,
+        a.min_user,
+        a.max_user,
+        a.gender AS meetingGender,
+        a.age_group,
+        a.level,
+        a.custom_place_address
+        FROM meeting a
+        JOIN member b ON a.leader_id = b.member_id
+        LEFT JOIN place c ON COALESCE(a.place_id, 0) = COALESCE(c.place_id, 0)
+        JOIN sport_type d ON a.sport_id = d.sport_id
+        JOIN status e ON a.status_id = e.status_id
+        WHERE a.gender = #{ meetingGender }
+        AND (
+        <foreach item="item" collection="ageGroups" separator=" OR ">
+            FIND_IN_SET(#{item}, age_group)
+        </foreach>
+        )
 
-    <select id="selectMeetings" resultType="MeetingDTO">
-        SELECT meeting_id, meeting_title
-        FROM meeting
-        WHERE gender = #{ gender }
+        AND (
+        <foreach item="item" collection="levels" separator=" OR ">
+            FIND_IN_SET(#{item}, level)
+        </foreach>
+        )
 
-        <if test="ageGroups != null and ageGroups.size() > 0">
-            AND (
-            <foreach item="item" collection="ageGroups" separator=" OR ">
-                FIND_IN_SET(#{item}, age_group)
-            </foreach>
-            )
+        AND a.sport_id IN
+        <foreach item="item" collection="sportIds" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+
+        AND a.status_id IN
+        <foreach item="item" collection="statusIds" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+
+        <if test="minDate != null">
+            AND date <![CDATA[ >= ]]> #{minDate}
         </if>
 
-        <if test="levels != null and levels.size() > 0">
-            AND (
-            <foreach item="item" collection="levels" separator=" OR ">
-                FIND_IN_SET(#{item}, level)
-            </foreach>
-            )
+        <if test="maxDate != null">
+            AND date <![CDATA[ <= ]]> #{maxDate}
         </if>
 
-        <if test="sportIds != null and sportIds.size() > 0">
-            AND sport_id IN
-            <foreach item="item" collection="sportIds" open="(" separator="," close=")">
-                #{item}
-            </foreach>
-        </if>
+        ORDER BY
+        CASE
+        WHEN a.status_id IN (1, 2)
+        AND a.date = CURDATE()
+        AND a.start_time <![CDATA[ >= ]]> CURTIME()
+        THEN 0
+        ELSE 1
+        END,
+        a.date ASC,
+        a.start_time ASC,
+        CASE
+        WHEN a.status_id IN (1, 2) THEN a.status_id
+        ELSE 3
+        END ASC
 
-        <if test="statusIds != null and statusIds.size() > 0">
-            AND status_id IN
-            <foreach item="item" collection="statusIds" open="(" separator="," close=")">
-                #{item}
-            </foreach>
-        </if>
-
-        <if test="minDate != null and maxDate != null">
-            AND date BETWEEN #{minDate} AND #{maxDate}
-        </if>
-
-        ORDER BY meeting_id
         LIMIT #{ limit } OFFSET #{ offset }
     </select>
 
     <select id="countMeetings" resultType="long">
         SELECT COUNT(*)
-        FROM meeting
-        WHERE gender = #{ gender }
+        FROM meeting a
+        JOIN member b ON a.leader_id = b.member_id
+        LEFT JOIN place c ON COALESCE(a.place_id, 0) = COALESCE(c.place_id, 0)
+        JOIN sport_type d ON a.sport_id = d.sport_id
+        JOIN status e ON a.status_id = e.status_id
+        WHERE a.gender = #{ meetingGender }
+        AND (
+        <foreach item="item" collection="ageGroups" separator=" OR ">
+            FIND_IN_SET(#{item}, a.age_group)
+        </foreach>
+        )
 
-        <if test="ageGroups != null and ageGroups.size() > 0">
-            AND (
-            <foreach item="item" collection="ageGroups" separator=" OR ">
-                FIND_IN_SET(#{item}, age_group)
-            </foreach>
-            )
+        AND (
+        <foreach item="item" collection="levels" separator=" OR ">
+            FIND_IN_SET(#{item}, a.level)
+        </foreach>
+        )
+
+        AND a.sport_id IN
+        <foreach item="item" collection="sportIds" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+
+        AND a.status_id IN
+        <foreach item="item" collection="statusIds" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+
+        <if test="minDate != null">
+            AND date <![CDATA[ >= ]]> #{minDate}
         </if>
 
-        <if test="levels != null and levels.size() > 0">
-            AND (
-            <foreach item="item" collection="levels" separator=" OR ">
-                FIND_IN_SET(#{item}, level)
-            </foreach>
-            )
+        <if test="maxDate != null">
+            AND date <![CDATA[ <= ]]> #{maxDate}
         </if>
 
-        <if test="sportIds != null and sportIds.size() > 0">
-            AND sport_id IN
-            <foreach item="item" collection="sportIds" open="(" separator="," close=")">
-                #{item}
-            </foreach>
-        </if>
-
-        <if test="statusIds != null and statusIds.size() > 0">
-            AND status_id IN
-            <foreach item="item" collection="statusIds" open="(" separator="," close=")">
-                #{item}
-            </foreach>
-        </if>
-
-        <if test="minDate != null and maxDate != null">
-            AND date BETWEEN #{minDate} AND #{maxDate}
-        </if>
     </select>
 </mapper>

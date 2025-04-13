@@ -4,6 +4,7 @@ import com.learningcrew.linkup.common.dto.Pagination;
 import com.learningcrew.linkup.meeting.query.dto.request.MeetingSearchRequest;
 import com.learningcrew.linkup.meeting.query.dto.response.MeetingDTO;
 import com.learningcrew.linkup.meeting.query.dto.response.MeetingListResponse;
+import com.learningcrew.linkup.meeting.query.dto.response.MeetingSummaryDTO;
 import com.learningcrew.linkup.meeting.query.mapper.MeetingMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,12 +22,16 @@ public class MeetingQueryService {
     @Transactional(readOnly = true)
     public MeetingDTO getMeeting(int meetingId) {
 
-        return meetingMapper.selectMeetingById(meetingId);
+        MeetingDTO meeting = meetingMapper.selectMeetingById(meetingId);
+        meeting.convertToStatusDescription();
+        return meeting;
     }
 
-    /* 모임 목록 조회 */
+    /* 모임 목록 조회 (페이징) */
     public MeetingListResponse getMeetings(MeetingSearchRequest meetingSearchRequest) {
-        List<MeetingDTO> meetings = meetingMapper.selectMeetings(meetingSearchRequest);
+        List<MeetingSummaryDTO> meetings = meetingMapper.selectMeetings(meetingSearchRequest);
+        meetings.forEach(MeetingSummaryDTO::convertToStatusDescription);
+
         long totalItems = meetingMapper.countMeetings(meetingSearchRequest);
 
         int page = meetingSearchRequest.getPage();
