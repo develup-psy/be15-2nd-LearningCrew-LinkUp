@@ -1,10 +1,7 @@
 package com.learningcrew.linkup.linker.query.mapper;
 
 import com.learningcrew.linkup.linker.command.domain.aggregate.User;
-import com.learningcrew.linkup.linker.query.dto.query.UserDeleteDto;
-import com.learningcrew.linkup.linker.query.dto.query.UserMeetingDto;
-import com.learningcrew.linkup.linker.query.dto.query.UserPointDto;
-import com.learningcrew.linkup.linker.query.dto.query.UserProfileDto;
+import com.learningcrew.linkup.linker.query.dto.query.*;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -21,4 +18,6 @@ public interface UserMapper {
     List<UserMeetingDto> findUserMeetings(int userId);
 
     Optional<UserPointDto> findPointByUserId(int userId);
+
+    Optional<UserMannerTemperatureDto> findUserMannerTemperature(int userId);
 }

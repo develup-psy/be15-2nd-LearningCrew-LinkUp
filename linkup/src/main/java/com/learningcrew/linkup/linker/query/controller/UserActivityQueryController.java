@@ -82,7 +82,7 @@ public class UserActivityQueryController {
     @GetMapping("/manner")
     @Operation(summary = "매너온도 조회", description = "사용자의 매너온도를 조회합니다.")
     public ResponseEntity<ApiResponse<UserMannerTemperatureDto>> getMannerTemperature(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        UserMannerTemperatureDto manner = communityQueryService.getMannerTemperature(userDetails.getUserId());
+        UserMannerTemperatureDto manner = userQueryService.getMannerTemperature(userDetails.getUserId());
         return ResponseEntity.ok(ApiResponse.success(manner, "매너 온도 조회에 성공했습니다. "));
     }
 

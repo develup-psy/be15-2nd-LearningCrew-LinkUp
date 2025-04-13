@@ -5,6 +5,7 @@ import com.learningcrew.linkup.common.query.mapper.RoleMapper;
 import com.learningcrew.linkup.exception.BusinessException;
 import com.learningcrew.linkup.exception.ErrorCode;
 import com.learningcrew.linkup.linker.query.dto.query.MemberProfileDto;
+import com.learningcrew.linkup.linker.query.dto.query.UserMannerTemperatureDto;
 import com.learningcrew.linkup.linker.query.dto.query.UserProfileDto;
 import com.learningcrew.linkup.linker.query.dto.response.UserListResponse;
 import com.learningcrew.linkup.linker.query.dto.response.UserProfileResponse;
@@ -18,11 +19,12 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class UserQueryServiceImpl {
+public class UserQueryServiceImpl implements UserQueryService {
     private final MemberMapper memberMapper;
     private final UserMapper userMapper;
     private final RoleMapper roleMapper;
 
+    @Override
     public UserProfileResponse getUserProfile(int userId) {
         MemberProfileDto memberProfileDTO = Optional.ofNullable(memberMapper.getUserProfileByEmail(userId))
                 .orElseThrow(() -> new RuntimeException("유저 정보 찾지 못함"));
@@ -33,6 +35,7 @@ public class UserQueryServiceImpl {
                 .build();
     }
 
+    @Override
     public UserListResponse getUserList() {
         int roleId = getRoleIdByRoleName("USER");
         List<UserProfileDto> userProfileDTOList = userMapper.findAllUsers(roleId);
@@ -42,10 +45,19 @@ public class UserQueryServiceImpl {
                 .build();
     }
 
+    @Override
     public int getRoleIdByRoleName(String roleName) {
         RoleDTO role = roleMapper.roleByRoleName(roleName).orElseThrow(
                 () -> new BusinessException(ErrorCode.INVALID_ROLE)
         );
         return role.getRoleId();
+    }
+
+    /* 매너 온도 조회 */
+    @Override
+    public UserMannerTemperatureDto getMannerTemperature(int userId) {
+        return memberMapper.findUserMannerTemperature(userId).orElseThrow(
+                () -> new BusinessException(ErrorCode.BAD_REQUEST)
+        );
     }
 }

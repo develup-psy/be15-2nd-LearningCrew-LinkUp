@@ -1,7 +1,6 @@
 package com.learningcrew.linkup.linker.query.service;
 
 import com.learningcrew.linkup.linker.query.dto.query.UserCommentDto;
-import com.learningcrew.linkup.linker.query.dto.query.UserMannerTemperatureDto;
 import com.learningcrew.linkup.linker.query.dto.query.UserPostDto;
 
 import java.util.List;
@@ -12,6 +11,5 @@ public interface CommunityQueryService {
 
     List<UserCommentDto> findCommentsByUser(int userId);
 
-    UserMannerTemperatureDto getMannerTemperature(int userId);
 }
 
