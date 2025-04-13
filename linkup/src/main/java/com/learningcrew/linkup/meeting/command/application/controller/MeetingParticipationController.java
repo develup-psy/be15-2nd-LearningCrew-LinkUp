@@ -5,6 +5,9 @@ import com.learningcrew.linkup.meeting.command.application.dto.request.MeetingPa
 import com.learningcrew.linkup.meeting.command.application.dto.response.MeetingParticipationCommandResponse;
 import com.learningcrew.linkup.meeting.command.application.service.MeetingParticipationCommandService;
 import com.learningcrew.linkup.meeting.command.domain.aggregate.Meeting;
+import com.learningcrew.linkup.meeting.command.domain.aggregate.MeetingParticipationHistory;
+import com.learningcrew.linkup.meeting.command.domain.repository.MeetingParticipationHistoryRepository;
+import com.learningcrew.linkup.meeting.command.infrastructure.repository.JpaMeetingParticipationHistoryRepository;
 import com.learningcrew.linkup.meeting.query.dto.response.MeetingParticipationDTO;
 import com.learningcrew.linkup.meeting.query.dto.response.MemberDTO;
 import com.learningcrew.linkup.meeting.query.mapper.MeetingParticipationMapper;
@@ -30,6 +33,7 @@ public class MeetingParticipationController {
     private final StatusQueryService statusQueryService;
     private final MeetingQueryService meetingQueryService;
     private final ModelMapper modelMapper;
+    private final MeetingParticipationHistoryRepository meetingParticipationHistoryRepository;
 
     @Operation(
             summary = "모임 참가 신청",
@@ -63,17 +67,19 @@ public class MeetingParticipationController {
             @PathVariable int meetingId,
             @PathVariable int memberId
     ) { // 1. 참여자 확인
-        List<MemberDTO> participants = queryService.getParticipants(meetingId, statusQueryService.getStatusId("ACCEPTED"));
+        List<MemberDTO> participants = queryService.getParticipantsByMeetingId(meetingId);
 
-        if (!participants.stream().anyMatch(x -> x.getMemberId() == (memberId) )) {
+        if (!participants.stream().anyMatch(x -> x.getMemberId() == memberId )) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
         // 2. 참여 이력 조회
-        MeetingParticipationDTO requestedParticipation = participationMapper.selectHistoryByMeetingIdAndMemberId(meetingId, memberId);
+        MeetingParticipationHistory requestedParticipation = meetingParticipationHistoryRepository.findByMeetingIdAndMemberId(meetingId, memberId);
+        MeetingParticipationDTO dto
+                = modelMapper.map(requestedParticipation, MeetingParticipationDTO.class);
 
         // 3. soft delete 수행
-        long participationId = service.deleteMeetingParticipation(requestedParticipation);
+        long participationId = service.deleteMeetingParticipation(dto);
 
         // 4. 응답 반환
         MeetingParticipationCommandResponse response = MeetingParticipationCommandResponse.builder()

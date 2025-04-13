@@ -46,16 +46,19 @@ public class MeetingCommandController {
             @RequestBody @Validated MeetingCreateRequest meetingCreateRequest
     ) {
         int meetingId = meetingCommandService.createMeeting(meetingCreateRequest);
-        // 2. 예약 생성
-        ReservationCreateRequest reservationCreateRequest = new ReservationCreateRequest(
-                meetingId,
-                meetingCreateRequest.getPlaceId(),
-                java.sql.Date.valueOf(meetingCreateRequest.getDate()),
-                meetingCreateRequest.getStartTime(),
-                meetingCreateRequest.getEndTime()
-        );
-        ReservationCommandResponse reservationResponse = reservationCommandService.createReservation(reservationCreateRequest);
-        System.out.println(reservationResponse.getMessage());
+        // 2. "장소 Id가 존재하면" 예약 생성
+        if (meetingCreateRequest.getPlaceId() != null) {
+
+            ReservationCreateRequest reservationCreateRequest = new ReservationCreateRequest(
+                    meetingId,
+                    meetingCreateRequest.getPlaceId(),
+                    java.sql.Date.valueOf(meetingCreateRequest.getDate()),
+                    meetingCreateRequest.getStartTime(),
+                    meetingCreateRequest.getEndTime()
+            );
+            ReservationCommandResponse reservationResponse = reservationCommandService.createReservation(reservationCreateRequest);
+            System.out.println(reservationResponse.getMessage());
+        }
 
         MeetingCommandResponse response = new MeetingCommandResponse(meetingId);
 
@@ -137,7 +140,7 @@ public class MeetingCommandController {
     @DeleteMapping("/api/v1/meetings/{meetingId}/cancel")
     public ResponseEntity<ApiResponse<MeetingCommandResponse>> deleteMeeting(
             @PathVariable int meetingId, @RequestParam int memberId
-    ) {
+    ) {  /* 요청자가 주최자인지 확인 */
         int leaderId = meetingQueryService.getMeeting(meetingId)
                 .getLeaderId();
 

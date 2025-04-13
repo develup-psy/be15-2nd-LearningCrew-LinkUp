@@ -44,9 +44,6 @@ public class MeetingParticipationCommandService {
 
         LocalDateTime now = LocalDateTime.now();
 
-        history.setMeetingId(meeting.getMeetingId());
-        history.setParticipatedAt(now);
-
         /* 회원이 모임에 속해 있는지 확인 */
         List<Integer> participantsIds = jpaRepository.findByMeetingIdAndStatusId(
                 meeting.getMeetingId(), statusQueryService.getStatusId("ACCEPTED")
@@ -78,9 +75,13 @@ public class MeetingParticipationCommandService {
         if (allowedUntil.isBefore(now)) {
             throw new BusinessException(ErrorCode.BAD_REQUEST, "참가 신청할 수 없는 모임입니다.");
         }
+
+        history.setMeetingId(meeting.getMeetingId());
+        history.setParticipatedAt(now);
         history.setStatusId(statusId);
 
         repository.save(history);
+        repository.flush();
 
         return history.getParticipationId();
     }
@@ -89,7 +90,8 @@ public class MeetingParticipationCommandService {
     public long acceptParticipation(MeetingDTO meeting, int memberId) {
         // 1. 참가 내역 조회
         int meetingId = meeting.getMeetingId();
-        MeetingParticipationDTO participation = mapper.selectHistoryByMeetingIdAndMemberId(meetingId, memberId);
+        MeetingParticipationHistory participation = jpaRepository.findByMeetingIdAndMemberId(meetingId, memberId);
+
         if (participation == null || participation.getStatusId() != statusQueryService.getStatusId("PENDING") ) {
             throw new BusinessException(ErrorCode.BAD_REQUEST, "승인 가능한 참가 신청 내역이 없습니다.");
         }
@@ -103,11 +105,11 @@ public class MeetingParticipationCommandService {
         }
 
         // status 확인
-        if (meeting.getStatusType().equals("REJECTED")) {
+        if (meeting.getStatusType().equals("모집 완료")) {
             throw new BusinessException(ErrorCode.MEETING_PARTICIPATION_LIMIT_EXCEEDED);
         }
 
-        if (meeting.getStatusType().equals("DELETED") || meeting.getStatusType().equals("DONE")) {
+        if (meeting.getStatusType().equals("모임 취소") || meeting.getStatusType().equals("모임 진행 완료")) {
             throw new BusinessException(ErrorCode.BAD_REQUEST, "참가 신청 내역을 승인할 수 없는 모임입니다.");
         }
 
@@ -117,10 +119,12 @@ public class MeetingParticipationCommandService {
         }
 
         // 3. 참가 승인 처리
-        int statusId = statusQueryService.getStatusId("ACCEPTED");
-        participation.setStatusId(statusId);
+        participation.setStatusId(statusQueryService.getStatusId("ACCEPTED"));
+        MeetingParticipationDTO dto = modelMapper.map(participation, MeetingParticipationDTO.class);
+        dto.setStatusType("승인");
 
-        repository.save(modelMapper.map(participation, MeetingParticipationHistory.class));
+        repository.save(participation);
+        repository.flush();
 
         return participation.getParticipationId();
     }
@@ -129,13 +133,14 @@ public class MeetingParticipationCommandService {
     public long rejectParticipation(MeetingDTO meeting, int memberId) {
         // 1. 참가 내역 조회
         int meetingId = meeting.getMeetingId();
-        MeetingParticipationDTO participation = mapper.selectHistoryByMeetingIdAndMemberId(meetingId, memberId);
+        MeetingParticipationHistory participation = jpaRepository.findByMeetingIdAndMemberId(meetingId, memberId);
+//        MeetingParticipationDTO participation = mapper.selectHistoryByMeetingIdAndMemberId(meetingId, memberId);
         if (participation == null || participation.getStatusId() != statusQueryService.getStatusId("PENDING") ) {
             throw new BusinessException(ErrorCode.BAD_REQUEST, "거절 가능한 참가 신청 내역이 없습니다.");
         }
 
         // 2. 모임이 참가 신청 거절 가능한 상태인지 확인
-        if (meeting.getStatusType().equals("DELETED") || meeting.getStatusType().equals("DONE")) {
+        if (meeting.getStatusType().equals("모임 취소") || meeting.getStatusType().equals("모임 진행 완료")) {
             throw new BusinessException(ErrorCode.BAD_REQUEST, "참가 신청 내역을 거절할 수 없는 모임입니다.");
         }
 
@@ -145,24 +150,28 @@ public class MeetingParticipationCommandService {
         }
 
         // 3. 참가 거절 처리
-        int statusId = statusQueryService.getStatusId("REJECTED");
-        participation.setStatusId(statusId);
+        MeetingParticipationDTO dto = modelMapper.map(participation, MeetingParticipationDTO.class);
+        dto.setStatusType("거절");
 
-        repository.save(modelMapper.map(participation, MeetingParticipationHistory.class));
+        participation.setStatusId(statusQueryService.getStatusId("REJECTED"));
+        repository.save(participation);
+        repository.flush();
 
         return participation.getParticipationId();
     }
 
     @Transactional
     public long deleteMeetingParticipation(MeetingParticipationDTO history) {
-//        if (history == null) {
-//            throw new NotFoundException("참여 정보가 없습니다.");
-//        }
+        if (history == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND, "참여 정보가 없습니다.");
+        }
 
-        history.setStatusId(4); // soft delete
+        MeetingParticipationHistory entity = modelMapper.map(history, MeetingParticipationHistory.class);
+        entity.setStatusId(statusQueryService.getStatusId("DELETED"));
+        repository.save(entity);
+        repository.flush();
 
-        repository.save(modelMapper.map(history, MeetingParticipationHistory.class));
-
+        history.setStatusType("참가 취소"); // soft delete
         return history.getParticipationId();
     }
 
