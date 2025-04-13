@@ -23,7 +23,7 @@ import java.util.List;
 public class FriendQueryController {
     private final FriendQueryService friendQueryService;
 
-    @GetMapping
+    @GetMapping()
     @Operation(summary = "친구 목록 조회", description = "현재 로그인한 사용자의 친구 목록을 조회합니다.")
     public ResponseEntity<ApiResponse<List<FriendInfoResponse>>> getFriendList(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
         List<FriendInfoResponse> frinedList = friendQueryService.getFriends(customUserDetails.getUserId());
