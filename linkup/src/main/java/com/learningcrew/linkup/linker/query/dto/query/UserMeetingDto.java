@@ -22,7 +22,7 @@ public class UserMeetingDto {
     private String meetingTitle;
 
     @Schema(description = "개설자 닉네임", example = "친구홍")
-    private int leaderNickName;
+    private String leaderNickName;
 
     @Schema(description = "모임 일시", example = "2025-04-01T19:00:00")
     private LocalDateTime meetingDate;

@@ -1,11 +1,11 @@
 package com.learningcrew.linkup.linker.query.service;
 
-import com.learningcrew.linkup.linker.query.dto.query.UserMeetingHistoryDto;
+import com.learningcrew.linkup.linker.query.dto.query.UserMeetingDto;
 
 import java.util.List;
 
 public interface MeetingQueryService {
 
-    List<UserMeetingHistoryDto> findMeetingsByUser(int userId);
+    List<UserMeetingDto> findMeetingsByUser(int userId);
 }
 

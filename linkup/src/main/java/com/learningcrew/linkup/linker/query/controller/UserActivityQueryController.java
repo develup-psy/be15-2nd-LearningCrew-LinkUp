@@ -46,42 +46,42 @@ public class UserActivityQueryController {
     /* 작성한 게시글 조회 */
     @GetMapping("/posts")
     @Operation(summary = "작성한 게시글 조회", description = "사용자가 작성한 게시글 목록을 조회합니다.")
-    public ResponseEntity<List<UserPostDto>> getUserPosts(@AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ResponseEntity<ApiResponse<List<UserPostDto>>> getUserPosts(@AuthenticationPrincipal CustomUserDetails userDetails) {
         List<UserPostDto> posts = communityQueryService.findPostsByUser(userDetails.getUserId());
-        return ResponseEntity.ok(posts);
+        return ResponseEntity.ok(ApiResponse.success(posts,"게시글 조회에 성공했습니다."));
     }
 
     /* 작성한 댓글 조회 */
     @GetMapping("/comments")
     @Operation(summary = "작성한 댓글 조회", description = "사용자가 작성한 댓글 목록을 조회합니다.")
-    public ResponseEntity<List<UserCommentDto>> getUserComments(@AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ResponseEntity<ApiResponse<List<UserCommentDto>>> getUserComments(@AuthenticationPrincipal CustomUserDetails userDetails) {
         List<UserCommentDto> comments = communityQueryService.findCommentsByUser(userDetails.getUserId());
-        return ResponseEntity.ok(comments);
+        return ResponseEntity.ok(ApiResponse.success(comments, "댓글 조회에 성공했습니다. "));
     }
 
     /* 참여 모임 이력 조회 */
     @GetMapping("/meetings")
     @Operation(summary = "참여한 모임 이력 조회", description = "사용자가 참여한 모임 목록을 조회합니다.")
-    public ResponseEntity<List<UserMeetingHistoryDto>> getUserMeetingHistory(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        List<UserMeetingHistoryDto> meetings = meetingQueryService.findMeetingsByUser(userDetails.getUserId());
-        return ResponseEntity.ok(meetings);
+    public ResponseEntity<ApiResponse<List<UserMeetingDto>>> getUserMeetingHistory(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        List<UserMeetingDto> meetings = meetingQueryService.findMeetingsByUser(userDetails.getUserId());
+        return ResponseEntity.ok(ApiResponse.success(meetings, "참여 모임 이력 조회에 성공했습니다. "));
     }
 
     /* 포인트 조회 */
     @GetMapping("/point")
     @Operation(summary = "포인트 조회", description = "사용자의 현재 포인트를 조회합니다.")
-    public ResponseEntity<UserPointDto> getUserPoints(@AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ResponseEntity<ApiResponse<UserPointDto>> getUserPoints(@AuthenticationPrincipal CustomUserDetails userDetails) {
         UserPointDto point = paymentQueryService.findUserPoint(userDetails.getUserId());
-        return ResponseEntity.ok(point);
+        return ResponseEntity.ok(ApiResponse.success(point, "포인트 조회에 성공했습니다."));
     }
 
 
     /* 매너 온도 조회 */
     @GetMapping("/manner")
     @Operation(summary = "매너온도 조회", description = "사용자의 매너온도를 조회합니다.")
-    public ResponseEntity<UserMannerTemperatureDto> getMannerTemperature(@AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ResponseEntity<ApiResponse<UserMannerTemperatureDto>> getMannerTemperature(@AuthenticationPrincipal CustomUserDetails userDetails) {
         UserMannerTemperatureDto manner = communityQueryService.getMannerTemperature(userDetails.getUserId());
-        return ResponseEntity.ok(manner);
+        return ResponseEntity.ok(ApiResponse.success(manner, "매너 온도 조회에 성공했습니다. "));
     }
 
 }
