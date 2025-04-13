@@ -4,6 +4,7 @@ import com.learningcrew.linkup.report.command.application.dto.request.HandleRepo
 import com.learningcrew.linkup.report.command.application.dto.response.ReportHandleResponse;
 import com.learningcrew.linkup.report.command.application.service.ReportAdminService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/report")
 @RequiredArgsConstructor
+@Tag(name = "신고 관리", description = "관리자의 사용자 신고 관리 API")
 public class ReportAdminController {
 
     private final ReportAdminService reportAdminService;

@@ -11,7 +11,7 @@ public class PenaltyResponse {
 
     private Long penaltyId;
 
-    private Integer memberId;
+    private Integer userId;
 
     private PenaltyType penaltyType;
 

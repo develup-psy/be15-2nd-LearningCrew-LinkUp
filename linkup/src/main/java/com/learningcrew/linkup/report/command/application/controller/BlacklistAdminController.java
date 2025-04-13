@@ -5,6 +5,7 @@ import com.learningcrew.linkup.report.command.application.dto.response.Blacklist
 import com.learningcrew.linkup.report.command.application.dto.response.BlacklistRemoveResponse;
 import com.learningcrew.linkup.report.command.application.service.BlacklistAdminService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/blacklist")
 @RequiredArgsConstructor
+@Tag(name = "블랙리스트 관리", description = "관리자의 블랙리스트 관리 API")
 public class BlacklistAdminController {
 
     private final BlacklistAdminService blacklistAdminService;
