@@ -12,7 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -44,8 +43,8 @@ public class FriendQueryController {
     /* 친구 개설 모임 조회 */
     @GetMapping("/meetings")
     @Operation(summary = "친구가 개설한 모임 조회", description = "사용자의 친구가 개설한 모임 목록을 조회합니다.")
-    public ResponseEntity<List<UserMeetingDto>> getMeetingsByFriends(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
+    public ResponseEntity<ApiResponse<List<UserMeetingDto>>> getMeetingsByFriends(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
         List<UserMeetingDto> meetings = friendQueryService.findMeetingsCreatedByFriends(customUserDetails.getUserId());
-        return ResponseEntity.ok(meetings);
+        return ResponseEntity.ok(ApiResponse.success(meetings,"친구 개설 모임에 성공했습니다. "));
     }
 }

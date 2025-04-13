@@ -36,5 +36,28 @@
                                WHERE status_type = 'PENDING' )
     </select>
 
+    <select id="findMeetingsCreatedByFriends" resultType="UserMeetingDTO">
+        SELECT
+                 m.meeting_id AS meetingId
+               , m.meeting_title
+               , u.nickname AS leaderNickName
+               , m.date AS meetingDate
+               , p.place_name AS meetingPlace
+               , m.custom_place_address AS customPlaceAddress
+               , m.latitude
+               , m.longitude
+          FROM friend f
+          JOIN member u ON (
+            (f.requester_id = #{userId} AND f.addressee_id = u.member_id) OR
+            (f.addressee_id = #{userId} AND f.requester_id = u.member_id)
+          )
+         JOIN meeting m ON m.leader_id = u.member_id
+         JOIN place p ON p.place_id = m.place_id
+        WHERE f.status_id = ( SELECT status_id
+                                FROM status
+                                WHERE status_type = 'ACCEPTED')
+        ORDER BY m.date DESC
+    </select>
+
 
 </mapper>

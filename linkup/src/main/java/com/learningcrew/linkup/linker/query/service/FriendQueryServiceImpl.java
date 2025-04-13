@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -20,6 +21,8 @@ public class FriendQueryServiceImpl implements FriendQueryService {
     private final FriendMapper friendMapper;
     private final ModelMapper modelMapper;
 
+    /* 친구 목록 조회 */
+    @Transactional(readOnly = true)
     @Override
     public List<FriendInfoResponse> getFriends(int memberId) {
         // 친구 목록 조회(ACCEPTED 상태인 친구 관계만 조회)
@@ -30,6 +33,8 @@ public class FriendQueryServiceImpl implements FriendQueryService {
         ).toList();
     }
 
+    /* 친구 신청 목록 조회 */
+    @Transactional(readOnly = true)
     @Override
     public List<FriendRequestResponse> getReceivedRequests(int addresseeId) {
         // address_id가 회원인 목록 조회
@@ -44,8 +49,13 @@ public class FriendQueryServiceImpl implements FriendQueryService {
         ).toList();
     }
 
+    /* 친구 개설 모임 조회 */
+    @Transactional(readOnly = true)
     @Override
     public List<UserMeetingDto> findMeetingsCreatedByFriends(int userId) {
-        return List.of();
+        // user_id가 requester_id 혹은 address_id에 포함되어 있고
+        // 상태가 ACCEPTED인 친구의
+        // 모임을 조회
+        return friendMapper.findMeetingsCreatedByFriends(userId);
     }
 }
