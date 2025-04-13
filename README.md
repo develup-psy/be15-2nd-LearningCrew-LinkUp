@@ -462,8 +462,11 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 
 ## 6. 📊 WBS (작업 분배 및 일정)
 
-> 프로젝트 기간 동안의 역할 분담 및 개발 일정표  
-> (이미지 혹은 표로 삽입)
+
+🔗 [WBS 명세서 링크](#6--wbs-작업-분배-및-일정)
+
+
+<img src="assets/images/wbs.jpg" alt="wbs" width="550"/>
 
 <br>
 
@@ -474,7 +477,7 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 🔗 [요구사항 명세서 링크](https://docs.google.com/spreadsheets/d/e/2PACX-1vR5o5viDNitHaRwGwl4o1biS6vLC52SPAyREVK2vDS9y13eXPo8N7CumbLhWDeejayHAh0Ji5Cmf2tf/pubhtml?gid=1583571973&single=true)
 
 
-<img src="assets/images/requirement_statement.png" alt="requirement_statement"/>
+<img src="assets/images/requirement_statement.jpg" alt="requirement_statement" width="550"/>
 
 <br>
 
@@ -501,7 +504,7 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 
 <br>
 
-<img src="assets/images/ddd-step8.png" alt="Step8 Policy" width="700"/>
+<img src="assets/images/ddd-step8.jpg" alt="Step8 Policy" width="700"/>
 
 🔗 [DDD 전체 보기](https://miro.com/app/board/uXjVIIWm93c=/?share_link_id=312811606423)
 
@@ -521,7 +524,7 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 - 중복 제거 및 시간순 정렬  
 - 이슈/관심 사항은 빨간 포스트잇으로 표시  
 
-<img src="assets/images/ddd-step1.png" alt="Step1 Domain Event" width="700"/>
+<img src="assets/images/ddd-step1.jpg" alt="Step1 Domain Event" width="700"/>
 
 <br>
 
@@ -533,7 +536,7 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 - 결제 시스템, 이메일 발송, SMS 등 외부 시스템 정의  
 - 명사형으로 작성  
 
-<img src="assets/images/ddd-step2.png" alt="Step2 External System" width="700"/>
+<img src="assets/images/ddd-step2.jpg" alt="Step2 External System" width="700"/>
 
 <br>
 
@@ -545,7 +548,7 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 - 각 Domain Event를 유발하는 명령  
 - 현재형 & 명령형으로 작성  
 
-<img src="assets/images/ddd-step3.png" alt="Step3 Command" width="700"/>
+<img src="assets/images/ddd-step3.jpg" alt="Step3 Command" width="700"/>
 
 <br>
 
@@ -556,7 +559,7 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 
 - 궁금하거나 결정되지 않은 사항을 정리  
 
-<img src="assets/images/ddd-step4.png" alt="Step4 HotSpot" width="700"/>
+<img src="assets/images/ddd-step4.jpg" alt="Step4 HotSpot" width="700"/>
 
 <br>
 
@@ -568,7 +571,7 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 - 도메인 이벤트를 유발하는 주체  
 - 예: 사용자, 시스템, 외부 서비스 등  
 
-<img src="assets/images/ddd-step5.png" alt="Step5 Actor" width="700"/>
+<img src="assets/images/ddd-step5.jpg" alt="Step5 Actor" width="700"/>
 
 <br>
 
@@ -580,7 +583,7 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 - 하나의 단위로 간주되는 도메인 객체 집합  
 - 관계와 제약을 관리하는 중심 단위  
 
-<img src="assets/images/ddd-step6.png" alt="Step6 Aggregate" width="700"/>
+<img src="assets/images/ddd-step6.jpg" alt="Step6 Aggregate" width="700"/>
 
 <br>
 
@@ -591,7 +594,7 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 
 - 관련 애그리거트를 하나의 컨텍스트로 묶기  
 
-<img src="assets/images/ddd-step7.png" alt="Step7 Bounded Context" width="700"/>
+<img src="assets/images/ddd-step7.jpg" alt="Step7 Bounded Context" width="700"/>
 
 <br>
 
@@ -659,7 +662,141 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 
 🔗 [테이블 정의서 링크](https://docs.google.com/spreadsheets/d/e/2PACX-1vRunQplhnLkZI3XVY3Phoj7wQVirdkzOMEnkMLMfItG7qATPKMGKVSAPNOodzxhBgE6C86Ax5my7o9p/pubhtml?gid=763788645&single=true)
 
-<img src="assets/images/table_definition.png" alt="table_definition"/>
+<details>
+<summary>🔹 기초 테이블 정의서 </summary>
+
+- 상태 테이블
+- 권한 테이블
+- 운동 종목 테이블
+
+<img src="assets/images/table_definition_init.jpg" alt="table_definition_init" width="700"/>
+
+<br>
+
+</details>
+
+<details>
+<summary>🔹 사용자 테이블 정의서 </summary>
+
+- 사용자 테이블
+- 회원 테이블
+- 친구 관계 테이블
+- 선호 운동 테이블
+
+<img src="assets/images/table_definition_user_1.jpg" alt="table_definition_user_1" width="700"/>
+<img src="assets/images/table_definition_user_2.jpg" alt="table_definition_user_2" width="700"/>
+
+<br>
+
+</details>
+
+<details>
+<summary>🔹 포인트 테이블 정의서 </summary>
+
+- 계좌 테이블
+- 포인트 거래 내역 테이블
+
+<img src="assets/images/table_definition_point.jpg" alt="table_definition_point" width="700"/>
+
+<br>
+
+</details>
+
+<details>
+<summary>🔹 장소 테이블 정의서 </summary>
+
+- 사업자 테이블
+- 장소 테이블
+- 장소 사진 테이블
+- 장소 즐겨찾기 테이블
+- 장소 예약 테이블
+- 장소 후기 테이블
+
+<img src="assets/images/table_definition_place_1.jpg" alt="table_definition_place_1" width="700"/>
+<img src="assets/images/table_definition_place_2.jpg" alt="table_definition_place_1" width="700"/>
+
+<br>
+
+</details>
+
+<details>
+<summary>🔹 모임 테이블 정의서 </summary>
+
+- 모임 테이블
+- 모임 참여이력 테이블
+- 참가자 평가 테이블
+- 베스트 플레이어 테이블
+- 모임 찜 테이블
+
+<img src="assets/images/table_definition_meeting_1.jpg" alt="table_definition_meeting_1" width="700"/>
+<img src="assets/images/table_definition_meeting_2.jpg" alt="table_definition_meeting_2" width="700"/>
+
+<br>
+
+</details>
+
+<details>
+<summary>🔹 커뮤니티 테이블 정의서 </summary>
+
+- 게시글 테이블
+- 게시글 좋아요 테이블
+- 게시글 사진 테이블
+- 댓글 테이블
+- 댓글 좋아요 테이블
+
+<img src="assets/images/table_definition_community_1.jpg" alt="table_definition_community_1" width="700"/>
+<img src="assets/images/table_definition_community_2.jpg" alt="table_definition_community_2" width="700"/>
+
+<br>
+
+</details>
+
+
+<details>
+<summary>🔹 알림 테이블 정의서 </summary>
+
+- 알림 유형 테이블
+- 알림 설정 테이블
+- 도메인 타입 테이블
+- 알림 테이블
+
+<img src="assets/images/table_definition_notification.jpg" alt="table_definition_notification" width="700"/>
+
+<br>
+
+</details>
+
+<details>
+<summary>🔹 신고 및 제재 테이블 정의서 </summary>
+
+- 신고 유형 테이블
+- 신고 이력 테이블
+- 사용자 제재 이력 테이블
+- 이의제기 테이블
+- 블랙리스트 테이블
+
+<img src="assets/images/table_definition_report.jpg" alt="table_definition_report" width="700"/>
+<img src="assets/images/table_definition_penalty.jpg" alt="table_definition_penalty" width="700"/>
+
+<br>
+
+</details>
+
+<details>
+<summary>🔹 토큰 테이블 정의서 </summary>
+
+- 인증 토큰 테이블
+- 리프레시 토큰 테이블
+
+<img src="assets/images/table_definition_token.jpg" alt="table_definition_token" width="700"/>
+
+<br>
+
+</details>
+
+
+
+
 
 <br>
 
