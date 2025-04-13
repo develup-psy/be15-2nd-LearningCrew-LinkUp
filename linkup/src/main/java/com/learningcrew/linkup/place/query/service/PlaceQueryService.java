@@ -57,4 +57,23 @@ public class PlaceQueryService {
     public PlaceDetailResponse getPlaceDetails(int placeId){
         return placeMapper.selectPlaceDetail(placeId);
     }
+
+    @Transactional(readOnly = true)
+    public PlaceListResponse getPlacesByOwner(PlaceListRequest request) {
+        List<PlaceDto> places = placeMapper.selectPlacesByOwner(request);
+        long totalItems = placeMapper.countPlacesByOwner(request);
+        int page = request.getPage();
+        int size = request.getSize();
+        int totalPage = (int) Math.ceil((double) totalItems / size);
+
+        return PlaceListResponse.builder()
+                .place(places)
+                .pagination(Pagination.builder()
+                        .currentPage(page)
+                        .totalPage(totalPage)
+                        .totalItems(totalItems)
+                        .build())
+                .build();
+    }
+
 }
