@@ -70,6 +70,9 @@ public enum ErrorCode {
     INVALID_VERIFICATION_TOKEN(HttpStatus.BAD_REQUEST, "이메일 인증코드가 일치하지 않습니다. "),
     INVALID_TOKEN_TYPE(HttpStatus.BAD_REQUEST, "이메일 타입이 일치하지 않습니다."),
 
+    //계좌
+    ACCOUNT_NOT_FOUND(HttpStatus.BAD_REQUEST, "계좌가 존재하지 않습니다."),
+    ALREADY_REGISTED_ACCOUNT(HttpStatus.BAD_REQUEST, "이미 등록된 계좌입니다"),
 
     // 토큰
     REFRESH_TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "refresh 토큰이 존재하지 않습니다."),
