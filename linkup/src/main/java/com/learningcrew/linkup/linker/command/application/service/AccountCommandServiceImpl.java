@@ -6,14 +6,13 @@ import com.learningcrew.linkup.exception.ErrorCode;
 import com.learningcrew.linkup.linker.command.application.dto.response.RegisterResponse;
 import com.learningcrew.linkup.linker.command.domain.aggregate.Member;
 import com.learningcrew.linkup.linker.command.domain.aggregate.User;
+import com.learningcrew.linkup.linker.command.domain.constants.EmailTokenType;
 import com.learningcrew.linkup.linker.command.domain.constants.LinkerStatusType;
 import com.learningcrew.linkup.linker.command.domain.repository.UserRepository;
 import com.learningcrew.linkup.linker.command.application.dto.request.UserCreateRequest;
 import com.learningcrew.linkup.linker.command.domain.service.MemberDomainServiceImpl;
 import com.learningcrew.linkup.linker.command.domain.service.UserDomainServiceImpl;
 import com.learningcrew.linkup.linker.command.domain.service.UserValidatorServiceImpl;
-import com.learningcrew.linkup.linker.query.dto.query.UserDeleteDTO;
-import com.learningcrew.linkup.linker.query.mapper.UserMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -30,7 +29,6 @@ public class AccountCommandServiceImpl implements AccountCommandService {
     private final UserDomainServiceImpl userDomainService;
     private final MemberDomainServiceImpl memberDomainService;
     private final EmailService emailService;
-    private final UserMapper userMapper;
 
 
     /* 유저 생성 - 회원 가입 */
@@ -52,8 +50,6 @@ public class AccountCommandServiceImpl implements AccountCommandService {
         //상태 부여
         userDomainService.assignStatus(user, "PENDING");
 
-        userDomainService.saveUser(user);
-
         // User 엔티티 생성 및 저장
         userRepository.save(user);
 
@@ -69,7 +65,7 @@ public class AccountCommandServiceImpl implements AccountCommandService {
         memberDomainService.saveMember(member, user.getUserId());
 
         // 이메일 전송 및 저장
-        emailService.sendVerificationCode(user.getUserId(), user.getEmail(), user.getUserName());
+        emailService.sendVerificationCode(user.getUserId(), user.getEmail(), user.getUserName(), EmailTokenType.REGISTER.name());
 
         return RegisterResponse
                 .builder()
@@ -98,6 +94,30 @@ public class AccountCommandServiceImpl implements AccountCommandService {
         user.setDeletedAt();
 
         //저장
+        userRepository.save(user);
+    }
+
+    /* 회원 계정 복구 */
+    @Override
+    @Transactional
+    public void recoverUser(String email, String password) {
+        // 회원 조회
+        User user = userRepository.findByEmail(email).orElseThrow(
+                () -> new BusinessException(ErrorCode.USER_NOT_FOUND)
+        );
+
+        // 비밀번호 검사
+        userValidatorService.validatePassword(password, user.getPassword());
+
+        // 계정 복구 유효기간(90일) 넘었는지 확인
+        userValidatorService.isWithinRecoveryPeriod(user.getStatus().getStatusType(), user.getDeletedAt());
+
+        // 상태 활성화
+        userDomainService.assignStatus(user,LinkerStatusType.ACCEPTED.name());
+
+        // 삭제일시 초기화
+        user.setDeletedAt(null);
+
         userRepository.save(user);
     }
 
