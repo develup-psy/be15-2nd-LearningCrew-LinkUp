@@ -49,7 +49,7 @@ public class ReportAdminServiceImpl implements ReportAdminService {
 
         // 제재 이력 등록
         UserPenaltyHistory penalty = UserPenaltyHistory.builder()
-                .memberId(report.getTargetId())
+                .userId(report.getTargetId())
                 .postId(report.getPostId())
                 .commentId(report.getCommentId())
                 .penaltyType(request.getPenaltyType())

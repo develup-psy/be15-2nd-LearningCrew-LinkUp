@@ -7,8 +7,8 @@
     <select id="selectPenalties" resultType="com.learningcrew.linkup.report.query.dto.response.PenaltyDTO">
         SELECT
             ph.penalty_id,
-            ph.member_id,
-            u.user_name AS member_name,
+            ph.user_id,
+            u.user_name AS user_name,
             ph.penalty_type,
             ph.reason,
             ph.created_at,
@@ -17,13 +17,13 @@
             ph.comment_id,
             ph.review_id
         FROM user_penalty_history ph
-        JOIN user u ON ph.member_id = u.user_id
+        JOIN user u ON ph.user_id = u.user_id
         WHERE 1 = 1
         <if test="req.penaltyType != null and req.penaltyType != ''">
             AND ph.penalty_type = #{req.penaltyType}
         </if>
-        <if test="req.memberId != null">
-            AND ph.member_id = #{req.memberId}
+        <if test="req.userId != null">
+            AND ph.user_id = #{req.userId}
         </if>
         ORDER BY ph.created_at DESC
         LIMIT #{req.size} OFFSET #{req.offset}
@@ -36,8 +36,8 @@
         <if test="req.penaltyType != null and req.penaltyType != ''">
             AND ph.penalty_type = #{req.penaltyType}
         </if>
-        <if test="req.memberId != null">
-            AND ph.member_id = #{req.memberId}
+        <if test="req.userId != null">
+            AND ph.user_id = #{req.userId}
         </if>
     </select>
 
@@ -45,7 +45,7 @@
     <select id="selectPenaltiesByMemberAndType" resultType="com.learningcrew.linkup.report.query.dto.response.PenaltyDTO">
         SELECT
             p.penalty_id,
-            p.member_id,
+            p.user_id,
             u.user_name AS member_name,
             p.penalty_type,
             p.reason,
@@ -55,8 +55,8 @@
             p.created_at,
             p.is_active
         FROM user_penalty_history p
-        JOIN user u ON p.member_id = u.user_id
-        WHERE p.member_id = #{memberId}
+        JOIN user u ON p.user_id = u.user_id
+        WHERE p.user_id = #{userId}
         AND p.penalty_type = #{penaltyType}
         ORDER BY p.created_at DESC
         LIMIT #{limit} OFFSET #{offset}
@@ -65,7 +65,7 @@
     <select id="countPenaltiesByMemberAndType" resultType="long">
         SELECT COUNT(*)
         FROM user_penalty_history
-        WHERE member_id = #{memberId}
+        WHERE user_id = #{userId}
         AND penalty_type = #{penaltyType}
     </select>
 

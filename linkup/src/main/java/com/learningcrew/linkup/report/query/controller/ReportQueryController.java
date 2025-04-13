@@ -1,15 +1,18 @@
 package com.learningcrew.linkup.report.query.controller;
 
 import com.learningcrew.linkup.report.query.dto.request.ReportSearchRequest;
-import com.learningcrew.linkup.report.query.dto.request.ReporterSearchRequest;
 import com.learningcrew.linkup.report.query.dto.request.ReporteeSearchRequest;
-import com.learningcrew.linkup.report.query.dto.response.*;
+import com.learningcrew.linkup.report.query.dto.request.ReporterSearchRequest;
+import com.learningcrew.linkup.report.query.dto.response.ReportListResponse;
+import com.learningcrew.linkup.report.query.dto.response.ReportUserCountDTO;
+import com.learningcrew.linkup.report.query.dto.response.ReportUserListResponse;
+import com.learningcrew.linkup.report.query.dto.response.ReportUserScoreDTO;
 import com.learningcrew.linkup.report.query.service.ReportQueryService;
-import com.learningcrew.linkup.common.dto.Pagination;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,7 +26,7 @@ public class ReportQueryController {
 
     @GetMapping
     @Operation(summary = "신고 전체 내역 조회", description = "관리자가 신고의 전체 내역을 조회한다.")
-    public ResponseEntity<ReportListResponse> getReports(ReportSearchRequest request) {
+    public ResponseEntity<ReportListResponse> getReports(@ParameterObject @ModelAttribute ReportSearchRequest request) {
         return ResponseEntity.ok(reportQueryService.getReports(request));
     }
 

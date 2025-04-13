@@ -2,6 +2,7 @@ package com.learningcrew.linkup.meeting.query.mapper;
 
 import com.learningcrew.linkup.meeting.query.dto.request.MeetingSearchRequest;
 import com.learningcrew.linkup.meeting.query.dto.response.MeetingDTO;
+import com.learningcrew.linkup.meeting.query.dto.response.MeetingSummaryDTO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -12,7 +13,7 @@ public interface MeetingMapper {
     MeetingDTO selectMeetingById(int meetingId);
 
     /* 검색/페이징 조건을 전달 받아 모임 목록 조회 */
-    List<MeetingDTO> selectMeetings(MeetingSearchRequest meetingSearchRequest);
+    List<MeetingSummaryDTO> selectMeetings(MeetingSearchRequest meetingSearchRequest);
 
     long countMeetings(MeetingSearchRequest meetingSearchRequest);
 }

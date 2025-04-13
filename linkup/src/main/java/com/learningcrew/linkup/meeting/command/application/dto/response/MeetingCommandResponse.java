@@ -1,6 +1,7 @@
 package com.learningcrew.linkup.meeting.command.application.dto.response;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 @Getter
 @AllArgsConstructor

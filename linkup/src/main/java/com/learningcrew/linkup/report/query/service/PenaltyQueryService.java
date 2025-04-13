@@ -8,6 +8,6 @@ public interface PenaltyQueryService {
     // 제재 내역 조회 (전체, 유형별, 사용자별 통합)
     PenaltyListResponse getPenalties(PenaltySearchRequest request);
 
-    PenaltyListResponse getPenaltiesByMemberAndType(Long memberId, String penaltyType, PenaltySearchRequest request);
+    PenaltyListResponse getPenaltiesByMemberAndType(Long userId, String penaltyType, PenaltySearchRequest request);
 
 }

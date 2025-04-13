@@ -10,6 +10,6 @@ import java.util.List;
 @Builder
 public class MeetingListResponse {
 
-    private final List<MeetingDTO> meetings;
+    private final List<MeetingSummaryDTO> meetings;
     private final Pagination pagination;
 }
