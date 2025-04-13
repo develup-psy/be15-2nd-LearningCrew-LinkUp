@@ -4,9 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * 이의 제기 처리 요청 DTO
- */
+// 이의 제기 처리 요청 DTO
 @Getter
 @Setter
 public class ObjectionDecisionRequest {
