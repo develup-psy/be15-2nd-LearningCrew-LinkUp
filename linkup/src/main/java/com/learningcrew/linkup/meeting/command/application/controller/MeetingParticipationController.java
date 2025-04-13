@@ -33,7 +33,7 @@ public class MeetingParticipationController {
 
     @Operation(
             summary = "모임 참가 신청",
-            description = "모임에 참가를 신청한다."
+            description = "회원이 개설된 모임에 참가를 신청한다."
     )
     @PostMapping("/api/v1/meetings/{meetingId}/participation")
     public ResponseEntity<ApiResponse<MeetingParticipationCommandResponse>> createMeetingParticipation(
@@ -56,7 +56,7 @@ public class MeetingParticipationController {
 
     @Operation(
             summary = "모임 참가 취소",
-            description = "모임 참가 신청을 취소한다."
+            description = "회원이 참가 신청이 승인된 모임의 참가를 취소한다."
     )
     @DeleteMapping("/api/v1/meetings/{meetingId}/participation/{memberId}")
     public ResponseEntity<ApiResponse<MeetingParticipationCommandResponse>> deleteMeetingParticipation(

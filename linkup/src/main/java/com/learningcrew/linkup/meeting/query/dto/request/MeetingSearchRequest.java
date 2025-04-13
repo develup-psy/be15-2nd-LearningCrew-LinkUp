@@ -17,7 +17,7 @@ public class MeetingSearchRequest {
     private Integer size = 10;
     // 지역별 ?
     @NotNull
-    private MeetingGender meetingGender = MeetingGender.BOTH;
+    private MeetingGender gender = MeetingGender.BOTH;
     @NotNull
     @NotEmpty
     private List<String> ageGroups = Arrays.asList("10, 20, 30, 40, 50, 60, 70+".split(", "));

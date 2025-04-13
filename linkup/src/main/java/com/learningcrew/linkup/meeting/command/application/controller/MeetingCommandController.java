@@ -1,6 +1,7 @@
 package com.learningcrew.linkup.meeting.command.application.controller;
 
 import com.learningcrew.linkup.common.dto.ApiResponse;
+import com.learningcrew.linkup.meeting.command.application.dto.request.LeaderUpdateRequest;
 import com.learningcrew.linkup.meeting.command.application.dto.request.ManageParticipationRequest;
 import com.learningcrew.linkup.meeting.command.application.dto.request.MeetingCreateRequest;
 import com.learningcrew.linkup.meeting.command.application.dto.response.LeaderUpdateResponse;
@@ -90,7 +91,7 @@ public class MeetingCommandController {
 
     @Operation(
             summary = "참가 거절",
-            description = "개설자가 모임 신청자 목록을 확인하여 참가 신청을 거절한다."
+            description = "주최자가 모임 신청자 목록을 확인하여 참가 신청을 거절한다."
     )
     @PutMapping("/api/v1/meetings/{meetingId}/participation/{memberId}/reject")
     public ResponseEntity<ApiResponse<ManageParticipationResponse>> rejectParticipation(
@@ -116,14 +117,14 @@ public class MeetingCommandController {
     }
 
     @Operation(
-            summary = "개설자 참가 취소",
-            description = "개설자가 모임 신청자 목록을 확인하여 참가 신청을 거절한다."
+            summary = "주최자 참가 취소",
+            description = "주최자가 다른 모임 참가자에게 개설자 권한을 넘기고 모임 참가를 취소한다."
     )
     @PutMapping("/api/v1/meetings/{meetingId}/change-leader/{memberId}")
     public ResponseEntity<ApiResponse<LeaderUpdateResponse>> updateLeader(
-            @PathVariable int meetingId, @PathVariable int memberId, @RequestParam int requestedMemberId
+            @PathVariable int meetingId, @PathVariable int memberId, @RequestBody LeaderUpdateRequest leaderUpdateRequest
     ) {
-        meetingCommandService.updateLeader(meetingId, memberId, requestedMemberId);
+        meetingCommandService.updateLeader(meetingId, memberId, leaderUpdateRequest);
         LeaderUpdateResponse response = new LeaderUpdateResponse(meetingId);
 
         return ResponseEntity.ok(ApiResponse.success(response));
@@ -131,7 +132,7 @@ public class MeetingCommandController {
 
     @Operation(
             summary = "모집 취소",
-            description = "개설자가 인원 모집을 취소한다."
+            description = "주최자가 인원 모집을 취소한다."
     )
     @DeleteMapping("/api/v1/meetings/{meetingId}/cancel")
     public ResponseEntity<ApiResponse<MeetingCommandResponse>> deleteMeeting(

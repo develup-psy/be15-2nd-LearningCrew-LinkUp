@@ -22,7 +22,7 @@
         a.min_user,
         a.max_user,
         a.created_at,
-        a.gender AS meetingGender,
+        a.gender,
         a.age_group,
         a.level,
         a.custom_place_address
@@ -46,7 +46,7 @@
         a.end_time,
         a.min_user,
         a.max_user,
-        a.gender AS meetingGender,
+        a.gender,
         a.age_group,
         a.level,
         a.custom_place_address
@@ -55,7 +55,7 @@
         LEFT JOIN place c ON COALESCE(a.place_id, 0) = COALESCE(c.place_id, 0)
         JOIN sport_type d ON a.sport_id = d.sport_id
         JOIN status e ON a.status_id = e.status_id
-        WHERE a.gender = #{ meetingGender }
+        WHERE a.gender = #{ gender }
         AND (
         <foreach item="item" collection="ageGroups" separator=" OR ">
             FIND_IN_SET(#{item}, age_group)
@@ -111,7 +111,7 @@
         LEFT JOIN place c ON COALESCE(a.place_id, 0) = COALESCE(c.place_id, 0)
         JOIN sport_type d ON a.sport_id = d.sport_id
         JOIN status e ON a.status_id = e.status_id
-        WHERE a.gender = #{ meetingGender }
+        WHERE a.gender = #{ gender }
         AND (
         <foreach item="item" collection="ageGroups" separator=" OR ">
             FIND_IN_SET(#{item}, a.age_group)

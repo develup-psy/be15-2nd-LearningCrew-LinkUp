@@ -24,6 +24,7 @@ public class Meeting {
     @Setter
     private int leaderId;
     private Integer placeId;
+    @Setter
     private int sportId;
     @Setter
     private int statusId;
