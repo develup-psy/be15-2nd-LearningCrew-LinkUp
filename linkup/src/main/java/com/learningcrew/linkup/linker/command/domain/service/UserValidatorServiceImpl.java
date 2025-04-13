@@ -2,6 +2,7 @@ package com.learningcrew.linkup.linker.command.domain.service;
 
 import com.learningcrew.linkup.exception.BusinessException;
 import com.learningcrew.linkup.exception.ErrorCode;
+import com.learningcrew.linkup.exception.security.CustomJwtException;
 import com.learningcrew.linkup.linker.command.domain.aggregate.User;
 import com.learningcrew.linkup.linker.command.domain.constants.LinkerStatusType;
 import com.learningcrew.linkup.linker.command.domain.repository.MemberRepository;
@@ -49,6 +50,7 @@ public class UserValidatorServiceImpl {
     }
 
     /* 비밀번호 중복 검사 */
+
     public void validateDuplicatePassword(String rawPassword, String encodedPassword) {
         if (passwordEncoder.matches(rawPassword, encodedPassword)) {
             throw new BusinessException(ErrorCode.DUPLICATE_PASSWORD);

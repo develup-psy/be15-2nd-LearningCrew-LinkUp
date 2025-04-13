@@ -14,7 +14,11 @@ public interface AccountCommandService {
 
     void recoverUser(String email, String password);
 
+
     void updateProfile(int userId, ProfileUpdateRequest request);
 
-}
-
+    // void verifyEmail(...);
+    // void updateProfile(...);
+    // void deleteUser(...);
+    // void sendResetToken(...);
+    // void resetPassword(...);

@@ -31,7 +31,9 @@ public class AccountCommandServiceImpl implements AccountCommandService {
     private final UserDomainServiceImpl userDomainService;
     private final MemberDomainServiceImpl memberDomainService;
     private final EmailService emailService;
+
     private final MemberRepository memberRepository;
+
 
 
     /* 유저 생성 - 회원 가입 */
@@ -115,8 +117,10 @@ public class AccountCommandServiceImpl implements AccountCommandService {
                 () -> new BusinessException(ErrorCode.USER_NOT_FOUND)
         );
 
+
         // 삭제된 상태 확인
         userValidatorService.validateUserStatus(user.getStatus().getStatusType(),LinkerStatusType.DELETED.name());
+
 
         // 비밀번호 검사
         userValidatorService.validatePassword(password, user.getPassword());
@@ -126,6 +130,16 @@ public class AccountCommandServiceImpl implements AccountCommandService {
 
         // 상태 활성화
         userDomainService.assignStatus(user,LinkerStatusType.ACCEPTED.name());
+
+
+        // 삭제일시 초기화
+        user.setDeletedAt(null);
+
+        userRepository.save(user);
+    }
+
+    /* 회원 정보 수정 - 닉네임, 휴대폰, 비밀번호 */
+
 
         // 삭제일시 초기화
         user.setDeletedAt(null);
