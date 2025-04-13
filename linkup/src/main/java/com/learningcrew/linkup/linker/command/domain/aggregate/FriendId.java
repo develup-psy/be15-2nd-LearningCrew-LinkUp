@@ -15,6 +15,5 @@ import java.io.Serializable;
 @EqualsAndHashCode
 public class FriendId implements Serializable {
     private Integer requesterId;
-
     private Integer addresseeId;
 }

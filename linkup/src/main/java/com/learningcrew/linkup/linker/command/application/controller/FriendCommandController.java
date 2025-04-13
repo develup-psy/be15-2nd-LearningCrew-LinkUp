@@ -32,7 +32,8 @@ public class FriendCommandController {
     /* 친구 요청 수락 */
     @PutMapping("/{targetMemberId}/accept")
     @Operation(summary = "친구 요청 수락", description = "받은 친구 요청을 수락합니다.")
-    public ResponseEntity<ApiResponse<Void>> acceptFriendRequest(@PathVariable int targetMemberId){
+    public ResponseEntity<ApiResponse<Void>> acceptFriendRequest(@AuthenticationPrincipal CustomUserDetails customUserDetails, @PathVariable int targetMemberId){
+        friendCommandService.acceptFriendRequest(customUserDetails.getUserId(), targetMemberId);
         return ResponseEntity.ok(ApiResponse.success(null, "친구 요청이 수락되었습니다."));
     }
 
