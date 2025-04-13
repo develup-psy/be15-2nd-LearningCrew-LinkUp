@@ -59,6 +59,7 @@ public enum ErrorCode {
     FRIEND_REQUEST_NOT_FOUND(HttpStatus.BAD_REQUEST, "친구 신청한 대상이 아닙니다"),
     ALREADY_SENT_FRIEND_REQUEST(HttpStatus.BAD_REQUEST, "이미 친구 신청한 대상입니다"),
     ALREADY_REQUESTED_BY_OTHER(HttpStatus.BAD_REQUEST, "이미 회원을 친구 신청한 회원입니다"),
+    IS_NOT_FRIEND(HttpStatus.BAD_REQUEST, "대상이 친구가 아닙니다"),
 
     //메일
     SEND_MAIL_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "메일 발송에 실패했습니다."),
