@@ -6,6 +6,6 @@ import java.util.List;
 
 public interface MeetingQueryService {
 
-    List<UserMeetingHistoryDto> findMeetingsByUser(Long userId);
+    List<UserMeetingHistoryDto> findMeetingsByUser(int userId);
 }
 

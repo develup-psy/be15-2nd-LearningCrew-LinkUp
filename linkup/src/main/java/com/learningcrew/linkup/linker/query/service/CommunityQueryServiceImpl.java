@@ -10,17 +10,17 @@ import java.util.List;
 @Service
 public class CommunityQueryServiceImpl implements CommunityQueryService {
     @Override
-    public List<UserPostDto> findPostsByUser(Long userId) {
+    public List<UserPostDto> findPostsByUser(int userId) {
         return List.of();
     }
 
     @Override
-    public List<UserCommentDto> findCommentsByUser(Long userId) {
+    public List<UserCommentDto> findCommentsByUser(int userId) {
         return List.of();
     }
 
     @Override
-    public UserMannerTemperatureDto getMannerTemperature(Long userId) {
+    public UserMannerTemperatureDto getMannerTemperature(int userId) {
         return null;
     }
 }

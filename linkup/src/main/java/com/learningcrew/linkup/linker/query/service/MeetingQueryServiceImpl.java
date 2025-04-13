@@ -10,7 +10,7 @@ import java.util.List;
 @Service
 public class MeetingQueryServiceImpl implements MeetingQueryService {
     @Override
-    public List<UserMeetingHistoryDto> findMeetingsByUser(Long userId) {
+    public List<UserMeetingHistoryDto> findMeetingsByUser(int userId) {
         return List.of();
     }
 }

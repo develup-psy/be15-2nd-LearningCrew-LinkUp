@@ -8,10 +8,10 @@ import java.util.List;
 
 public interface CommunityQueryService {
 
-    List<UserPostDto> findPostsByUser(Long userId);
+    List<UserPostDto> findPostsByUser(int userId);
 
-    List<UserCommentDto> findCommentsByUser(Long userId);
+    List<UserCommentDto> findCommentsByUser(int userId);
 
-    UserMannerTemperatureDto getMannerTemperature(Long userId);
+    UserMannerTemperatureDto getMannerTemperature(int userId);
 }
 

@@ -42,10 +42,10 @@ public class FriendQueryController {
     }
 
     /* 친구 개설 모임 조회 */
-    @GetMapping("/{userId}/friends/meetings")
+    @GetMapping("/meetings")
     @Operation(summary = "친구가 개설한 모임 조회", description = "사용자의 친구가 개설한 모임 목록을 조회합니다.")
-    public ResponseEntity<List<UserMeetingDto>> getMeetingsByFriends(@PathVariable int userId) {
-        List<UserMeetingDto> meetings = friendQueryService.findMeetingsCreatedByFriends(userId);
+    public ResponseEntity<List<UserMeetingDto>> getMeetingsByFriends(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        List<UserMeetingDto> meetings = friendQueryService.findMeetingsCreatedByFriends(customUserDetails.getUserId());
         return ResponseEntity.ok(meetings);
     }
 }

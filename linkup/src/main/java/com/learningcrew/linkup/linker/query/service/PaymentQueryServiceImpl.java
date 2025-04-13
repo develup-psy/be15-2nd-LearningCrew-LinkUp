@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class PaymentQueryServiceImpl implements PaymentQueryService {
     @Override
-    public UserPointDto findUserPoint(Long userId) {
+    public UserPointDto findUserPoint(int userId) {
         return null;
     }
 }

@@ -4,6 +4,6 @@ import com.learningcrew.linkup.linker.query.dto.query.UserPointDto;
 
 public interface PaymentQueryService {
 
-    UserPointDto findUserPoint(Long userId);
+    UserPointDto findUserPoint(int userId);
 }
 

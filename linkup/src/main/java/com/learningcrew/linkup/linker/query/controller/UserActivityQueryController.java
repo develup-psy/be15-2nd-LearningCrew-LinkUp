@@ -45,43 +45,43 @@ public class UserActivityQueryController {
     }
 
     /* 작성한 게시글 조회 */
-    @GetMapping("/{userId}/posts")
+    @GetMapping("/posts")
     @Operation(summary = "작성한 게시글 조회", description = "사용자가 작성한 게시글 목록을 조회합니다.")
-    public ResponseEntity<List<UserPostDto>> getUserPosts(@PathVariable Long userId) {
-        List<UserPostDto> posts = communityQueryService.findPostsByUser(userId);
+    public ResponseEntity<List<UserPostDto>> getUserPosts(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        List<UserPostDto> posts = communityQueryService.findPostsByUser(userDetails.getUserId());
         return ResponseEntity.ok(posts);
     }
 
     /* 작성한 댓글 조회 */
-    @GetMapping("/{userId}/comments")
+    @GetMapping("/comments")
     @Operation(summary = "작성한 댓글 조회", description = "사용자가 작성한 댓글 목록을 조회합니다.")
-    public ResponseEntity<List<UserCommentDto>> getUserComments(@PathVariable Long userId) {
-        List<UserCommentDto> comments = communityQueryService.findCommentsByUser(userId);
+    public ResponseEntity<List<UserCommentDto>> getUserComments(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        List<UserCommentDto> comments = communityQueryService.findCommentsByUser(userDetails.getUserId());
         return ResponseEntity.ok(comments);
     }
 
     /* 참여 모임 이력 조회 */
-    @GetMapping("/{userId}/meetings")
+    @GetMapping("/meetings")
     @Operation(summary = "참여한 모임 이력 조회", description = "사용자가 참여한 모임 목록을 조회합니다.")
-    public ResponseEntity<List<UserMeetingHistoryDto>> getUserMeetingHistory(@PathVariable Long userId) {
-        List<UserMeetingHistoryDto> meetings = meetingQueryService.findMeetingsByUser(userId);
+    public ResponseEntity<List<UserMeetingHistoryDto>> getUserMeetingHistory(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        List<UserMeetingHistoryDto> meetings = meetingQueryService.findMeetingsByUser(userDetails.getUserId());
         return ResponseEntity.ok(meetings);
     }
 
     /* 포인트 조회 */
-    @GetMapping("/{userId}/points")
+    @GetMapping("/point")
     @Operation(summary = "포인트 조회", description = "사용자의 현재 포인트를 조회합니다.")
-    public ResponseEntity<UserPointDto> getUserPoints(@PathVariable Long userId) {
-        UserPointDto point = paymentQueryService.findUserPoint(userId);
+    public ResponseEntity<UserPointDto> getUserPoints(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        UserPointDto point = paymentQueryService.findUserPoint(userDetails.getUserId());
         return ResponseEntity.ok(point);
     }
 
 
     /* 매너 온도 조회 */
-    @GetMapping("/{userId}/manner")
+    @GetMapping("/manner")
     @Operation(summary = "매너온도 조회", description = "사용자의 매너온도를 조회합니다.")
-    public ResponseEntity<UserMannerTemperatureDto> getMannerTemperature(@PathVariable Long userId) {
-        UserMannerTemperatureDto manner = communityQueryService.getMannerTemperature(userId);
+    public ResponseEntity<UserMannerTemperatureDto> getMannerTemperature(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        UserMannerTemperatureDto manner = communityQueryService.getMannerTemperature(userDetails.getUserId());
         return ResponseEntity.ok(manner);
     }
 
