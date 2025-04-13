@@ -20,37 +20,16 @@
     <!-- 받은 친구 요청 조회 -->
     <select id="findIncomingFriendRequests" resultType="FriendRequestStatusDTO">
         SELECT
-            f.requester_id AS adresseeId,
-            m.nickname,
-            s.status_type AS status,
-            f.requested_at
-        FROM friend f
-                 JOIN member m ON f.requester_id = m.member_id
-                 JOIN status s ON f.status_id = s.status_id
-        WHERE f.adressee_id = #{memberId}
-          AND s.status_type = 'PENDING'
+                f.requester_id
+              , m.nickname
+              , m.profile_image_url
+          FROM friend f
+          JOIN member m ON f.requester_id = m.member_id
+        WHERE f.addressee_id = #{ addresseeId }
+          AND f.status_id = ( SELECT status_id
+                                FROM status
+                               WHERE status_type = 'PENDING' )
     </select>
 
-    <!-- 보낸 친구 요청 조회 -->
-    <select id="findOutgoingFriendRequests" resultType="FriendRequestStatusDTO">
-        SELECT
-            f.adressee_id,
-            m.nickname,
-            s.status_type AS status,
-            f.requested_at
-        FROM friend f
-                 JOIN member m ON f.adressee_id = m.member_id
-                 JOIN status s ON f.status_id = s.status_id
-        WHERE f.requester_id = #{memberId}
-          AND s.status_type = 'PENDING'
-    </select>
-
-    <!-- 친구 요청 존재 여부 -->
-    <select id="existsFriendRequest" resultType="boolean">
-        SELECT COUNT(*)
-        FROM friend
-        WHERE requester_id = #{requesterId}
-          AND adressee_id = #{adresseeId}
-    </select>
 
 </mapper>
