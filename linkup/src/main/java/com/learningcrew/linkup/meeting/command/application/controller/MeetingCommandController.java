@@ -1,15 +1,18 @@
 package com.learningcrew.linkup.meeting.command.application.controller;
 
 import com.learningcrew.linkup.common.dto.ApiResponse;
+import com.learningcrew.linkup.meeting.command.application.dto.request.ManageParticipationRequest;
 import com.learningcrew.linkup.meeting.command.application.dto.request.MeetingCreateRequest;
 import com.learningcrew.linkup.meeting.command.application.dto.response.LeaderUpdateResponse;
 import com.learningcrew.linkup.meeting.command.application.dto.response.ManageParticipationResponse;
 import com.learningcrew.linkup.meeting.command.application.dto.response.MeetingCommandResponse;
 import com.learningcrew.linkup.meeting.command.application.service.MeetingCommandService;
 import com.learningcrew.linkup.meeting.command.application.service.MeetingParticipationCommandService;
+import com.learningcrew.linkup.meeting.query.dto.response.MeetingDTO;
 import com.learningcrew.linkup.meeting.query.dto.response.MeetingParticipationDTO;
 import com.learningcrew.linkup.meeting.query.service.MeetingParticipationQueryService;
 import com.learningcrew.linkup.meeting.query.service.MeetingQueryService;
+import com.learningcrew.linkup.meeting.query.service.StatusQueryService;
 import com.learningcrew.linkup.place.command.application.dto.request.ReservationCreateRequest;
 import com.learningcrew.linkup.place.command.application.dto.response.ReservationCommandResponse;
 import com.learningcrew.linkup.place.command.application.service.ReservationCommandService;
@@ -31,6 +34,7 @@ public class MeetingCommandController {
     private final MeetingParticipationQueryService participationQueryService;
     private final MeetingQueryService meetingQueryService;
     private final ReservationCommandService reservationCommandService;
+    private final StatusQueryService statusQueryService;
 
     @Operation(
             summary = "모임 생성",
@@ -60,30 +64,25 @@ public class MeetingCommandController {
 
     @Operation(
             summary = "참가 승인",
-            description = "개설자가 모임 신청자 목록을 확인하여 참가 신청을 승인한다."
+            description = "주최자가 모임 신청 목록을 확인하여 참가 신청을 승인한다."
     )
     @PutMapping("/api/v1/meetings/{meetingId}/participation/{memberId}/accept")
     public ResponseEntity<ApiResponse<ManageParticipationResponse>> acceptParticipation(
-            @PathVariable int meetingId, @PathVariable int memberId, @RequestParam int requestedMemberId
+            @PathVariable int meetingId, @PathVariable int memberId, @RequestBody ManageParticipationRequest manageParticipationRequest
     ) {
-        int leaderId = meetingQueryService.getMeeting(meetingId)
-                .getLeaderId();
-        if (leaderId != requestedMemberId) {
+        // 1. 요청된 모임의 주최자가 맞는지 확인
+        MeetingDTO meeting = meetingQueryService.getMeeting(meetingId);
+
+        if (meeting.getLeaderId() != manageParticipationRequest.getMemberId()) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-
-        List<MeetingParticipationDTO> appliers = participationQueryService.getHistories(meetingId, 1);
-
-        if (appliers.stream().noneMatch(applier -> applier.getMemberId() == memberId)) {
-            return ResponseEntity.badRequest().body(ApiResponse.failure( "참가 신청하지 않은 회원입니다."));
-        }
-
-        long participationId = service.acceptParticipation(meetingId, memberId);
+        // 2. 참가 승인
+        long participationId = service.acceptParticipation(meeting, memberId);
 
         ManageParticipationResponse response
                 = ManageParticipationResponse.builder()
                 .participationId(participationId)
-                .statusId(2)
+                .statusType("승인")
                 .build();
 
         return ResponseEntity.ok().body(ApiResponse.success(response));
@@ -95,25 +94,22 @@ public class MeetingCommandController {
     )
     @PutMapping("/api/v1/meetings/{meetingId}/participation/{memberId}/reject")
     public ResponseEntity<ApiResponse<ManageParticipationResponse>> rejectParticipation(
-            @PathVariable int meetingId, @PathVariable int memberId, @RequestParam int requestedMemberId
+            @PathVariable int meetingId, @PathVariable int memberId, @RequestBody ManageParticipationRequest manageParticipationRequest
     ) {
-        int leaderId = meetingQueryService.getMeeting(meetingId).getLeaderId();
-        if (leaderId != requestedMemberId) {
+        // 1. 요청된 모임의 주최자가 맞는지 확인
+        MeetingDTO meeting = meetingQueryService.getMeeting(meetingId);
+
+        if (meeting.getLeaderId() != manageParticipationRequest.getMemberId()) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
-        List<MeetingParticipationDTO> appliers = participationQueryService.getHistories(meetingId, 1);
-
-        if (appliers.stream().noneMatch(applier -> applier.getMemberId() == memberId)) {
-            return ResponseEntity.badRequest().body(ApiResponse.failure("참가 신청하지 않은 회원입니다."));
-        }
-
-        long participationId = service.rejectParticipation(meetingId, memberId);
+        // 2. 참가 거절
+        long participationId = service.rejectParticipation(meeting, memberId);
 
         ManageParticipationResponse response
                 = ManageParticipationResponse.builder()
                 .participationId(participationId)
-                .statusId(3)
+                .statusType("거절")
                 .build();
 
         return ResponseEntity.ok().body(ApiResponse.success(response));

@@ -139,14 +139,6 @@ public class AccountCommandServiceImpl implements AccountCommandService {
     }
 
     /* 회원 정보 수정 - 닉네임, 휴대폰, 비밀번호 */
-
-
-        // 삭제일시 초기화
-        user.setDeletedAt(null);
-
-        userRepository.save(user);
-    }
-
     /* 프로필 수정 */
     @Override
     @Transactional

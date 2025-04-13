@@ -9,6 +9,7 @@ import com.learningcrew.linkup.meeting.command.domain.aggregate.Meeting;
 import com.learningcrew.linkup.meeting.command.domain.aggregate.MeetingParticipationHistory;
 import com.learningcrew.linkup.meeting.command.domain.repository.MeetingParticipationHistoryRepository;
 import com.learningcrew.linkup.meeting.command.infrastructure.repository.JpaMeetingParticipationHistoryRepository;
+import com.learningcrew.linkup.meeting.query.dto.response.MeetingDTO;
 import com.learningcrew.linkup.meeting.query.dto.response.MeetingParticipationDTO;
 import com.learningcrew.linkup.meeting.query.mapper.MeetingParticipationMapper;
 import com.learningcrew.linkup.meeting.query.service.MeetingParticipationQueryService;
@@ -84,18 +85,40 @@ public class MeetingParticipationCommandService {
         return history.getParticipationId();
     }
 
-    /* 개설 요청자와 모임 주최자가 일치하는지 체크 */
-//        if (meeting.getLeaderId() != request.getLeaderId()) {
-//        throw new BusinessException(ErrorCode.FORBIDDEN);
-//    }
-
     @Transactional
-    public long acceptParticipation(int meetingId, int memberId) {
+    public long acceptParticipation(MeetingDTO meeting, int memberId) {
+        // 1. 참가 내역 조회
+        int meetingId = meeting.getMeetingId();
         MeetingParticipationDTO participation = mapper.selectHistoryByMeetingIdAndMemberId(meetingId, memberId);
+        if (participation == null || participation.getStatusId() != statusQueryService.getStatusId("PENDING") ) {
+            throw new BusinessException(ErrorCode.BAD_REQUEST, "승인 가능한 참가 신청 내역이 없습니다.");
+        }
 
-        participation.setStatusId(2);
+        // 2. 모임이 참가 신청 승인 가능한 상태인지 확인
+        int participantsCount = meetingParticipationQueryService.getParticipantsByMeetingId(meetingId).size();
 
+        // 정원 확인
+        if (participantsCount >= meeting.getMaxUser()) {
+            throw new BusinessException(ErrorCode.MEETING_PARTICIPATION_LIMIT_EXCEEDED);
+        }
 
+        // status 확인
+        if (meeting.getStatusType().equals("REJECTED")) {
+            throw new BusinessException(ErrorCode.MEETING_PARTICIPATION_LIMIT_EXCEEDED);
+        }
+
+        if (meeting.getStatusType().equals("DELETED") || meeting.getStatusType().equals("DONE")) {
+            throw new BusinessException(ErrorCode.BAD_REQUEST, "참가 신청 내역을 승인할 수 없는 모임입니다.");
+        }
+
+        // 모임 시작 시간 확인
+        if (meeting.getDate().atTime(meeting.getStartTime()).isBefore(LocalDateTime.now())) {
+            throw new BusinessException(ErrorCode.BAD_REQUEST, "참가 신청 내역을 승인할 수 없는 모임입니다.");
+        }
+
+        // 3. 참가 승인 처리
+        int statusId = statusQueryService.getStatusId("ACCEPTED");
+        participation.setStatusId(statusId);
 
         repository.save(modelMapper.map(participation, MeetingParticipationHistory.class));
 
@@ -103,10 +126,27 @@ public class MeetingParticipationCommandService {
     }
 
     @Transactional
-    public long rejectParticipation(int meetingId, int memberId) {
+    public long rejectParticipation(MeetingDTO meeting, int memberId) {
+        // 1. 참가 내역 조회
+        int meetingId = meeting.getMeetingId();
         MeetingParticipationDTO participation = mapper.selectHistoryByMeetingIdAndMemberId(meetingId, memberId);
+        if (participation == null || participation.getStatusId() != statusQueryService.getStatusId("PENDING") ) {
+            throw new BusinessException(ErrorCode.BAD_REQUEST, "거절 가능한 참가 신청 내역이 없습니다.");
+        }
 
-        participation.setStatusId(3);
+        // 2. 모임이 참가 신청 거절 가능한 상태인지 확인
+        if (meeting.getStatusType().equals("DELETED") || meeting.getStatusType().equals("DONE")) {
+            throw new BusinessException(ErrorCode.BAD_REQUEST, "참가 신청 내역을 거절할 수 없는 모임입니다.");
+        }
+
+        // 모임 시작 시간 확인
+        if (meeting.getDate().atTime(meeting.getStartTime()).isBefore(LocalDateTime.now())) {
+            throw new BusinessException(ErrorCode.BAD_REQUEST, "참가 신청 내역을 거절할 수 없는 모임입니다");
+        }
+
+        // 3. 참가 거절 처리
+        int statusId = statusQueryService.getStatusId("REJECTED");
+        participation.setStatusId(statusId);
 
         repository.save(modelMapper.map(participation, MeetingParticipationHistory.class));
 
