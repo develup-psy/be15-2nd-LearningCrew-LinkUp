@@ -101,15 +101,18 @@ public class FriendCommandServiceImpl implements FriendCommandService{
         friendRepository.save(friend);
     }
 
-    @Override
-    @Transactional
-    public void rejectFriendRequest(int requesterId, int addresseeId) {
-
-    }
 
     @Override
     @Transactional
     public void deleteFriend(int requesterId, int addresseeId) {
 
+        // 친구 테이블에 있는지 확인
+        FriendId friendId = new FriendId(addresseeId, requesterId);
+        Friend friend = friendRepository.findById(friendId).orElseThrow(
+                () -> new BusinessException(ErrorCode.FRIEND_REQUEST_NOT_FOUND)
+        );
+
+        //친구 삭제
+        friendRepository.delete(friend);
     }
 }
