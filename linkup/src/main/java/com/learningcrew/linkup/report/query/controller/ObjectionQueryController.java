@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,7 +21,7 @@ public class ObjectionQueryController {
 
     @GetMapping
     @Operation(summary = "이의 제기 전체 조회", description = "관리자가 사용자 혹은 사업자가 제기한 이의 내역을 전체 조회한다.")
-    public ResponseEntity<ObjectionListResponse> getObjections(ObjectionSearchRequest request) {
+    public ResponseEntity<ObjectionListResponse> getObjections(@ParameterObject @ModelAttribute ObjectionSearchRequest request) {
         return ResponseEntity.ok(objectionQueryService.getObjections(request));
     }
 

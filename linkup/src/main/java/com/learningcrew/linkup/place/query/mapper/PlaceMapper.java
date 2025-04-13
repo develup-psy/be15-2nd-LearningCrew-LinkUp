@@ -20,8 +20,13 @@ public interface PlaceMapper {
 
     PlaceDetailResponse selectPlaceDetail(@Param("placeId")int placeId);
 
+    List<PlaceDto> selectPlacesByOwner(PlaceListRequest placeListRequest);
+
     long countPlaces(PlaceListRequest placeListRequest);
 
     long countPlacesByAdmin(PlaceListRequest placeListRequest);
+
+    long countPlacesByOwner(PlaceListRequest placeListRequest);
+
 
 }

@@ -32,22 +32,18 @@ public class FriendCommandController {
     /* 친구 요청 수락 */
     @PutMapping("/{targetMemberId}/accept")
     @Operation(summary = "친구 요청 수락", description = "받은 친구 요청을 수락합니다.")
-    public ResponseEntity<ApiResponse<Void>> acceptFriendRequest(@PathVariable int targetMemberId){
+    public ResponseEntity<ApiResponse<Void>> acceptFriendRequest(@AuthenticationPrincipal CustomUserDetails customUserDetails, @PathVariable int targetMemberId){
+        friendCommandService.acceptFriendRequest(customUserDetails.getUserId(), targetMemberId);
         return ResponseEntity.ok(ApiResponse.success(null, "친구 요청이 수락되었습니다."));
     }
 
 
-    /* 친구 요청 거절 */
-    @PutMapping("/{targetMemberId}/reject")
-    @Operation(summary = "친구 요청 거절", description = "받은 친구 요청을 거절합니다.")
-    public ResponseEntity<ApiResponse<Void>> rejectFriendRequest(@PathVariable int targetMemberId){
-        return ResponseEntity.ok(ApiResponse.success(null, "친구 요청이 거절되었습니다."));
-    }
 
     /* 친구 삭제 */
     @DeleteMapping("/{targetMemberId}")
     @Operation(summary = "친구 삭제", description = "친구 관계를 삭제합니다.")
-    public ResponseEntity<ApiResponse<Void>> deleteFriend(@PathVariable int targetMemberId){
+    public ResponseEntity<ApiResponse<Void>> deleteFriend(@AuthenticationPrincipal CustomUserDetails customUserDetails, @PathVariable int targetMemberId){
+        friendCommandService.deleteFriend(customUserDetails.getUserId(), targetMemberId);
         return ResponseEntity.ok(ApiResponse.success(null, "친구 삭제를 성공했습니다. "));
     }
 }

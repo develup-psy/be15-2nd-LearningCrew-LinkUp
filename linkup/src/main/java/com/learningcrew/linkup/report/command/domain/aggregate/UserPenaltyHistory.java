@@ -19,8 +19,8 @@ public class UserPenaltyHistory {
     @Column(name = "penalty_id")
     private Long id;
 
-    @Column(name = "member_id", nullable = false)
-    private Integer memberId;
+    @Column(name = "user_id", nullable = false)
+    private Integer userId;
 
     @Column(name = "post_id")
     private Integer postId;
