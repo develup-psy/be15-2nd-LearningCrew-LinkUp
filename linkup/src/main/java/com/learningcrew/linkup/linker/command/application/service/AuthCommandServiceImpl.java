@@ -136,14 +136,13 @@ public class AuthCommandServiceImpl implements AuthCommandService {
         User user = userRepository.findById(verificationToken.getUserId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
-<<<<<<< HEAD
+
         if (!user.getStatus().getStatusType().equals("PENDING")) {
             throw new BusinessException(ErrorCode.ALREADY_VERIFIED);
         }
-=======
+
         // 상태 확인
         userValidatorService.validateUserStatus(user.getStatus().getStatusType(),LinkerStatusType.PENDING.name());
->>>>>>> d3f58a765796c8fb8b2d76f3adf6054d6e563df2
 
         // 삭제 여부 확인
         userValidatorService.isDeletedUser(user.getDeletedAt());
