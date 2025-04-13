@@ -53,6 +53,10 @@ public enum ErrorCode {
     ACCOUNT_NOT_RECOVERABLE(HttpStatus.BAD_REQUEST, "복구 가능한 계정이 아닙니다. "),
     DUPLICATE_PASSWORD(HttpStatus.BAD_REQUEST, "기존 비밀번호와 동일한 비밀번호는 사용할 수 없습니다. "),
 
+    //친구
+    CANNOT_ADD_SELF(HttpStatus.BAD_REQUEST, "자기 자신에게 친구 요청은 불가능합니다."),
+    ALREADY_FRIENDED(HttpStatus.BAD_REQUEST, "이미 친구관계가 되어있는 회원입니다. "),
+
     //메일
     SEND_MAIL_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "메일 발송에 실패했습니다."),
     NOT_AUTHORIZED_USER_EMAIL(HttpStatus.BAD_REQUEST, "이메일이 인증되지 않아 회원 가입에 실패했습니다."),
