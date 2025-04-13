@@ -1,8 +1,8 @@
 package com.learningcrew.linkup.report.command.application.controller;
 
 import com.learningcrew.linkup.report.command.application.dto.request.HandleReportRequest;
-import com.learningcrew.linkup.report.command.application.service.ReportAdminService;
 import com.learningcrew.linkup.report.command.application.dto.response.ReportHandleResponse;
+import com.learningcrew.linkup.report.command.application.service.ReportAdminService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
