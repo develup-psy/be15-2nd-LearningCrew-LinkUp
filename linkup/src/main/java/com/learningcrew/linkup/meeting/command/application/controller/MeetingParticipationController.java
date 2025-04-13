@@ -15,6 +15,7 @@ import com.learningcrew.linkup.meeting.query.service.MeetingParticipationQuerySe
 import com.learningcrew.linkup.meeting.query.service.MeetingQueryService;
 import com.learningcrew.linkup.meeting.query.service.StatusQueryService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -25,12 +26,12 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@RequestMapping("/api/v1/meetings")
 @RequiredArgsConstructor
+@Tag(name = "모임 참가 관리", description = "모임 참가 신청 및 취소 API")
 public class MeetingParticipationController {
     private final MeetingParticipationCommandService service;
     private final MeetingParticipationQueryService queryService;
-    private final MeetingParticipationMapper participationMapper;
-    private final StatusQueryService statusQueryService;
     private final MeetingQueryService meetingQueryService;
     private final ModelMapper modelMapper;
     private final MeetingParticipationHistoryRepository meetingParticipationHistoryRepository;
@@ -39,7 +40,7 @@ public class MeetingParticipationController {
             summary = "모임 참가 신청",
             description = "회원이 개설된 모임에 참가를 신청한다."
     )
-    @PostMapping("/api/v1/meetings/{meetingId}/participation")
+    @PostMapping("/{meetingId}/participation")
     public ResponseEntity<ApiResponse<MeetingParticipationCommandResponse>> createMeetingParticipation(
             @RequestBody @Validated MeetingParticipationCreateRequest request,
             @PathVariable int meetingId
@@ -62,18 +63,18 @@ public class MeetingParticipationController {
             summary = "모임 참가 취소",
             description = "회원이 참가 신청이 승인된 모임의 참가를 취소한다."
     )
-    @DeleteMapping("/api/v1/meetings/{meetingId}/participation/{memberId}")
+    @DeleteMapping("/{meetingId}/participation/{memberId}")
     public ResponseEntity<ApiResponse<MeetingParticipationCommandResponse>> deleteMeetingParticipation(
             @PathVariable int meetingId,
             @PathVariable int memberId
-    ) { // 1. 참여자 확인
+    ) { // 1. 참가자 확인
         List<MemberDTO> participants = queryService.getParticipantsByMeetingId(meetingId);
 
         if (!participants.stream().anyMatch(x -> x.getMemberId() == memberId )) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
-        // 2. 참여 이력 조회
+        // 2. 참가 이력 조회
         MeetingParticipationHistory requestedParticipation = meetingParticipationHistoryRepository.findByMeetingIdAndMemberId(meetingId, memberId);
         MeetingParticipationDTO dto
                 = modelMapper.map(requestedParticipation, MeetingParticipationDTO.class);
