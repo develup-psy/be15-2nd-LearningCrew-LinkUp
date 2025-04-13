@@ -4,7 +4,7 @@
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.learningcrew.linkup.meeting.query.mapper.MeetingParticipationMapper">
     <select id="selectMeetingParticipationByMeetingIdAndMemberId" resultType="MeetingParticipationDTO">
-        SELECT participation_id, status_id, meeting_id, member_id
+        SELECT participation_id, status_id, meeting_id, member_id, participated_at
         FROM meeting_participation_history
         WHERE meeting_id = #{ meetingId }
         AND member_id = #{ memberId }
@@ -12,21 +12,25 @@
     </select>
 
     <select id="selectParticipantsByMeetingId" resultType="MemberDTO">
-        SELECT member_id
-        FROM meeting_participation_history
+        SELECT b.member_id, b.gender, b.nickname, b.birth_date, b.introduction,
+               b.manner_temperature, b.profile_image_url, c.status_id
+        FROM meeting_participation_history a
+        JOIN member b ON a.member_id = b.member_id
+        JOIN user c ON b.member_id = c.user_id
         WHERE meeting_id = #{ meetingId }
-        AND status_id = 2
+        AND a.status_id = 2
+        AND c.status_id != 4
     </select>
 
-    <select id="selectHistoryByMeetingIdAndStatusId" resultType="MeetingParticipationDTO">
-        SELECT participation_id, status_id, meeting_id, member_id
+    <select id="selectHistoriesByMeetingIdAndStatusId" resultType="MeetingParticipationDTO">
+        SELECT participation_id, status_id, meeting_id, member_id, participated_at
         FROM meeting_participation_history
         WHERE meeting_id = #{ meetingId }
         AND status_id = #{ statusId }
     </select>
 
     <select id="selectHistoryByMeetingIdAndMemberId" resultType="MeetingParticipationDTO">
-        SELECT participation_id, status_id, meeting_id, member_id
+        SELECT participation_id, status_id, meeting_id, member_id, participated_at
         FROM meeting_participation_history
         WHERE meeting_id = #{ meetingId }
         AND member_id = #{ memberId }

@@ -8,9 +8,8 @@ import com.learningcrew.linkup.meeting.command.domain.repository.ParticipantRevi
 import com.learningcrew.linkup.meeting.query.dto.response.MemberDTO;
 import com.learningcrew.linkup.meeting.query.service.MeetingParticipationQueryService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
-
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -23,7 +22,7 @@ public class ParticipantReviewCommandService {
     private final MeetingParticipationQueryService participationQueryService;
 
     public long createParticipantReview(ParticipantReviewCreateRequest request, int revieweeId, int reviewerId, int meetingId) {
-        List<Integer> participants = participationQueryService.getParticipants(meetingId).getParticipants()
+        List<Integer> participants = participationQueryService.getParticipantsByMeetingId(meetingId)
                 .stream()
                 .map(MemberDTO::getMemberId)
                 .toList();

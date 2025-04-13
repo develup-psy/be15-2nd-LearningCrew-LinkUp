@@ -7,5 +7,5 @@ import lombok.Getter;
 @Builder
 public class ManageParticipationResponse {
     private long participationId;
-    private int statusId;
+    private String statusType;
 }

@@ -8,17 +8,14 @@ import java.time.LocalTime;
 
 @Getter
 @Setter
-public class MeetingDTO {
+public class MeetingSummaryDTO {
     private int meetingId;
-    private int leaderId;
-    private String leaderNickname; // member
-    private Integer placeId;
-    private String placeName; // place
+    private String leaderNickname;
+    private String placeName;
     private String placeAddress;
-    private String sportName; // sport_type
-    private String statusType; // status
+    private String sportName;
+    private String statusType;
     private String meetingTitle;
-    private String meetingContent;
     private LocalDate date;
     private LocalTime startTime;
     private LocalTime endTime;
