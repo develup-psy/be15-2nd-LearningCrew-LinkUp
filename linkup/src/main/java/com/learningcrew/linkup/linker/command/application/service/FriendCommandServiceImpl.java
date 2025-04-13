@@ -5,23 +5,37 @@ import com.learningcrew.linkup.exception.BusinessException;
 import com.learningcrew.linkup.exception.ErrorCode;
 import com.learningcrew.linkup.linker.command.domain.aggregate.Friend;
 import com.learningcrew.linkup.linker.command.domain.aggregate.FriendId;
+import com.learningcrew.linkup.linker.command.domain.aggregate.User;
 import com.learningcrew.linkup.linker.command.domain.constants.LinkerStatusType;
 import com.learningcrew.linkup.linker.command.domain.repository.FriendRepository;
 import com.learningcrew.linkup.linker.command.domain.repository.StatusRepository;
 import com.learningcrew.linkup.linker.command.domain.repository.UserRepository;
+import com.learningcrew.linkup.linker.query.service.UserQueryServiceImpl;
+import com.learningcrew.linkup.notification.command.application.dto.EventNotificationRequest;
+import com.learningcrew.linkup.notification.command.application.helper.FriendNotificationHelper;
+import com.learningcrew.linkup.notification.command.application.helper.NotificationHelper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class FriendCommandServiceImpl implements FriendCommandService{
     private final UserRepository userRepository;
     private final FriendRepository friendRepository;
     private final StatusRepository statusRepository;
+    EventNotificationRequest notificationRequest = new EventNotificationRequest();
+    private final UserQueryServiceImpl userQueryService;
+    private final FriendNotificationHelper friendnotificationHelper;
+
 
     @Override
     public void sendFriendRequest(int requesterId, int addresseeId) {
@@ -71,6 +85,8 @@ public class FriendCommandServiceImpl implements FriendCommandService{
 
         // 저장
         friendRepository.save(friend);
+
+        friendnotificationHelper.sendFriendRequestNotification(requesterId, addresseeId);
     }
 
     @Override
@@ -99,6 +115,8 @@ public class FriendCommandServiceImpl implements FriendCommandService{
 
         // 저장
         friendRepository.save(friend);
+
+        friendnotificationHelper.sendFriendAcceptNotification(addresseeId, requesterId);
     }
 
 
@@ -114,5 +132,8 @@ public class FriendCommandServiceImpl implements FriendCommandService{
 
         //친구 삭제
         friendRepository.delete(friend);
+
+        friendnotificationHelper.sendFriendDeleteNotification(requesterId, addresseeId);
+
     }
 }

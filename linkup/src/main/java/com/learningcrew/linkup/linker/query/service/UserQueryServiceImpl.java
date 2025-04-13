@@ -4,6 +4,7 @@ import com.learningcrew.linkup.common.dto.query.RoleDTO;
 import com.learningcrew.linkup.common.query.mapper.RoleMapper;
 import com.learningcrew.linkup.exception.BusinessException;
 import com.learningcrew.linkup.exception.ErrorCode;
+import com.learningcrew.linkup.linker.command.domain.aggregate.User;
 import com.learningcrew.linkup.linker.query.dto.query.MemberProfileDTO;
 import com.learningcrew.linkup.linker.query.dto.query.UserProfileDTO;
 import com.learningcrew.linkup.linker.query.dto.response.UserListResponse;
@@ -48,5 +49,10 @@ public class UserQueryServiceImpl {
                 () -> new BusinessException(ErrorCode.INVALID_ROLE)
         );
         return role.getRoleId();
+    }
+
+    public Optional<User> getUserName(Integer userId) {
+        return Optional.ofNullable(userMapper.findUserNameByUserId(userId))
+                .orElseThrow(() -> new RuntimeException("사용자 이름을 찾을 수 없습니다."));
     }
 }

@@ -15,4 +15,7 @@ public interface UserMapper {
     Optional<User> findByUserEmail(String email);
 
     Optional<UserDeleteDTO> findByUserUserId(int userId);
+
+    Optional<User> findUserNameByUserId(int userId);
+
 }

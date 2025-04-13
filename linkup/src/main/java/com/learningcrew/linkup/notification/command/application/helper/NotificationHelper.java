@@ -18,7 +18,7 @@ public class NotificationHelper {
     private final NotificationTypeRepository notificationTypeRepository;
 
     /**
-     * 다른 도메인에서 알림을 전송할 때 사용.
+     * 다른 도메인에서 알림을 전송할 때 사용 (기존 방식)
      * @param receiverId 알림 받을 사용자 ID
      * @param notificationTypeId 알림 유형 ID
      * @param domainTypeId 알림 도메인 구분 ID
@@ -32,4 +32,11 @@ public class NotificationHelper {
         notificationCommandService.sendEventNotification(request);
     }
 
-} 
+    /**
+     * 다른 도메인에서 알림을 전송할 때, 변수 바인딩 포함하여 직접 요청 객체 전달
+     * @param request EventNotificationRequest (receiverId, typeId, domainId, variables 포함)
+     */
+    public void sendNotification(EventNotificationRequest request) {
+        notificationCommandService.sendEventNotification(request);
+    }
+}
