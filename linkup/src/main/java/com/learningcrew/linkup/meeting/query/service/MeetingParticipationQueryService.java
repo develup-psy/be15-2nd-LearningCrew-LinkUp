@@ -46,6 +46,24 @@ public class MeetingParticipationQueryService {
         return mapper.selectHistoriesByMeetingIdAndStatusId(meetingId, statusId);
     }
 
+    /* 참가자 목록 조회 -> 30명이 최대이므로 따로 페이징 처리 안함 */
+    @Transactional(readOnly = true)
+    public List<MemberDTO> getParticipantsOfMyMeeting(int meetingId, int memberId) {
+        // 1. 해당 모임에 속해있는지 확인
+        List<MemberDTO> participants = getParticipantsByMeetingId(meetingId);
+
+        boolean isParticipant = participants.stream()
+                .anyMatch(participant -> participant.getMemberId() == memberId);
+
+        if (!isParticipant) {
+            throw new BusinessException(ErrorCode.FORBIDDEN); // 조회 권한 없음
+        }
+
+        // 2. 있으면 조회
+        return participants;
+    }
+
+
     @Transactional(readOnly = true)
     public List<MemberDTO> getParticipants(int meetingId, int memberId) {
         List<MemberDTO> response = mapper.selectParticipantsByMeetingId(meetingId);

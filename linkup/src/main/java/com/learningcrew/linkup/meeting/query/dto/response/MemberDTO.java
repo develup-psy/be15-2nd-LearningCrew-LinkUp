@@ -14,7 +14,7 @@ public class MemberDTO {
     private String nickname;
     private LocalDate birthDate;
     private String introduction;
-    private BigDecimal memberTempurature; // 테이블 컬럼명과 맞춤
+    private BigDecimal mannerTemperature;
     private String profileImageUrl;
 //    private int statusId;
 
