@@ -3,6 +3,7 @@ package com.learningcrew.linkup.report.command.application.controller;
 import com.learningcrew.linkup.report.command.application.dto.response.ObjectionDecisionResponse;
 import com.learningcrew.linkup.report.command.application.service.ObjectionDecisionService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/objections")
 @RequiredArgsConstructor
+@Tag(name = "이의 제기 관리", description = "관리자의 사용자 이의제기 관리 API")
 public class ObjectionDecisionController {
 
     private final ObjectionDecisionService objectionDecisionService;

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/penalty")
 @RequiredArgsConstructor
+@Tag(name = "사용자 제재 관리", description = "관리자의 사용자 제재 관리 API")
 public class PenaltyCommandController {
 
     private final PenaltyAdminService penaltyAdminService;

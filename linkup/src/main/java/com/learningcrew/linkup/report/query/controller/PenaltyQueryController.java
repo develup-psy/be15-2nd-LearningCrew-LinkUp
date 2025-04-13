@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,7 +21,7 @@ public class PenaltyQueryController {
 
     @GetMapping
     @Operation(summary = "전체 제재 내역 조회", description = "관리자가 모든 제재 이력을 페이징하여 조회합니다.")
-    public ResponseEntity<PenaltyListResponse> getPenalties(PenaltySearchRequest request) {
+    public ResponseEntity<PenaltyListResponse> getPenalties(@ParameterObject @ModelAttribute PenaltySearchRequest request) {
         return ResponseEntity.ok(penaltyQueryService.getPenalties(request));
     }
 

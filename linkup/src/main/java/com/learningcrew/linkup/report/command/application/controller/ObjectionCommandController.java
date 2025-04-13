@@ -6,6 +6,7 @@ import com.learningcrew.linkup.report.command.application.dto.request.ReviewObje
 import com.learningcrew.linkup.report.command.application.dto.response.ObjectionRegisterResponse;
 import com.learningcrew.linkup.report.command.application.service.ObjectionCommandService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,12 +15,13 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/objections")
 @RequiredArgsConstructor
+@Tag(name = "이의 제기 ", description = "사용자 및 사업자의 이의제기 신청 API")
 public class ObjectionCommandController {
 
     private final ObjectionCommandService objectionCommandService;
 
     @PostMapping("/review/{reviewId}")
-    @Operation(summary = "장소 후기 제재 이의 신청", description = "사업자가 장소 후기 제재에 대해 이의를 신청합니다.")
+    @Operation(summary = "장소 후기 제재 이의 신청", description = "사용자가 장소 후기 제재에 대해 이의를 신청합니다.")
     public ResponseEntity<ObjectionRegisterResponse> submitReviewObjection(
             @PathVariable Integer reviewId,
             @RequestBody @Valid ReviewObjectionRequest request

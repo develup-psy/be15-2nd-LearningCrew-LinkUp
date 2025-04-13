@@ -21,7 +21,6 @@ public class PenaltyDTO {
     private String reason;
 
     private LocalDateTime createdAt;
-    private LocalDateTime expiredAt;
 
     private String isActive; // "Y" or "N"
 
