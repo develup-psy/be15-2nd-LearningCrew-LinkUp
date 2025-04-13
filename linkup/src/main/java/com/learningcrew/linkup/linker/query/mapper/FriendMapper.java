@@ -10,12 +10,8 @@ import java.util.List;
 @Mapper
 public interface FriendMapper {
 
-    List<FriendInfoDTO> findAcceptedFriends(@Param("memberId") int memberId);
+    List<FriendInfoDTO> findAcceptedFriends(int memberId);
 
-    List<FriendRequestStatusDTO> findIncomingFriendRequests(@Param("memberId") int memberId);
-
-    List<FriendRequestStatusDTO> findOutgoingFriendRequests(@Param("memberId") int memberId);
-
-    boolean existsFriendRequest(@Param("requesterId") int requesterId, @Param("adresseeId") int adresseeId);
+    List<FriendRequestStatusDTO> findIncomingFriendRequests(int addresseeId);
 }
 
