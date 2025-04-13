@@ -1,15 +1,18 @@
 package com.learningcrew.linkup.linker.command.domain.service;
 
-import com.learningcrew.linkup.common.domain.Status;
-import com.learningcrew.linkup.common.query.mapper.StatusMapper;
 import com.learningcrew.linkup.exception.BusinessException;
 import com.learningcrew.linkup.exception.ErrorCode;
+import com.learningcrew.linkup.exception.security.CustomJwtException;
 import com.learningcrew.linkup.linker.command.domain.aggregate.User;
+import com.learningcrew.linkup.linker.command.domain.constants.LinkerStatusType;
 import com.learningcrew.linkup.linker.command.domain.repository.MemberRepository;
 import com.learningcrew.linkup.linker.command.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -17,7 +20,6 @@ public class UserValidatorServiceImpl {
     private final UserRepository userRepository;
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
-    private final StatusMapper statusMapper;
 
     /* 이메일 중복 검사*/
     public void validateDuplicateEmail(String email) {
@@ -47,12 +49,47 @@ public class UserValidatorServiceImpl {
         }
     }
 
+    /* 비밀번호 중복 검사 */
+
+    public void validateDuplicatePassword(String rawPassword, String encodedPassword) {
+        if (passwordEncoder.matches(rawPassword, encodedPassword)) {
+            throw new BusinessException(ErrorCode.DUPLICATE_PASSWORD);
+        }
+    }
+
     /* 이메일 인증 검사 */
     public User validateEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(
                         () -> new BusinessException(ErrorCode.INVALID_CREDENTIALS)
                 );
+    }
+
+    public void isWithinRecoveryPeriod(String statusType, LocalDateTime deletedAt) {
+        // 삭제된 회원인지 확인
+        if (Objects.isNull(deletedAt) || !statusType.equals(LinkerStatusType.DELETED.name())) {
+            throw new BusinessException(ErrorCode.ACCOUNT_NOT_RECOVERABLE);
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime expiry = deletedAt.plusDays(90);
+
+        // 복구 유효기간 내 회원인지 확인
+        if(!now.isBefore(expiry)){
+            throw new BusinessException(ErrorCode.ACCOUNT_NOT_RECOVERABLE);
+        }
+    }
+
+    public void validateUserStatus(String providedStatus, String targetStatus) {
+        if(!(providedStatus.equals(targetStatus))) {
+            throw new BusinessException(ErrorCode.NOT_AUTHORIZED_USER_EMAIL);
+        }
+    }
+
+    public void isDeletedUser(LocalDateTime userDeletedAt){
+        if(Objects.nonNull(userDeletedAt)){
+            throw new BusinessException(ErrorCode.WITHDRAW_USER);
+        }
     }
 }
 
