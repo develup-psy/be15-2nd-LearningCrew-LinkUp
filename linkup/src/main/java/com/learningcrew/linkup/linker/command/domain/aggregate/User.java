@@ -35,7 +35,6 @@ public class User {
 
     @CreatedDate
     private LocalDateTime createdAt;
-    @LastModifiedDate
     private LocalDateTime deletedAt;
 
     @ManyToOne
@@ -55,5 +54,13 @@ public class User {
     /* 상태 주입 */
     public void setStatus(Status status) {
         this.status = status;
+    }
+
+    public void setDeletedAt() {
+        this.deletedAt = LocalDateTime.now();
+    }
+
+    public void setDeletedAt(LocalDateTime deletedAt) {
+        this.deletedAt = deletedAt;
     }
 }

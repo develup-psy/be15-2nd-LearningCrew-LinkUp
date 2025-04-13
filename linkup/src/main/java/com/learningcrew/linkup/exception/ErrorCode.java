@@ -49,11 +49,18 @@ public enum ErrorCode {
     ALREADY_VERIFIED(HttpStatus.BAD_REQUEST, "이미 인증을 거친 계정입니다"),
     INVALID_STATUS(HttpStatus.BAD_REQUEST, "유효하지 않은 상태입니다."),
     INVALID_ROLE(HttpStatus.BAD_REQUEST, "올바르지 않는 권한입니다. "),
+    WITHDRAW_USER(HttpStatus.UNAUTHORIZED, "이미 탈퇴한 계정입니다."),
+    ACCOUNT_NOT_RECOVERABLE(HttpStatus.BAD_REQUEST, "복구 가능한 계정이 아닙니다. "),
+    DUPLICATE_PASSWORD(HttpStatus.BAD_REQUEST, "기존 비밀번호와 동일한 비밀번호는 사용할 수 없습니다. "),
+
+    //친구
+    CANNOT_ADD_SELF(HttpStatus.BAD_REQUEST, "자기 자신에게 친구 요청은 불가능합니다."),
+    ALREADY_FRIENDED(HttpStatus.BAD_REQUEST, "이미 친구관계가 되어있는 회원입니다. "),
 
     //메일
     SEND_MAIL_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "메일 발송에 실패했습니다."),
     NOT_AUTHORIZED_USER_EMAIL(HttpStatus.BAD_REQUEST, "이메일이 인증되지 않아 회원 가입에 실패했습니다."),
-    EXPIRE_VERIFICATION_CODE(HttpStatus.NOT_FOUND, "인증시간이 만료되었습니다. 다시 요청해주세요."),
+    EXPIRE_VERIFICATION_CODE(HttpStatus.BAD_REQUEST, "인증시간이 만료되었습니다. 다시 요청해주세요."),
     TOKEN_ALREADY_SENT(HttpStatus.CONFLICT, "이미 비밀번호 재설정 이메일이 전송되었습니다. 잠시 후 다시 시도해 주세요."),
     INVALID_VERIFICATION_TOKEN(HttpStatus.BAD_REQUEST, "이메일 인증코드가 일치하지 않습니다. "),
     INVALID_TOKEN_TYPE(HttpStatus.BAD_REQUEST, "이메일 타입이 일치하지 않습니다."),
@@ -84,6 +91,26 @@ public enum ErrorCode {
     REPORT_ALREADY_EXISTS(HttpStatus.CONFLICT, "해당 항목은 이미 신고되었습니다."),
     REPORT_ALREADY_SUBMITTED(HttpStatus.BAD_REQUEST, "이미 신고한 사용자입니다."),
     REPORT_REASON_REQUIRED(HttpStatus.BAD_REQUEST, "신고 사유는 필수입니다."),
+
+    // 제재
+    PENALTY_NOT_FOUND(HttpStatus.NOT_FOUND, "제재 이력을 찾을 수 없습니다."),
+    PENALTY_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 제재된 콘텐츠입니다."),
+    PENALTY_SAVE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "제재 정보를 저장하는 데 실패했습니다."),
+    PENALTY_CANCEL_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "제재를 철회하는 데 실패했습니다."),
+    PENALTY_ALREADY_CONFIRMED(HttpStatus.BAD_REQUEST, "이미 확정된 제재입니다."),
+    PENALTY_ALREADY_CANCELED(HttpStatus.BAD_REQUEST, "이미 철회된 제재입니다."),
+
+    // 이의 제기
+    OBJECTION_NOT_FOUND(HttpStatus.NOT_FOUND, "이의 제기 내역을 찾을 수 없습니다."),
+    OBJECTION_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 이의 제기를 제출한 제재입니다."),
+    OBJECTION_ALREADY_PROCESSED(HttpStatus.BAD_REQUEST, "이미 처리된 이의 제기입니다."),
+    OBJECTION_REASON_REQUIRED(HttpStatus.BAD_REQUEST, "이의 제기 사유는 필수입니다."),
+    OBJECTION_UNAUTHORIZED(HttpStatus.FORBIDDEN, "이의 제기를 제출할 권한이 없습니다."),
+
+    // 블랙리스트
+    ALREADY_BLACKLISTED(HttpStatus.CONFLICT, "이미 블랙리스트에 등록된 사용자입니다."),
+    BLACKLIST_NOT_FOUND(HttpStatus.NOT_FOUND, "블랙리스트에 등록되지 않은 사용자입니다."),
+    CANNOT_BLACKLIST_ADMIN(HttpStatus.FORBIDDEN, "관리자는 블랙리스트에 등록할 수 없습니다."),
 
     // 알림
     NOTIFICATION_NOT_FOUND(HttpStatus.NOT_FOUND, "알림을 찾을 수 없습니다."),

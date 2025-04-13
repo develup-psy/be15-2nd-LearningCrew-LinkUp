@@ -12,7 +12,6 @@
             ph.penalty_type,
             ph.reason,
             ph.created_at,
-            ph.expired_at,
             ph.is_active,
             ph.post_id,
             ph.comment_id,
@@ -54,7 +53,6 @@
             p.comment_id,
             p.review_id,
             p.created_at,
-            p.expired_at,
             p.is_active
         FROM user_penalty_history p
         JOIN user u ON p.member_id = u.user_id

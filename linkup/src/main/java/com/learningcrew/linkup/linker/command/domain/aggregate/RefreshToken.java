@@ -18,6 +18,7 @@ import java.util.Date;
 @AllArgsConstructor
 public class RefreshToken {
     @Id
+    private int userId;
     private String userEmail;
     private String token;
     private Date expiryDate;
