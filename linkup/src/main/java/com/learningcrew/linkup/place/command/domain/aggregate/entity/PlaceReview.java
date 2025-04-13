@@ -24,7 +24,7 @@ public class PlaceReview {
     private Integer placeId;
 
     @Column(name = "participation_id", nullable = false)
-    private Integer participationId;
+    private Long participationId;
 
     @Column(name = "status_id", nullable = false)
     private Integer statusId;

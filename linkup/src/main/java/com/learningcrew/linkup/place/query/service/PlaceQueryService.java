@@ -54,7 +54,13 @@ public class PlaceQueryService {
     }
 
     @Transactional(readOnly = true)
-    public PlaceDetailResponse getPlaceDetails(int placeId){
-        return placeMapper.selectPlaceDetail(placeId);
+    public PlaceDetailResponse getPlaceDetails(int placeId) {
+        PlaceDetailResponse placeDetailResponse = placeMapper.selectPlaceDetail(placeId);
+
+        // 여기!
+        System.out.println(">>> PLACE DETAIL: " + placeDetailResponse);
+
+        return placeDetailResponse;
     }
+
 }
