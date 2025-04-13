@@ -1,5 +1,6 @@
 package com.learningcrew.linkup.linker.query.service;
 
+import com.learningcrew.linkup.community.query.mapper.CommentMapper;
 import com.learningcrew.linkup.community.query.mapper.CommunityMapper;
 import com.learningcrew.linkup.linker.query.dto.query.UserCommentDto;
 import com.learningcrew.linkup.linker.query.dto.query.UserPostDto;
@@ -13,6 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CommunityQueryServiceImpl implements CommunityQueryService {
     private final CommunityMapper communityMapper;
+    private final CommentMapper commentMapper;
 
     /* 작성 게시글 조회 */
     @Override
@@ -23,6 +25,6 @@ public class CommunityQueryServiceImpl implements CommunityQueryService {
     /* 작성 댓글 조회 */
     @Override
     public List<UserCommentDto> findCommentsByUser(int userId) {
-        return List.of();
+        return commentMapper.findCommentsByUserId(userId);
     }
 }

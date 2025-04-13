@@ -15,8 +15,8 @@ public class UserCommentDto {
     @Schema(description = "댓글 ID", example = "202")
     private Long commentId;
 
-    @Schema(description = "댓글이 작성된 게시글 ID", example = "101")
-    private Long postId;
+    @Schema(description = "댓글이 작성된 게시글 제목", example = "용이 나타났다?!")
+    private String postTitle;
 
     @Schema(description = "댓글 내용", example = "정말 공감돼요!")
     private String content;
