@@ -53,7 +53,7 @@ public class MeetingParticipationCommandService {
             throw new BusinessException(ErrorCode.MEETING_ALREADY_JOINED);
         }
 
-        /* 개설 요청자가 주최자이면 ACCEPTED, 아니면 PENDING 처리 */
+        /* 개설 요청자가 개설자이면 ACCEPTED, 아니면 PENDING 처리 */
         int statusId;
         if (meeting.getLeaderId() != request.getMemberId()) {
             statusId = statusQueryService.getStatusId("PENDING");

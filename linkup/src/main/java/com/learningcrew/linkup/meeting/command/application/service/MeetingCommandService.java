@@ -83,7 +83,7 @@ public class MeetingCommandService {
         Meeting savedMeeting = meetingRepository.findById(meeting.getMeetingId()).orElseThrow(() -> new BusinessException(ErrorCode.MEETING_NOT_FOUND));
 
 
-        /* 3. 주최자를 모임 참가자에 등록 */
+        /* 3. 개설자를 모임 참가자에 등록 */
         int leaderId = meetingCreateRequest.getLeaderId();
 
         MeetingParticipationCreateRequest request
@@ -97,7 +97,7 @@ public class MeetingCommandService {
         return meeting.getMeetingId();
     }
 
-    /* 주최자 변경 */
+    /* 개설자 변경 */
     @Transactional
     public int updateLeader(int meetingId, int memberId, LeaderUpdateRequest leaderUpdateRequest) {
         // 1. 모임 정보 조회
@@ -108,13 +108,13 @@ public class MeetingCommandService {
             throw new BusinessException(ErrorCode.FORBIDDEN);
         }
 
-        // 3. 새로운 주최자가 모임 참여자인지 확인
+        // 3. 새로운 개설자가 모임 참여자인지 확인
         List<MemberDTO> participants = participationMapper.selectParticipantsByMeetingId(meetingId);
         if (participants.stream().noneMatch(p -> p.getMemberId() == memberId)) {
             throw new BusinessException(ErrorCode.USER_NOT_FOUND, "모임에 속하지 않은 회원입니다.");
         }
 
-        // 4. 기존 주최자의 참여 내역 soft delete
+        // 4. 기존 개설자의 참여 내역 soft delete
         MeetingParticipationDTO requestedParticipation = participationMapper.selectHistoryByMeetingIdAndMemberId(meetingId, leaderUpdateRequest.getMemberId());
 
         requestedParticipation.setStatusType("참가 취소"); // soft delete

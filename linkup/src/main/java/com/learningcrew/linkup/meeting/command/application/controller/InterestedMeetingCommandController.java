@@ -59,4 +59,5 @@ public class InterestedMeetingCommandController {
 
         return ResponseEntity.ok(ApiResponse.success(null));
     }
+
 }

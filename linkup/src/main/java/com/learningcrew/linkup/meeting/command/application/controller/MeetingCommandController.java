@@ -68,13 +68,13 @@ public class MeetingCommandController {
 
     @Operation(
             summary = "참가 승인",
-            description = "주최자가 모임 신청 목록을 확인하여 참가 신청을 승인한다."
+            description = "개설자가 모임 신청 목록을 확인하여 참가 신청을 승인한다."
     )
     @PutMapping("/api/v1/meetings/{meetingId}/participation/{memberId}/accept")
     public ResponseEntity<ApiResponse<ManageParticipationResponse>> acceptParticipation(
             @PathVariable int meetingId, @PathVariable int memberId, @RequestBody ManageParticipationRequest manageParticipationRequest
     ) {
-        // 1. 요청된 모임의 주최자가 맞는지 확인
+        // 1. 요청된 모임의 개설자가 맞는지 확인
         MeetingDTO meeting = meetingQueryService.getMeeting(meetingId);
 
         if (meeting.getLeaderId() != manageParticipationRequest.getMemberId()) {
@@ -94,13 +94,13 @@ public class MeetingCommandController {
 
     @Operation(
             summary = "참가 거절",
-            description = "주최자가 모임 신청자 목록을 확인하여 참가 신청을 거절한다."
+            description = "개설자가 모임 신청자 목록을 확인하여 참가 신청을 거절한다."
     )
     @PutMapping("/api/v1/meetings/{meetingId}/participation/{memberId}/reject")
     public ResponseEntity<ApiResponse<ManageParticipationResponse>> rejectParticipation(
             @PathVariable int meetingId, @PathVariable int memberId, @RequestBody ManageParticipationRequest manageParticipationRequest
     ) {
-        // 1. 요청된 모임의 주최자가 맞는지 확인
+        // 1. 요청된 모임의 개설자가 맞는지 확인
         MeetingDTO meeting = meetingQueryService.getMeeting(meetingId);
 
         if (meeting.getLeaderId() != manageParticipationRequest.getMemberId()) {
@@ -120,8 +120,8 @@ public class MeetingCommandController {
     }
 
     @Operation(
-            summary = "주최자 참가 취소",
-            description = "주최자가 다른 모임 참가자에게 개설자 권한을 넘기고 모임 참가를 취소한다."
+            summary = "개설자 참가 취소",
+            description = "개설자가 다른 모임 참가자에게 개설자 권한을 넘기고 모임 참가를 취소한다."
     )
     @PutMapping("/api/v1/meetings/{meetingId}/change-leader/{memberId}")
     public ResponseEntity<ApiResponse<LeaderUpdateResponse>> updateLeader(
@@ -135,12 +135,12 @@ public class MeetingCommandController {
 
     @Operation(
             summary = "모집 취소",
-            description = "주최자가 인원 모집을 취소한다."
+            description = "개설자가 인원 모집을 취소한다."
     )
     @DeleteMapping("/api/v1/meetings/{meetingId}/cancel")
     public ResponseEntity<ApiResponse<MeetingCommandResponse>> deleteMeeting(
             @PathVariable int meetingId, @RequestParam int memberId
-    ) {  /* 요청자가 주최자인지 확인 */
+    ) {  /* 요청자가 개설자인지 확인 */
         int leaderId = meetingQueryService.getMeeting(meetingId)
                 .getLeaderId();
 
