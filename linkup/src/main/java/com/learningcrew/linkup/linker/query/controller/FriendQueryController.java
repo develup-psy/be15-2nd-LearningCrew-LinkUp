@@ -24,6 +24,7 @@ import java.util.List;
 public class FriendQueryController {
     private final FriendQueryService friendQueryService;
 
+    /* 친구 목록 조회 */
     @GetMapping()
     @Operation(summary = "친구 목록 조회", description = "현재 로그인한 사용자의 친구 목록을 조회합니다.")
     public ResponseEntity<ApiResponse<List<FriendInfoResponse>>> getFriendList(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
@@ -31,6 +32,7 @@ public class FriendQueryController {
         return ResponseEntity.ok(ApiResponse.success(frinedList));
     }
 
+    /* 친구 신청 목록 조회*/
     @GetMapping("/received")
     @Operation(summary = "받은 친구 요청 조회", description = "내가 받은 친구 요청 목록을 조회합니다.")
     public ResponseEntity<ApiResponse<List<FriendRequestResponse>>> getReceivedRequests(@AuthenticationPrincipal CustomUserDetails customUserDetails) {

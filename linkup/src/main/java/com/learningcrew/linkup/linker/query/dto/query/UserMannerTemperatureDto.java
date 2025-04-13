@@ -1,14 +1,11 @@
 package com.learningcrew.linkup.linker.query.dto.query;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 
 @Schema(description = "사용자의 매너온도 정보")
-@Data
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder

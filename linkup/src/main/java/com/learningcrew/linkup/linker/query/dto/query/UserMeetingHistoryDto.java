@@ -1,18 +1,15 @@
 package com.learningcrew.linkup.linker.query.dto.query;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Schema(description = "참여한 모임 이력 정보")
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Getter
 public class UserMeetingHistoryDto {
 
     @Schema(description = "모임 ID", example = "301")

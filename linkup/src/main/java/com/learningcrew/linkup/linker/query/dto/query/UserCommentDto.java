@@ -1,15 +1,12 @@
 package com.learningcrew.linkup.linker.query.dto.query;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Schema(description = "사용자가 작성한 댓글 정보")
-@Data
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder

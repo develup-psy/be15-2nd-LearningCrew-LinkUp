@@ -33,6 +33,7 @@ public class UserActivityQueryController {
 
     /* 프로필 조회 */
     @GetMapping
+    @Operation(summary = "프로필 조회", description = "사용자가 자신의 프로필 정보를 조회합니다.")
     public ResponseEntity<ApiResponse<UserProfileResponse>> getUserProfile(
             @AuthenticationPrincipal CustomUserDetails userDetails
     ){
