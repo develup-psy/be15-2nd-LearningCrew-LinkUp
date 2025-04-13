@@ -1,6 +1,6 @@
 package com.learningcrew.linkup.notification.command.domain.aggregate;
 
-public enum NotificationReadStatus {
+public enum NotificationEnumStatus {
     Y,  // 읽음
     N   // 안 읽음
 }

@@ -5,10 +5,9 @@ import com.learningcrew.linkup.notification.command.application.dto.EventNotific
 import com.learningcrew.linkup.notification.command.application.dto.MarkNotificationReadResponse;
 import com.learningcrew.linkup.notification.command.application.dto.NotificationSettingRequest;
 import com.learningcrew.linkup.notification.command.domain.aggregate.Notification;
-import com.learningcrew.linkup.notification.command.domain.aggregate.NotificationReadStatus;
+import com.learningcrew.linkup.notification.command.domain.aggregate.NotificationEnumStatus;
 import com.learningcrew.linkup.notification.command.domain.aggregate.NotificationSetting;
 import com.learningcrew.linkup.notification.command.domain.aggregate.NotificationType;
-import com.learningcrew.linkup.notification.command.domain.repository.DomainTypeRepository;
 import com.learningcrew.linkup.notification.command.domain.repository.NotificationRepository;
 import com.learningcrew.linkup.notification.command.domain.repository.NotificationSettingRepository;
 import com.learningcrew.linkup.notification.command.domain.repository.NotificationTypeRepository;
@@ -56,22 +55,23 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
                 request.getDomainTypeId(),
                 notificationTypeId
         );
-        notification.setIsRead(NotificationReadStatus.N);
+        notification.setIsRead(NotificationEnumStatus.N);
 
         Notification savedNotification = notificationRepository.save(notification);
         notificationDomainService.processNotification(savedNotification);
 
 // 📧 이메일 전송
-        try {
-            gmailNotificationClient.sendEmailNotification(
-                    String.valueOf(receiverId),
-                    savedNotification.getTitle(),
-                    savedNotification.getContent()
-            );
-        } catch (Exception e) {
-            log.warn("📧 이메일 전송 실패 - userId: {}, error: {}", receiverId, e.getMessage());
+        if (notificationType.getSendEmail() == NotificationEnumStatus.Y) {
+            try {
+                gmailNotificationClient.sendEmailNotification(
+                        String.valueOf(receiverId),
+                        savedNotification.getTitle(),
+                        savedNotification.getContent()
+                );
+            } catch (Exception e) {
+                log.warn("📧 이메일 전송 실패 - userId: {}, error: {}", receiverId, e.getMessage());
+            }
         }
-
 // 📡 SSE 실시간 알림 전송
         try {
                 notificationSseService.pushNotification(savedNotification);
@@ -107,7 +107,7 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
                 .orElseThrow(() -> new RuntimeException("Notification not found with id " + notificationId));
         notification.markAsRead();
         notificationRepository.save(notification);
-        boolean readStatus = notification.getIsRead() == NotificationReadStatus.Y;
+        boolean readStatus = notification.getIsRead() == NotificationEnumStatus.Y;
         return new MarkNotificationReadResponse(notification.getId(), readStatus);
     }
 

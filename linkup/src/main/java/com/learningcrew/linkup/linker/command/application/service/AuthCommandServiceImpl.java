@@ -128,9 +128,9 @@ public class AuthCommandServiceImpl implements AuthCommandService {
         User user = userRepository.findById(verificationToken.getUserId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
-//        if (!user.getStatus().getStatusType().equals("PENDING")) {
-//            throw new BusinessException(ErrorCode.ALREADY_VERIFIED);
-//        }
+        if (!user.getStatus().getStatusType().equals("PENDING")) {
+            throw new BusinessException(ErrorCode.ALREADY_VERIFIED);
+        }
 
         userDomainService.activateUser(user);
 

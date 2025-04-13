@@ -1,7 +1,7 @@
 
 package com.learningcrew.linkup.notification.query.dto.response;
 
-import com.learningcrew.linkup.notification.command.domain.aggregate.NotificationReadStatus;
+import com.learningcrew.linkup.notification.command.domain.aggregate.NotificationEnumStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -14,7 +14,7 @@ public class NotificationResponse {
     private String title;              // 알림 제목 (NotificationType의 notification_type 값)
     private String content;            // 알림 내용 (NotificationType의 notification_template 값)
     private Integer receiverId;
-    private NotificationReadStatus isRead;
+    private NotificationEnumStatus isRead;
     private LocalDateTime createdAt;
     private Integer domainTypeId;         // 도메인 타입 ID
     private Integer notificationTypeId;   // 알림 타입 ID
