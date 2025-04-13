@@ -2,7 +2,7 @@ package com.learningcrew.linkup.linker.query.controller;
 
 import com.learningcrew.linkup.common.dto.ApiResponse;
 import com.learningcrew.linkup.linker.query.dto.response.FriendRequestResponse;
-import com.learningcrew.linkup.linker.query.dto.response.FriendResponse;
+import com.learningcrew.linkup.linker.query.dto.response.FriendInfoResponse;
 import com.learningcrew.linkup.linker.query.service.FriendQueryService;
 import com.learningcrew.linkup.security.jwt.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,8 +23,9 @@ public class FriendQueryController {
 
     @GetMapping
     @Operation(summary = "친구 목록 조회", description = "현재 로그인한 사용자의 친구 목록을 조회합니다.")
-    public ResponseEntity<ApiResponse<List<FriendResponse>>> getFriendList(){
-        return null;
+    public ResponseEntity<ApiResponse<List<FriendInfoResponse>>> getFriendList(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        List<FriendInfoResponse> frinedList = friendQueryService.getFriends(customUserDetails.getUserId());
+        return ResponseEntity.ok(ApiResponse.success(frinedList));
     }
 
     @GetMapping("/received")
