@@ -1,6 +1,7 @@
 package com.learningcrew.linkup.linker.query.service;
 
 import com.learningcrew.linkup.linker.query.dto.query.FriendInfoDTO;
+import com.learningcrew.linkup.linker.query.dto.query.FriendRequestStatusDTO;
 import com.learningcrew.linkup.linker.query.dto.response.FriendRequestResponse;
 import com.learningcrew.linkup.linker.query.dto.response.FriendInfoResponse;
 import com.learningcrew.linkup.linker.query.mapper.FriendMapper;
@@ -30,8 +31,16 @@ public class FriendQueryServiceImpl implements FriendQueryService {
     }
 
     @Override
-    public List<FriendRequestResponse> getReceivedRequests(int adresseeId) {
-
-        return List.of();
+    public List<FriendRequestResponse> getReceivedRequests(int addresseeId) {
+        // address_id가 회원인 목록 조회
+        List<FriendRequestStatusDTO> friendRequestList = friendMapper.findIncomingFriendRequests(addresseeId);
+        return friendRequestList.stream().map(
+                friendInfo -> FriendRequestResponse
+                        .builder()
+                        .requesterId(friendInfo.getTargetMemberId())
+                        .requesterNickname(friendInfo.getNickname())
+                        .requesterProfileImageUrl(friendInfo.getProfileImageUrl())
+                        .build()
+        ).toList();
     }
 }
