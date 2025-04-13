@@ -35,7 +35,6 @@ public class User {
 
     @CreatedDate
     private LocalDateTime createdAt;
-    @LastModifiedDate
     private LocalDateTime deletedAt;
 
     @ManyToOne
@@ -59,5 +58,9 @@ public class User {
 
     public void setDeletedAt() {
         this.deletedAt = LocalDateTime.now();
+    }
+
+    public void setDeletedAt(LocalDateTime deletedAt) {
+        this.deletedAt = deletedAt;
     }
 }
