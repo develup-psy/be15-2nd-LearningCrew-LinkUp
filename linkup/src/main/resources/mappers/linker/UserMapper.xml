@@ -51,4 +51,11 @@
                               WHERE status_type = 'ACCEPTED')
         ORDER BY m.date DESC
     </select>
+    <select id="findPointByUserId" resultType="UserPointDto">
+        SELECT
+                user_id
+              , point_balance AS totalPoints
+          FROM user
+         WHERE user_id = #{ userId }
+    </select>
 </mapper>

@@ -71,7 +71,9 @@ public class UserActivityQueryController {
     @GetMapping("/point")
     @Operation(summary = "포인트 조회", description = "사용자의 현재 포인트를 조회합니다.")
     public ResponseEntity<ApiResponse<UserPointDto>> getUserPoints(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        log.info("포인트 조회 user : {}", userDetails.getUserId());
         UserPointDto point = paymentQueryService.findUserPoint(userDetails.getUserId());
+        log.info("포인트 조회에 성공했습니다.");
         return ResponseEntity.ok(ApiResponse.success(point, "포인트 조회에 성공했습니다."));
     }
 
