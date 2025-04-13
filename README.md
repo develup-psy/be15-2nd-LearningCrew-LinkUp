@@ -504,7 +504,7 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 
 <br>
 
-<img src="assets/images/ddd-step8.png" alt="Step8 Policy" width="700"/>
+<img src="assets/images/ddd-step8.jpg" alt="Step8 Policy" width="700"/>
 
 🔗 [DDD 전체 보기](https://miro.com/app/board/uXjVIIWm93c=/?share_link_id=312811606423)
 
@@ -524,7 +524,7 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 - 중복 제거 및 시간순 정렬  
 - 이슈/관심 사항은 빨간 포스트잇으로 표시  
 
-<img src="assets/images/ddd-step1.png" alt="Step1 Domain Event" width="700"/>
+<img src="assets/images/ddd-step1.jpg" alt="Step1 Domain Event" width="700"/>
 
 <br>
 
@@ -536,7 +536,7 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 - 결제 시스템, 이메일 발송, SMS 등 외부 시스템 정의  
 - 명사형으로 작성  
 
-<img src="assets/images/ddd-step2.png" alt="Step2 External System" width="700"/>
+<img src="assets/images/ddd-step2.jpg" alt="Step2 External System" width="700"/>
 
 <br>
 
@@ -548,7 +548,7 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 - 각 Domain Event를 유발하는 명령  
 - 현재형 & 명령형으로 작성  
 
-<img src="assets/images/ddd-step3.png" alt="Step3 Command" width="700"/>
+<img src="assets/images/ddd-step3.jpg" alt="Step3 Command" width="700"/>
 
 <br>
 
@@ -559,7 +559,7 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 
 - 궁금하거나 결정되지 않은 사항을 정리  
 
-<img src="assets/images/ddd-step4.png" alt="Step4 HotSpot" width="700"/>
+<img src="assets/images/ddd-step4.jpg" alt="Step4 HotSpot" width="700"/>
 
 <br>
 
@@ -571,7 +571,7 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 - 도메인 이벤트를 유발하는 주체  
 - 예: 사용자, 시스템, 외부 서비스 등  
 
-<img src="assets/images/ddd-step5.png" alt="Step5 Actor" width="700"/>
+<img src="assets/images/ddd-step5.jpg" alt="Step5 Actor" width="700"/>
 
 <br>
 
@@ -583,7 +583,7 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 - 하나의 단위로 간주되는 도메인 객체 집합  
 - 관계와 제약을 관리하는 중심 단위  
 
-<img src="assets/images/ddd-step6.png" alt="Step6 Aggregate" width="700"/>
+<img src="assets/images/ddd-step6.jpg" alt="Step6 Aggregate" width="700"/>
 
 <br>
 
@@ -594,7 +594,7 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 
 - 관련 애그리거트를 하나의 컨텍스트로 묶기  
 
-<img src="assets/images/ddd-step7.png" alt="Step7 Bounded Context" width="700"/>
+<img src="assets/images/ddd-step7.jpg" alt="Step7 Bounded Context" width="700"/>
 
 <br>
 
