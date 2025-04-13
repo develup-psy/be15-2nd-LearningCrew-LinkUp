@@ -1,4 +1,36 @@
 package com.learningcrew.linkup.linker.query.controller;
 
+import com.learningcrew.linkup.common.dto.ApiResponse;
+import com.learningcrew.linkup.linker.query.dto.response.FriendRequestResponse;
+import com.learningcrew.linkup.linker.query.dto.response.FriendResponse;
+import com.learningcrew.linkup.linker.query.service.FriendQueryService;
+import com.learningcrew.linkup.security.jwt.CustomUserDetails;
+import io.swagger.v3.oas.annotations.Operation;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/v1/friends")
 public class FriendQueryController {
+    private final FriendQueryService friendQueryService;
+
+    @GetMapping
+    @Operation(summary = "친구 목록 조회", description = "현재 로그인한 사용자의 친구 목록을 조회합니다.")
+    public ResponseEntity<ApiResponse<List<FriendResponse>>> getFriendList(){
+        return null;
+    }
+
+    @GetMapping("/received")
+    @Operation(summary = "받은 친구 요청 조회", description = "내가 받은 친구 요청 목록을 조회합니다.")
+    public ResponseEntity<ApiResponse<List<FriendRequestResponse>>> getReceivedRequests(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        List<FriendRequestResponse> responses = friendQueryService.getReceivedRequests(customUserDetails.getUserId());
+        return ResponseEntity.ok(ApiResponse.success(responses, "받은 친구 요청 조회 성공"));
+    }
 }
