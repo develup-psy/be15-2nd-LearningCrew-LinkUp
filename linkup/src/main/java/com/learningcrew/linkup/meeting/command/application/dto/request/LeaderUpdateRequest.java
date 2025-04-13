@@ -8,7 +8,5 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class LeaderUpdateRequest {
     @Min(value = 1)
-    private final int leaderId;
-    @Min(1)
-    private final int meetingId;
+    private final int memberId;
 }

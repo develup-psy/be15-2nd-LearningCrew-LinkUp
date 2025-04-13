@@ -13,15 +13,14 @@ public class PenaltyDTO {
 
     private Long penaltyId;
 
-    private Long memberId;
-    private String memberName;
+    private Long userId;
+    private String userName;
 
     private String penaltyType;
 
     private String reason;
 
     private LocalDateTime createdAt;
-    private LocalDateTime expiredAt;
 
     private String isActive; // "Y" or "N"
 

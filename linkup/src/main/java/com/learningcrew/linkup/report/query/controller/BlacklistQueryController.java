@@ -6,8 +6,12 @@ import com.learningcrew.linkup.report.query.service.BlacklistQueryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/blacklist")
@@ -19,7 +23,7 @@ public class BlacklistQueryController {
 
     @GetMapping
     @Operation(summary = "블랙리스트 전체 조회", description = "서비스 이용이 제한된 사용자의 블랙리스트 목록을 조회한다.")
-    public ResponseEntity<BlacklistListResponse> getBlacklist(BlacklistSearchRequest request) {
+    public ResponseEntity<BlacklistListResponse> getBlacklist(@ParameterObject @ModelAttribute BlacklistSearchRequest request) {
         return ResponseEntity.ok(blacklistQueryService.getBlacklist(request));
     }
 }

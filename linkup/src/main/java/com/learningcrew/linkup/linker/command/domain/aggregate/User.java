@@ -22,7 +22,6 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int userId;
 
-
     @ManyToOne
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;
@@ -35,7 +34,6 @@ public class User {
 
     @CreatedDate
     private LocalDateTime createdAt;
-    @LastModifiedDate
     private LocalDateTime deletedAt;
 
     @ManyToOne
@@ -59,5 +57,9 @@ public class User {
 
     public void setDeletedAt() {
         this.deletedAt = LocalDateTime.now();
+    }
+
+    public void setDeletedAt(LocalDateTime deletedAt) {
+        this.deletedAt = deletedAt;
     }
 }

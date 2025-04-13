@@ -16,12 +16,12 @@ public interface PenaltyMapper {
     // 사용자 제재 전체 건수 (페이징용)
     long countPenalties(@Param("req") PenaltySearchRequest request);
 
-    List<PenaltyDTO> selectPenaltiesByMemberAndType(@Param("memberId") Long memberId,
+    List<PenaltyDTO> selectPenaltiesByMemberAndType(@Param("userId") Long userId,
                                                     @Param("penaltyType") String penaltyType,
                                                     @Param("limit") int limit,
                                                     @Param("offset") int offset);
 
-    long countPenaltiesByMemberAndType(@Param("memberId") Long memberId,
+    long countPenaltiesByMemberAndType(@Param("userId") Long userId,
                                        @Param("penaltyType") String penaltyType);
 
 

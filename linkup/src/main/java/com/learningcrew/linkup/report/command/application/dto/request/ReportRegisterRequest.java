@@ -5,9 +5,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * 신고 등록 요청 DTO
- */
+// 신고 등록 요청 DTO
 @Getter
 @Setter
 public class ReportRegisterRequest {

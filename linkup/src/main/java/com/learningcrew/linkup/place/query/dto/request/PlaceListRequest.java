@@ -10,6 +10,7 @@ public class PlaceListRequest {
     private Integer size = 10;
     private Integer sportId;
     private String address;
+    private Integer ownerId;
 
     public int getOffset(){
         return (page - 1) * size;

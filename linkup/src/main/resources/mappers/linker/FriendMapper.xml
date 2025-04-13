@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.learningcrew.linkup.linker.query.mapper.FriendMapper">
+    <!-- 친구 목록 조회 -->
+    <select id="findAcceptedFriends" resultType="FriendInfoDTO">
+        SELECT
+                CASE
+                    WHEN f.requester_id = #{memberId} THEN f.addressee_id
+                    ELSE f.requester_id
+                END AS friendId
+              , m.nickname
+              , m.profile_image_url
+          FROM friend as f
+          JOIN member m
+            ON m.member_id =   CASE
+                               WHEN f.requester_id = #{memberId} THEN f.addressee_id
+                               ELSE f.requester_id END
+         WHERE (f.requester_id = #{memberId} OR f.addressee_id = #{memberId})
+           AND f.status_id = ( SELECT status_id
+                                  FROM status
+                                 WHERE status_type = 'ACCEPTED' )
+    </select>
+
+    <!-- 받은 친구 요청 조회 -->
+    <select id="findIncomingFriendRequests" resultType="FriendRequestStatusDTO">
+        SELECT
+                f.requester_id
+              , m.nickname
+              , m.profile_image_url
+          FROM friend f
+          JOIN member m ON f.requester_id = m.member_id
+        WHERE f.addressee_id = #{ addresseeId }
+          AND f.status_id = ( SELECT status_id
+                                FROM status
+                               WHERE status_type = 'PENDING' )
+    </select>
+
+
+</mapper>
