@@ -10,7 +10,7 @@ public interface AccountCommandService {
 
     RegisterResponse registerUser(UserCreateRequest request);
 
-    void withdrawUser(String password,int userId);
+    void withdrawUser(String password, int userId);
 
     void recoverUser(String email, String password);
 
@@ -22,3 +22,4 @@ public interface AccountCommandService {
     // void deleteUser(...);
     // void sendResetToken(...);
     // void resetPassword(...);
+}
