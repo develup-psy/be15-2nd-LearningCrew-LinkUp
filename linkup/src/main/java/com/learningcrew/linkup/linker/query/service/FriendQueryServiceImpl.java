@@ -37,8 +37,10 @@ public class FriendQueryServiceImpl implements FriendQueryService {
     @Transactional(readOnly = true)
     @Override
     public List<FriendRequestResponse> getReceivedRequests(int addresseeId) {
-        // address_id가 회원인 목록 조회
+
+        // addressee_id가 회원인 목록 조회
         List<FriendRequestStatusDto> friendRequestList = friendMapper.findIncomingFriendRequests(addresseeId);
+
         return friendRequestList.stream().map(
                 friendInfo -> FriendRequestResponse
                         .builder()

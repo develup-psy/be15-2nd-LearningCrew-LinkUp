@@ -4,9 +4,13 @@ import com.learningcrew.linkup.common.dto.query.RoleDTO;
 import com.learningcrew.linkup.common.query.mapper.RoleMapper;
 import com.learningcrew.linkup.exception.BusinessException;
 import com.learningcrew.linkup.exception.ErrorCode;
+
+import com.learningcrew.linkup.linker.command.domain.aggregate.User;
+
 import com.learningcrew.linkup.linker.query.dto.query.MemberProfileDto;
 import com.learningcrew.linkup.linker.query.dto.query.UserMannerTemperatureDto;
 import com.learningcrew.linkup.linker.query.dto.query.UserProfileDto;
+
 import com.learningcrew.linkup.linker.query.dto.response.UserListResponse;
 import com.learningcrew.linkup.linker.query.dto.response.UserProfileResponse;
 import com.learningcrew.linkup.linker.query.mapper.MemberMapper;
@@ -52,6 +56,11 @@ public class UserQueryServiceImpl implements UserQueryService {
         );
         return role.getRoleId();
     }
+
+
+    public Optional<User> getUserName(Integer userId) {
+        return Optional.ofNullable(userMapper.findUserNameByUserId(userId))
+                .orElseThrow(() -> new RuntimeException("사용자 이름을 찾을 수 없습니다."));
 
     /* 매너 온도 조회 */
     @Override

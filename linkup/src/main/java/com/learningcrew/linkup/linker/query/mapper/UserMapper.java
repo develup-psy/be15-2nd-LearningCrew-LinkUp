@@ -13,6 +13,8 @@ public interface UserMapper {
 
     Optional<User> findByUserEmail(String email);
 
+    Optional<User> findUserNameByUserId(int userId);
+
     Optional<UserDeleteDto> findByUserUserId(int userId);
 
     List<UserMeetingDto> findUserMeetings(int userId);
@@ -20,4 +22,5 @@ public interface UserMapper {
     Optional<UserPointDto> findPointByUserId(int userId);
 
     Optional<UserMannerTemperatureDto> findUserMannerTemperature(int userId);
+
 }

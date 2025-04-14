@@ -29,6 +29,13 @@
         FROM user
         WHERE user_id = #{ userId }
     </select>
+  
+    <select id="findUserNameByUserId" resultType="String" parameterType="int">
+        SELECT user_name
+        FROM user
+        WHERE user_id = #{userId}
+    </select>
+  
     <select id="findUserMeetings" resultType="UserMeetingDTO">
         SELECT
                   m.meeting_id AS meetingId
