@@ -3,9 +3,7 @@ package com.learningcrew.linkup.place.query.mapper;
 import com.learningcrew.linkup.place.command.domain.aggregate.entity.Place;
 import com.learningcrew.linkup.place.query.dto.request.FavoriteRequest;
 import com.learningcrew.linkup.place.query.dto.request.PlaceListRequest;
-import com.learningcrew.linkup.place.query.dto.response.FavoriteDto;
-import com.learningcrew.linkup.place.query.dto.response.PlaceDetailResponse;
-import com.learningcrew.linkup.place.query.dto.response.PlaceDto;
+import com.learningcrew.linkup.place.query.dto.response.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -31,4 +29,12 @@ public interface PlaceMapper {
 
     Place selectPlaceById(@Param("placeId") int placeId);
 
+    PlaceDetailResponse selectBasicPlaceDetail(int placeId);
+
+    // 장소 세부 정보 조회
+    List<String> selectImages(int placeId);
+
+    List<OperationTimeResponse> selectOperationTimes(int placeId);
+
+    List<PlaceReviewResponse> selectReviews(int placeId);
 }
