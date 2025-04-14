@@ -1,9 +1,7 @@
 package com.learningcrew.linkup.meeting.command.domain.aggregate;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 

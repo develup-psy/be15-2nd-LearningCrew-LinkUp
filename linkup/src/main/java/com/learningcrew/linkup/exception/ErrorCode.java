@@ -61,6 +61,7 @@ public enum ErrorCode {
     ALREADY_REQUESTED_BY_OTHER(HttpStatus.BAD_REQUEST, "이미 회원을 친구 신청한 회원입니다"),
     IS_NOT_FRIEND(HttpStatus.BAD_REQUEST, "대상이 친구가 아닙니다"),
 
+
     //메일
     SEND_MAIL_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "메일 발송에 실패했습니다."),
     NOT_AUTHORIZED_USER_EMAIL(HttpStatus.BAD_REQUEST, "이메일이 인증되지 않아 회원 가입에 실패했습니다."),
@@ -69,6 +70,9 @@ public enum ErrorCode {
     INVALID_VERIFICATION_TOKEN(HttpStatus.BAD_REQUEST, "이메일 인증코드가 일치하지 않습니다. "),
     INVALID_TOKEN_TYPE(HttpStatus.BAD_REQUEST, "이메일 타입이 일치하지 않습니다."),
 
+    //계좌
+    ACCOUNT_NOT_FOUND(HttpStatus.BAD_REQUEST, "계좌가 존재하지 않습니다."),
+    ALREADY_REGISTED_ACCOUNT(HttpStatus.BAD_REQUEST, "이미 등록된 계좌입니다"),
 
     // 토큰
     REFRESH_TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "refresh 토큰이 존재하지 않습니다."),
@@ -130,7 +134,8 @@ public enum ErrorCode {
     REVIEW_NOT_FOUND(HttpStatus.NOT_FOUND, "후기를 찾을 수 없습니다."),
     REVIEW_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "이미 후기를 작성하셨습니다."),
     UNAUTHORIZED_REVIEW_EDIT(HttpStatus.FORBIDDEN, "해당 후기를 수정할 수 없습니다."),
-    INVALID_REVIEW_SCORE(HttpStatus.BAD_REQUEST, "유효하지 않은 평점입니다.");
+    INVALID_REVIEW_SCORE(HttpStatus.BAD_REQUEST, "유효하지 않은 평점입니다."),
+    REVIEW_NOT_ALLOWED(HttpStatus.BAD_REQUEST,"참여하지 않은 장소는 리뷰가 불가능합니다.");
 
 
     private final HttpStatus status;

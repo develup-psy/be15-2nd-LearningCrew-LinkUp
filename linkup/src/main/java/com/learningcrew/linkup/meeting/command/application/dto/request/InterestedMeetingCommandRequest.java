@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-@Schema(description = "모임 찜 등록 요청")
+@Schema(description = "모임 찜 등록, 삭제 요청")
 public class InterestedMeetingCommandRequest {
     @Min(value = 1)
     @Schema(description = "모임 ID")
