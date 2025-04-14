@@ -275,19 +275,22 @@ public class MeetingParticipationCommandService {
         }
 
         int acceptedStatusId = statusQueryService.getStatusId("ACCEPTED");
-        System.out.println("✅ 현재 상태 ID: " + history.getStatusId());
+
+        // JPA를 통해 참여 기록 재조회하여 상태 확인
+        MeetingParticipationHistory participation = jpaRepository.findByMeetingIdAndMemberId(history.getMeetingId(), history.getMemberId());
+        System.out.println("✅ 현재 상태 ID: " + participation.getStatusId());
         System.out.println("✅ ACCEPTED ID: " + acceptedStatusId);
 
-        if (history.getStatusId()+2 != acceptedStatusId) {
+        if (participation.getStatusId() != acceptedStatusId) {
             throw new BusinessException(ErrorCode.BAD_REQUEST, "환불 가능한 참가 정보가 아닙니다.");
         }
 
         // 취소 로직 실행
         cancelParticipation(history.getMeetingId(), history.getMemberId());
 
-        MeetingParticipationHistory entity = modelMapper.map(history, MeetingParticipationHistory.class);
-        entity.setStatusId(statusQueryService.getStatusId("DELETED"));
-        repository.save(entity);
+        // 상태 DELETED로 변경 후 저장
+        participation.setStatusId(statusQueryService.getStatusId("DELETED"));
+        repository.save(participation);
         repository.flush();
 
         history.setStatusId(statusQueryService.getStatusId("DELETED")); // soft delete

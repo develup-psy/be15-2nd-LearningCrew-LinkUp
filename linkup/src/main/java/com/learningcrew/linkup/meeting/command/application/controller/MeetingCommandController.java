@@ -1,6 +1,8 @@
 package com.learningcrew.linkup.meeting.command.application.controller;
 
 import com.learningcrew.linkup.common.dto.ApiResponse;
+import com.learningcrew.linkup.exception.BusinessException;
+import com.learningcrew.linkup.exception.ErrorCode;
 import com.learningcrew.linkup.meeting.command.application.dto.request.LeaderUpdateRequest;
 import com.learningcrew.linkup.meeting.command.application.dto.request.ManageParticipationRequest;
 import com.learningcrew.linkup.meeting.command.application.dto.request.MeetingCreateRequest;
@@ -14,6 +16,10 @@ import com.learningcrew.linkup.meeting.query.service.MeetingQueryService;
 import com.learningcrew.linkup.place.command.application.dto.request.ReservationCreateRequest;
 import com.learningcrew.linkup.place.command.application.dto.response.ReservationCommandResponse;
 import com.learningcrew.linkup.place.command.application.service.ReservationCommandService;
+import com.learningcrew.linkup.place.command.domain.aggregate.entity.Place;
+import com.learningcrew.linkup.place.query.service.PlaceQueryService;
+import com.learningcrew.linkup.point.command.application.dto.request.PointTransactionRequest;
+import com.learningcrew.linkup.point.command.application.service.PointCommandService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +38,8 @@ public class MeetingCommandController {
     private final MeetingParticipationCommandService service;
     private final MeetingQueryService meetingQueryService;
     private final ReservationCommandService reservationCommandService;
+    private final PlaceQueryService placeQueryService;
+    private final PointCommandService pointCommandService;
 
     @Operation(
             summary = "모임 생성",
@@ -62,6 +70,18 @@ public class MeetingCommandController {
         }
 
         MeetingCommandResponse response = new MeetingCommandResponse(meetingId);
+        if (meetingCreateRequest.getPlaceId() != null) {
+            Place place = placeQueryService.getPlaceById(meetingCreateRequest.getPlaceId());
+            if (place == null) {
+                throw new BusinessException(ErrorCode.PLACE_NOT_FOUND);
+            }
+            int rentalFee = place.getRentalCost();
+            int ownerId = place.getOwnerId();
+            pointCommandService.createPointTransaction(
+                    new PointTransactionRequest(ownerId, rentalFee, "CHARGE")
+            );
+        }
+
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success(response));

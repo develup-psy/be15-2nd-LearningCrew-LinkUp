@@ -132,13 +132,18 @@ public class MeetingCommandService {
             throw new BusinessException(ErrorCode.USER_NOT_FOUND, "모임에 속하지 않은 회원입니다.");
         }
 
-        // 4. 기존 개설자의 참여 내역 soft delete
+// 4. 기존 개설자의 참여 내역 soft delete
         MeetingParticipationDTO requestedParticipation = participationMapper.selectHistoryByMeetingIdAndMemberId(meetingId, leaderUpdateRequest.getMemberId());
+        MeetingParticipationHistory origin = participationRepository.findByMeetingIdAndMemberId(meetingId, leaderUpdateRequest.getMemberId());
 
         MeetingParticipationHistory history = modelMapper.map(requestedParticipation, MeetingParticipationHistory.class);
+        history.setParticipatedAt(origin.getParticipatedAt());
         history.setStatusId(statusQueryService.getStatusId("DELETED")); // soft delete
         participationRepository.save(history);
-        requestedParticipation.setStatusId(2);
+
+// 환불 처리
+        commandService.cancelParticipation(meetingId, leaderUpdateRequest.getMemberId());
+
 
         // 5. 모임 리더 변경
         meeting.setLeaderId(memberId);
@@ -166,8 +171,9 @@ public class MeetingCommandService {
     @Transactional
     public void deleteMeeting(int meetingId) {
         cancelMeetingByLeader(meetingId);
-
-        for (String string : List.of("PENDING", "ACCEPTED", "REJECTED")) { // history에서 status를 모두 DELETED로 변경
+        /* 준서 : List.of에 ACCEPTED가 있어서 4가 이미 처리가 되어서 계속 안나왔던 이유입니다.
+        *  혹시나 제가 ACCPETED를 빼서 뭔가 에러가 발생한다면 수정하겠습니다. */
+        for (String string : List.of("PENDING", "REJECTED")) { // history에서 status를 모두 DELETED로 변경
             List<MeetingParticipationDTO> participants = participationQueryService.getHistories(
                     meetingId, statusQueryService.getStatusId(string)
             );
@@ -188,6 +194,26 @@ public class MeetingCommandService {
         /* 모임의 status를 deleted로 변경하고 update */
         meetingEntity.setStatusId(statusQueryService.getStatusId("DELETED"));
         meetingRepository.save(meetingEntity);
+        // 장소 대여비 회수 로직 추가
+        if (meeting.getPlaceId() != null) {
+            Place place = placeQueryService.getPlaceById(meeting.getPlaceId());
+            User owner = userRepository.findById(place.getOwnerId())
+                    .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+
+            int rentalCost = place.getRentalCost();
+            owner.subtractPointBalance(rentalCost);
+            userRepository.save(owner);
+
+            PointTransaction revokeTransaction = new PointTransaction(
+                    null,
+                    owner.getUserId(),
+                    -rentalCost,
+                    "REFUND",
+                    null
+            );
+            pointRepository.save(revokeTransaction);
+        }
+
     }
     @Transactional
     public void validateCreatorBalance(int creatorId, Integer placeId, int minUser) {
