@@ -105,7 +105,7 @@ public class MeetingCommandController {
         ));
     }
 
-    @Operation(summary = "개설자 변경", description = "리더가 권한을 다른 참여자에게 넘긴다.")
+    @Operation(summary = "개설자 변경", description = "개설자가 권한을 다른 참여자에게 넘긴다.")
     @PutMapping("/{meetingId}/change-leader/{memberId}")
     public ResponseEntity<ApiResponse<LeaderUpdateResponse>> updateLeader(
             @PathVariable int meetingId,

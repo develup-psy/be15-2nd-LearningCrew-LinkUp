@@ -15,6 +15,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -64,6 +65,7 @@ public class MeetingCommandService {
                 .build();
 
         Meeting saved = meetingRepository.save(meeting);
+        changeStatusByMemberCount(saved); // 혹시 minUser 1이면 status 바로 변경
 
         // 개설자 자동 참가 처리
         MeetingParticipationCreateRequest participationRequest = MeetingParticipationCreateRequest.builder()
@@ -75,14 +77,14 @@ public class MeetingCommandService {
         return saved.getMeetingId();
     }
 
-    /** 2. 리더 변경 */
+    /** 2. 개설자 변경 */
     @Transactional
     public int updateLeader(int meetingId, int newLeaderId, LeaderUpdateRequest request) {
         Meeting meeting = meetingRepository.findById(meetingId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEETING_NOT_FOUND));
 
         if (meeting.getLeaderId() != request.getMemberId()) {
-            throw new BusinessException(ErrorCode.FORBIDDEN, "리더만 리더 변경 권한이 있습니다.");
+            throw new BusinessException(ErrorCode.FORBIDDEN, "개설자만 개설자 변경 권한이 있습니다.");
         }
 
         List<MeetingParticipationHistory> acceptedParticipants =
@@ -102,7 +104,8 @@ public class MeetingCommandService {
                 });
 
         meeting.setLeaderId(newLeaderId);
-        meetingRepository.save(meeting);
+        Meeting saved = meetingRepository.save(meeting);
+        changeStatusByMemberCount(saved);
 
         return meetingId;
     }
@@ -149,6 +152,28 @@ public class MeetingCommandService {
         }
     }
 
+    void changeStatusByMemberCount(Meeting meeting) { // 정합성 체크
+        meeting = meetingRepository.findById(meeting.getMeetingId())
+                .orElseThrow(() -> new BusinessException(ErrorCode.MEETING_NOT_FOUND));
+
+        List<MeetingParticipationHistory> meetingParticipationHistories
+                = meetingParticipationHistoryRepository.findAllByMeetingIdAndStatusId(meeting.getMeetingId(), STATUS_ACCEPTED);
+
+        int participantsCount = meetingParticipationHistories.size();
+
+        if (participantsCount < meeting.getMinUser()) {
+            meeting.setStatusId(STATUS_PENDING);
+        }
+        if (participantsCount >= meeting.getMinUser() && participantsCount < meeting.getMaxUser()) {
+            meeting.setStatusId(STATUS_ACCEPTED);
+        }
+        if (participantsCount == meeting.getMaxUser()) {
+            meeting.setStatusId(STATUS_REJECTED);
+        }
+
+        meetingRepository.save(meeting);
+    }
+
     @Scheduled(cron = "0 0 0 * * *") // 자정에 한 번 오늘 모임 목록 캐싱
     public void cacheTodaysMeetings() {
         LocalDate today = LocalDate.now();
@@ -165,12 +190,14 @@ public class MeetingCommandService {
         }
 
         LocalDateTime now = LocalDateTime.now().withSecond(0).withNano(0);
+
         List<Meeting> updatedMeetings = new ArrayList<>();
 
         for (Meeting meeting : cachedTodaysMeetings) {
             LocalDateTime startAt = meeting.getDate().atTime(meeting.getStartTime());
+            Duration diff = Duration.between(startAt, now);
 
-            if (!startAt.isEqual(now)) {
+            if (Math.abs(diff.toMinutes()) <= 1) { // 1분 차이까지 허용 (더 적게?)
                 continue;
             }
 

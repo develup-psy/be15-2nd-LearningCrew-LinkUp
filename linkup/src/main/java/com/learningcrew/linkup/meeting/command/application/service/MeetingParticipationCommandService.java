@@ -31,13 +31,18 @@ public class MeetingParticipationCommandService {
     private final NotificationHelper notificationHelper;
     private final PlaceRepository placeRepository;
     private final MeetingRepository meetingRepository;
+    private final MeetingCommandService meetingCommandService;
 
     private static final int STATUS_PENDING = 1;
     private static final int STATUS_ACCEPTED = 2;
     private static final int STATUS_REJECTED = 3;
     private static final int STATUS_DELETED = 4;
+    private static final int STATUS_DONE = 5;
 
-    /** 1. 참가 신청 */
+
+    /**
+     * 1. 참가 신청
+     */
     @Transactional
     public long createMeetingParticipation(MeetingParticipationCreateRequest request, Meeting meeting) {
         int meetingId = meeting.getMeetingId();
@@ -49,7 +54,9 @@ public class MeetingParticipationCommandService {
         }
 
         // 모임 상태 확인
-        if (meeting.getStatusId() == STATUS_REJECTED || meeting.getStatusId() == STATUS_DELETED) {
+        if (meeting.getStatusId() == STATUS_REJECTED
+            || meeting.getStatusId() == STATUS_DELETED
+            || meeting.getStatusId() == STATUS_DONE) {
             throw new BusinessException(ErrorCode.BAD_REQUEST, "참가 신청할 수 없는 모임입니다.");
         }
 
@@ -67,15 +74,24 @@ public class MeetingParticipationCommandService {
                 .statusId(statusId)
                 .build();
 
+        notificationHelper.sendNotification(
+                meeting.getLeaderId(),  // 알림 받을 대상: 모임 개설자
+                1,                  // 알림 유형 ID
+                1                    // 도메인 ID
+        );
+
         participationRepository.save(participation);
-        notificationHelper.sendNotification(meeting.getLeaderId(), 1, 1);
+        meetingCommandService.changeStatusByMemberCount(meeting);
 
         return participation.getParticipationId();
     }
 
-    /** 2. 참가 승인 */
+    /**
+     * 2. 참가 승인
+     */
     @Transactional
     public long acceptParticipation(Meeting meeting, int memberId) {
+        // 1. 참가 내역 조회
         int meetingId = meeting.getMeetingId();
 
         MeetingParticipationHistory participation = participationRepository
@@ -85,7 +101,8 @@ public class MeetingParticipationCommandService {
         if (participation.getStatusId() != STATUS_PENDING) {
             throw new BusinessException(ErrorCode.BAD_REQUEST, "승인 가능한 참가 신청이 없습니다.");
         }
-
+        // 2. 모임이 참가 신청 승인 가능한 상태인지 확인
+        // 정원 확인
         List<MeetingParticipationHistory> acceptedList =
                 participationRepository.findByMeetingIdAndStatusId(meetingId, STATUS_ACCEPTED);
 
@@ -94,22 +111,31 @@ public class MeetingParticipationCommandService {
         }
 
         if (meeting.getStatusId() == STATUS_DELETED ||
-                meeting.getDate().atTime(meeting.getStartTime()).isBefore(LocalDateTime.now())) {
+            meeting.getStatusId() == STATUS_DONE ||
+            meeting.getDate().atTime(meeting.getStartTime()).isBefore(LocalDateTime.now())) {
             throw new BusinessException(ErrorCode.BAD_REQUEST, "모임 상태가 유효하지 않아 승인할 수 없습니다.");
         }
 
         payParticipation(meeting, memberId);
 
-        participation.setStatusId(STATUS_ACCEPTED);
-        participationRepository.save(participation);
+        // 알림 발송
+        notificationHelper.sendNotification(
+                participation.getMemberId(),  // 알림 받을 대상: 모임 개설자
+                2,                  // 알림 유형 ID: 예) 모임 참가 신청
+                1                    // 도메인 ID: 예) 모임 도메인
+        );
 
-        notificationHelper.sendNotification(memberId, 2, 1);
+        participationRepository.save(participation);
+        meetingCommandService.changeStatusByMemberCount(meeting);
         return participation.getParticipationId();
     }
 
-    /** 3. 참가 거절 */
+    /**
+     * 3. 참가 거절
+     */
     @Transactional
     public long rejectParticipation(Meeting meeting, int memberId) {
+        // 1. 참가 내역 조회
         int meetingId = meeting.getMeetingId();
 
         MeetingParticipationHistory participation = participationRepository
@@ -119,30 +145,53 @@ public class MeetingParticipationCommandService {
         if (participation.getStatusId() != STATUS_PENDING) {
             throw new BusinessException(ErrorCode.BAD_REQUEST, "거절 가능한 참가 신청이 없습니다.");
         }
-
-        if (meeting.getStatusId() == STATUS_DELETED ||
-                meeting.getDate().atTime(meeting.getStartTime()).isBefore(LocalDateTime.now())) {
-            throw new BusinessException(ErrorCode.BAD_REQUEST, "모임 상태가 유효하지 않아 거절할 수 없습니다.");
+        // 2. 모임이 참가 신청 거절 가능한 상태인지 확인
+        if (meeting.getStatusId() == STATUS_DELETED) {
+            throw new BusinessException(ErrorCode.BAD_REQUEST, "이미 삭제된 모임입니다.");
         }
 
+        // 모임 시작 시간 확인
+        if (meeting.getStatusId() == STATUS_DONE ||
+            meeting.getDate().atTime(meeting.getStartTime()).isBefore(LocalDateTime.now())) {
+            throw new BusinessException(ErrorCode.BAD_REQUEST, "이미 시작된 모임입니다.");
+        }
+        // 3. 참가 거절 처리
         participation.setStatusId(STATUS_REJECTED);
         participationRepository.save(participation);
         return participation.getParticipationId();
     }
 
-    /** 4. 참가 취소 (soft delete) */
+    /**
+     * 4. 참가 취소 (soft delete)
+     */
     @Transactional
     public long deleteMeetingParticipation(MeetingParticipationHistory history) {
         if (history == null) {
             throw new BusinessException(ErrorCode.NOT_FOUND, "참가 정보를 찾을 수 없습니다.");
         }
 
+        Meeting meeting = meetingRepository.findById(history.getMeetingId())
+                .orElseThrow(() -> new BusinessException(ErrorCode.MEETING_NOT_FOUND));
+
+        if (meeting.getStatusId() == STATUS_DELETED) {  // soft deleted 된 모임
+            throw new BusinessException(ErrorCode.MEETING_NOT_FOUND);
+        }
+
+        // 최대 인원 모집 (모임 확정) 혹은 진행 완료
+        if (meeting.getStatusId() == STATUS_REJECTED || meeting.getStatusId() == STATUS_DONE) {
+            throw new BusinessException(ErrorCode.BAD_REQUEST, "참가 취소가 불가능한 모임입니다.");
+        }
+
         history.setStatusId(STATUS_DELETED);
         participationRepository.save(history);
+
+        meetingCommandService.changeStatusByMemberCount(meeting);
         return history.getParticipationId();
     }
 
-    /** 5. 참가 가능 여부 확인 */
+    /**
+     * 5. 참가 가능 여부 확인 (잔액)
+     */
     @Transactional(readOnly = true)
     public void validateBalance(int meetingId, int userId) {
         Meeting meeting = meetingRepository.findById(meetingId)
@@ -179,10 +228,14 @@ public class MeetingParticipationCommandService {
     }
 
 
-
-    /** 포인트 차감 처리 */
+    /**
+     * 포인트 차감 처리
+     */
     private void payParticipation(Meeting meeting, int memberId) {
-        int placeId = meeting.getPlaceId();
+        Integer placeId = meeting.getPlaceId();
+        if (placeId == null) {
+            return;
+        }
 
         Place place = placeRepository.findById(placeId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.PLACE_NOT_FOUND));

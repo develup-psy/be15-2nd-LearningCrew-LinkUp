@@ -15,5 +15,4 @@ public interface MeetingRepository {
 
     List<Meeting> findAllByDate(LocalDate today);
 
-
 }
