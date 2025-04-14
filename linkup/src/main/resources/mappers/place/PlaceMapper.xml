@@ -41,31 +41,33 @@
         AND p.is_active = 'Y'
     </select>
 
-    <!-- 장소 상세 조회 쿼리 -->
     <resultMap id="placeDetailResultMap" type="com.learningcrew.linkup.place.query.dto.response.PlaceDetailResponse">
         <id property="placeId" column="place_id"/>
         <result property="placeName" column="place_name"/>
-        <result property="address" column="address"/>
+        <result property="address" column="address" jdbcType="VARCHAR"/>
         <result property="description" column="description"/>
         <result property="equipment" column="equipment"/>
         <result property="rentalCost" column="rental_cost"/>
+        <!-- 하위 리스트들도 정확히 지정 -->
         <collection property="imageUrl" ofType="java.lang.String" javaType="java.util.ArrayList">
             <result column="image_url"/>
         </collection>
         <collection property="operationTimes" ofType="com.learningcrew.linkup.place.query.dto.response.OperationTimeResponse">
-            <result property="dayOfWeek"  column="day_of_week"/>
-            <result property="startTime"  column="start_time"/>
-            <result property="endTime"    column="end_time"/>
+            <result property="dayOfWeek" column="day_of_week"/>
+            <result property="startTime" column="start_time"/>
+            <result property="endTime" column="end_time"/>
         </collection>
         <collection property="placeReviews" ofType="com.learningcrew.linkup.place.query.dto.response.PlaceReviewResponse">
             <result property="reviewContent" column="review_content"/>
-            <result property="reviewImageUrl" column="review_Image_Url"/>
+            <result property="reviewImageUrl" column="review_image_url"/>
             <result property="reviewScore" column="review_score"/>
         </collection>
     </resultMap>
 
-    <select id="selectPlaceDetail" parameterType="int" resultMap="placeDetailResultMap">
-            SELECT
+
+    <select id="selectPlaceDetail" parameterType="int"
+            resultMap="placeDetailResultMap">
+    SELECT
             p.place_id,
             p.place_name,
             p.address,

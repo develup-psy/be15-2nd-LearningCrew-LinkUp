@@ -3,7 +3,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalTime;
 import java.util.List;
 
 @Getter
@@ -24,5 +23,7 @@ public class PlaceDetailResponse {
     private List<OperationTimeResponse> operationTimes;
     // 장소 후기
     private List<PlaceReviewResponse> placeReviews;
+
 }
+
 
