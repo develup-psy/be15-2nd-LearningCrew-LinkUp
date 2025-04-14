@@ -6,7 +6,6 @@ import com.learningcrew.linkup.meeting.query.dto.response.MeetingDTO;
 import com.learningcrew.linkup.meeting.query.dto.response.MeetingListResponse;
 import com.learningcrew.linkup.meeting.query.service.MeetingQueryService;
 import io.swagger.v3.oas.annotations.Operation;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -44,4 +43,5 @@ public class MeetingQueryController {
 
         return ResponseEntity.ok(ApiResponse.success(response));
     }
+
 }

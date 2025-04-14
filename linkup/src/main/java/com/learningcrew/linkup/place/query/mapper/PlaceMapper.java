@@ -1,5 +1,6 @@
 package com.learningcrew.linkup.place.query.mapper;
 
+import com.learningcrew.linkup.place.command.domain.aggregate.entity.Place;
 import com.learningcrew.linkup.place.query.dto.request.FavoriteRequest;
 import com.learningcrew.linkup.place.query.dto.request.PlaceListRequest;
 import com.learningcrew.linkup.place.query.dto.response.FavoriteDto;
@@ -28,5 +29,6 @@ public interface PlaceMapper {
 
     long countPlacesByOwner(PlaceListRequest placeListRequest);
 
+    Place selectPlaceById(@Param("placeId") int placeId);
 
 }

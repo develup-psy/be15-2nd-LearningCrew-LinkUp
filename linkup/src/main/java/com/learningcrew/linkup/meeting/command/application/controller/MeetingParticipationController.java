@@ -11,6 +11,7 @@ import com.learningcrew.linkup.meeting.query.mapper.MeetingParticipationMapper;
 import com.learningcrew.linkup.meeting.query.service.MeetingParticipationQueryService;
 import com.learningcrew.linkup.meeting.query.service.MeetingQueryService;
 import com.learningcrew.linkup.meeting.query.service.StatusQueryService;
+import com.learningcrew.linkup.point.command.application.dto.response.MeetingPaymentResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -32,6 +33,19 @@ public class MeetingParticipationController {
     private final ModelMapper modelMapper;
 
     @Operation(
+            summary = "모임 참가 신청 가능 여부 확인",
+            description = "해당 모임에 참가 신청을 할 수 있는지 (포인트 잔액 기준) 확인한다."
+    )
+    @GetMapping("/api/v1/meetings/{meetingId}/participation/check")
+    public ResponseEntity<ApiResponse<MeetingPaymentResponse>> checkEligibility(
+            @PathVariable int meetingId,
+            @RequestParam("userId") int userId
+    ) {
+        MeetingPaymentResponse response = service.checkBalance(meetingId, userId);
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+    @Operation(
             summary = "모임 참가 신청",
             description = "회원이 개설된 모임에 참가를 신청한다."
     )
@@ -41,6 +55,9 @@ public class MeetingParticipationController {
             @PathVariable int meetingId
     ) {
         Meeting meeting = modelMapper.map(meetingQueryService.getMeeting(meetingId), Meeting.class);
+
+        service.validateBalance(meetingId, request.getMemberId());
+
 
         long participationId = service.createMeetingParticipation(request, meeting);
 

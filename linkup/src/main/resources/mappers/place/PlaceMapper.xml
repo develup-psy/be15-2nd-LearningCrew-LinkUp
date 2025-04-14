@@ -44,7 +44,7 @@
     <resultMap id="placeDetailResultMap" type="com.learningcrew.linkup.place.query.dto.response.PlaceDetailResponse">
         <id property="placeId" column="place_id"/>
         <result property="placeName" column="place_name"/>
-        <result property="address" column="address" jdbcType="VARCHAR"/>
+        <result property="address" column="address"/>
         <result property="description" column="description"/>
         <result property="equipment" column="equipment"/>
         <result property="rentalCost" column="rental_cost"/>
@@ -167,6 +167,14 @@
             AND p.address LIKE CONCAT('%', #{address}, '%')
         </if>
     </select>
+
+    <!-- PlaceMapper.xml -->
+    <select id="selectPlaceById" resultType="com.learningcrew.linkup.place.command.domain.aggregate.entity.Place">
+        SELECT *
+        FROM place
+        WHERE place_id = #{placeId}
+    </select>
+
 
 
 </mapper>
