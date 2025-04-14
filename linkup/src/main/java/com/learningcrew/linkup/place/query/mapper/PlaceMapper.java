@@ -29,6 +29,11 @@ public interface PlaceMapper {
 
     Place selectPlaceById(@Param("placeId") int placeId);
 
+
+    Integer findOwnerIdByPlaceId(@Param("placeId") int placeId);
+
+    String findPlaceNameByPlaceId(@Param("placeId") int placeId);
+
     PlaceDetailResponse selectBasicPlaceDetail(int placeId);
 
     // 장소 세부 정보 조회
@@ -37,4 +42,5 @@ public interface PlaceMapper {
     List<OperationTimeResponse> selectOperationTimes(int placeId);
 
     List<PlaceReviewResponse> selectReviews(int placeId);
+
 }

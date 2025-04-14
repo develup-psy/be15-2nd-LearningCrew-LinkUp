@@ -20,10 +20,14 @@ import com.learningcrew.linkup.meeting.query.mapper.MeetingMapper;
 import com.learningcrew.linkup.meeting.query.mapper.MeetingParticipationMapper;
 import com.learningcrew.linkup.meeting.query.service.MeetingParticipationQueryService;
 import com.learningcrew.linkup.meeting.query.service.StatusQueryService;
+
 import com.learningcrew.linkup.place.command.domain.aggregate.entity.Place;
 import com.learningcrew.linkup.place.query.service.PlaceQueryService;
 import com.learningcrew.linkup.point.command.domain.aggregate.PointTransaction;
 import com.learningcrew.linkup.point.command.domain.repository.PointRepository;
+
+import com.learningcrew.linkup.notification.command.application.helper.MeetingNotificationHelper;
+
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -43,6 +47,7 @@ public class MeetingCommandService {
     private final ModelMapper modelMapper;
     private final MeetingMapper meetingMapper;
     private final MeetingParticipationMapper participationMapper;
+    private final MeetingNotificationHelper meetingNotificationHelper;
 
     private final MeetingParticipationCommandService commandService;
     private final MeetingParticipationCommandService participationCommandService;
@@ -143,6 +148,12 @@ public class MeetingCommandService {
         meetingEntity.setSportId(sportId);
         meetingEntity.setStatusId(statusId);
         meetingRepository.save(meetingEntity);
+
+        /* 개설자 변경 알림 발송 */
+        meetingNotificationHelper.sendLeaderChangeNotification(
+                memberId,       // 알림 받을 사람 (모임 개설자)
+                meeting.getMeetingTitle()           // 모임 제목 (바인딩될 {meetingTitle})
+        );
 
         return meetingId;
     }

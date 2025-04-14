@@ -18,7 +18,7 @@ public class FriendNotificationHelper {
     private final NotificationHelper notificationHelper;
 
     /**
-     * 친구 신청 알림 발송 - jgh 스타일 유지
+     * 친구 신청 알림 - jgh
      */
     public void sendFriendRequestNotification(int requesterId, int addresseeId) {
         /* 친구 신청 알림 발송 - jgh */
@@ -67,7 +67,7 @@ public class FriendNotificationHelper {
         notificationHelper.sendNotification(notificationRequest);
     }
 
-    // 친구 삭제 알림
+/*    // 친구 삭제 알림
     public void sendFriendDeleteNotification(int deleterId, int deletedUserId) {
         String userName = String.valueOf(userQueryService.getUserName(deleterId)
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다.")));
@@ -87,6 +87,6 @@ public class FriendNotificationHelper {
                 deletedUserId, deleterId, variables);
 
         notificationHelper.sendNotification(notificationRequest);
-    }
+    }*/
 }
 
