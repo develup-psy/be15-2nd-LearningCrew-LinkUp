@@ -41,6 +41,7 @@ public class FavoriteCommandService {
     @Transactional
     public void deleteFavorite(int memberId, int placeId) {
         FavoriteId favoriteId = new FavoriteId(memberId, placeId);
+        System.out.println("삭제 시도: memberId = " + memberId + ", placeId = " + placeId);
         favoriteRepository.deleteById(favoriteId);
     }
 }
