@@ -17,15 +17,15 @@ public interface SportTypeMapper {
 
     /* sport_name으로 sportType 조회 */
     @Results(id = "sportTypeMap", value = {
-            @Result(property = "sportTypeId", column = "sport_type_id"),
+            @Result(property = "sportTypeId", column = "sport_id"),
             @Result(property = "sportName", column = "sport_name")
     })
-    @Select("SELECT sport_type_id, sport_name FROM sport_type WHERE sport_name = #{sportName}")
+    @Select("SELECT sport_id, sport_name FROM sport_type WHERE sport_name = #{sportName}")
     Optional<SportTypeDTO> findBySportName(String sportName);
 
     /* sport_id로 sportType 조회 */
     @ResultMap("sportTypeMap")
-    @Select("SELECT sport_type_id, sport_name FROM sport_type WHERE sport_type_id = #{id}")
+    @Select("SELECT sport_id, sport_name FROM sport_type WHERE sport_id = #{id}")
     Optional<SportTypeDTO> findBySportTypeId(int id);
 
     /* sport_name으로 유무 확인 */

@@ -36,12 +36,12 @@ public class PenaltyQueryServiceImpl implements PenaltyQueryService {
     }
 
     @Override
-    public PenaltyListResponse getPenaltiesByMemberAndType(Long memberId, String penaltyType, PenaltySearchRequest request) {
+    public PenaltyListResponse getPenaltiesByMemberAndType(Long userId, String penaltyType, PenaltySearchRequest request) {
         int limit = request.getSize();
         int offset = (request.getPage() - 1) * limit;
 
-        List<PenaltyDTO> penalties = penaltyMapper.selectPenaltiesByMemberAndType(memberId, penaltyType, limit, offset);
-        long totalItems = penaltyMapper.countPenaltiesByMemberAndType(memberId, penaltyType);
+        List<PenaltyDTO> penalties = penaltyMapper.selectPenaltiesByMemberAndType(userId, penaltyType, limit, offset);
+        long totalItems = penaltyMapper.countPenaltiesByMemberAndType(userId, penaltyType);
 
         Pagination pagination = Pagination.builder()
                 .currentPage(request.getPage())

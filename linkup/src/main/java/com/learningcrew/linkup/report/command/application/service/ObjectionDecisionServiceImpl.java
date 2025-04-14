@@ -17,14 +17,14 @@ import java.time.LocalDateTime;
 public class ObjectionDecisionServiceImpl implements ObjectionDecisionService {
 
     private final ObjectionRepository objectionRepository;
-//    private final PenaltyAdminService penaltyAdminService;
+    private final PenaltyAdminService penaltyAdminService;
 
     @Override
     public ObjectionDecisionResponse acceptObjection(Long objectionId) {
         Objection objection = getValidObjection(objectionId);
 
         // 제재 철회
-//        penaltyAdminService.cancelPenalty(objection.getPenaltyId().longValue());
+        penaltyAdminService.cancelPenalty(objection.getPenaltyId().longValue());
 
         // 상태 변경
         objection.setStatusId(2); // 승인됨

@@ -18,4 +18,10 @@
           JOIN user u ON (u.user_id = m.member_id)
         WHERE m.member_id = #{ userId }
     </select>
+    <select id="findUserMannerTemperature" resultType="UserMannerTemperatureDto">
+        SELECT
+              manner_temperature
+         FROM member
+        WHERE member_id = #{ memberId }
+    </select>
 </mapper>

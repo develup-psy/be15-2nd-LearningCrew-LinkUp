@@ -1,9 +1,6 @@
 package com.learningcrew.linkup.notification.command.domain.aggregate;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -24,4 +21,8 @@ public class NotificationType {
     // 알림 템플릿 (내용)
     @Column(name = "notification_template", nullable = false)
     private String notificationTemplate;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "send_email")
+    private NotificationEnumStatus sendEmail = NotificationEnumStatus.Y;
 }

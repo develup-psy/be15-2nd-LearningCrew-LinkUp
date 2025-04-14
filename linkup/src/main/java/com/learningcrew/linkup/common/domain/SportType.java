@@ -16,6 +16,7 @@ public class SportType {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "sport_id")
     private int sportTypeId;
 
     private String sportName;

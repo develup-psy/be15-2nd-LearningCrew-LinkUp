@@ -5,20 +5,21 @@ import com.learningcrew.linkup.notification.command.application.dto.EventNotific
 import com.learningcrew.linkup.notification.command.application.dto.MarkNotificationReadResponse;
 import com.learningcrew.linkup.notification.command.application.dto.NotificationSettingRequest;
 import com.learningcrew.linkup.notification.command.domain.aggregate.Notification;
-import com.learningcrew.linkup.notification.command.domain.aggregate.NotificationReadStatus;
+import com.learningcrew.linkup.notification.command.domain.aggregate.NotificationEnumStatus;
 import com.learningcrew.linkup.notification.command.domain.aggregate.NotificationSetting;
 import com.learningcrew.linkup.notification.command.domain.aggregate.NotificationType;
-import com.learningcrew.linkup.notification.command.domain.repository.DomainTypeRepository;
 import com.learningcrew.linkup.notification.command.domain.repository.NotificationRepository;
 import com.learningcrew.linkup.notification.command.domain.repository.NotificationSettingRepository;
 import com.learningcrew.linkup.notification.command.domain.repository.NotificationTypeRepository;
 import com.learningcrew.linkup.notification.command.domain.service.NotificationDomainService;
 import com.learningcrew.linkup.notification.command.infrastructure.GmailNotificationClient;
 import com.learningcrew.linkup.notification.command.infrastructure.NotificationSseService;
+import com.learningcrew.linkup.notification.command.util.NotificationTemplateProcessor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
@@ -45,43 +46,52 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
                 notificationSettingRepository.findByUserIdAndNotificationTypeId(receiverId, notificationTypeId);
         boolean isAllowed = settingOpt.map(NotificationSetting::isEnabled).orElse(false);
         if (!isAllowed) {
-            log.info("\uD83D\uDD15 수신 차단된 유저 - userId: {}, typeId: {}", receiverId, notificationTypeId);
+            log.info("🔕 수신 차단된 유저 - userId: {}, typeId: {}", receiverId, notificationTypeId);
             return new CreateNotificationResponse(null);
         }
 
+        Map<String, String> variables = request.getVariables();
+
+        String processedTitle = NotificationTemplateProcessor.process(notificationType.getNotificationType(), variables);
+        String processedContent = NotificationTemplateProcessor.process(notificationType.getNotificationTemplate(), variables);
+
+        log.info("📨 바인딩된 제목: {}, 내용: {}", processedTitle, processedContent);
+
+
         Notification notification = new Notification(
-                notificationType.getNotificationType(),
-                notificationType.getNotificationTemplate(),
+                processedTitle,
+                processedContent,
                 receiverId,
                 request.getDomainTypeId(),
                 notificationTypeId
         );
-        notification.setIsRead(NotificationReadStatus.N);
+        notification.setIsRead(NotificationEnumStatus.N);
 
         Notification savedNotification = notificationRepository.save(notification);
         notificationDomainService.processNotification(savedNotification);
 
-// 📧 이메일 전송
-        try {
-            gmailNotificationClient.sendEmailNotification(
-                    String.valueOf(receiverId),
-                    savedNotification.getTitle(),
-                    savedNotification.getContent()
-            );
-        } catch (Exception e) {
-            log.warn("📧 이메일 전송 실패 - userId: {}, error: {}", receiverId, e.getMessage());
+        // 📧 이메일 전송
+        if (notificationType.getSendEmail() == NotificationEnumStatus.Y) {
+            try {
+                gmailNotificationClient.sendEmailNotification(
+                        String.valueOf(receiverId),
+                        savedNotification.getTitle(),
+                        savedNotification.getContent()
+                );
+            } catch (Exception e) {
+                log.warn("📧 이메일 전송 실패 - userId: {}, error: {}", receiverId, e.getMessage());
+            }
         }
 
-// 📡 SSE 실시간 알림 전송
+        // 📡 SSE 실시간 알림 전송
         try {
-                notificationSseService.pushNotification(savedNotification);
+            notificationSseService.pushNotification(savedNotification);
         } catch (Exception e) {
             log.warn("📡 SSE 전송 실패 - userId: {}, error: {}", receiverId, e.getMessage());
         }
 
         return new CreateNotificationResponse(savedNotification.getId());
     }
-
 
     @Override
     public void updateNotificationSetting(Integer userId, NotificationSettingRequest request) {
@@ -107,9 +117,7 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
                 .orElseThrow(() -> new RuntimeException("Notification not found with id " + notificationId));
         notification.markAsRead();
         notificationRepository.save(notification);
-        boolean readStatus = notification.getIsRead() == NotificationReadStatus.Y;
+        boolean readStatus = notification.getIsRead() == NotificationEnumStatus.Y;
         return new MarkNotificationReadResponse(notification.getId(), readStatus);
     }
-
-
 }

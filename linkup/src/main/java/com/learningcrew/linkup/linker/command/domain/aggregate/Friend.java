@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "friend")
-@IdClass(FriendId.class)
 @Getter
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
@@ -18,11 +17,8 @@ import java.time.LocalDateTime;
 @Builder
 public class Friend {
 
-    @Id
-    private int requesterId;
-
-    @Id
-    private int addresseeId;
+    @EmbeddedId
+    private FriendId id;
 
     @ManyToOne
     @JoinColumn(name="status_id", nullable = false)
@@ -31,4 +27,12 @@ public class Friend {
     @CreatedDate
     private LocalDateTime requestedAt;
     private LocalDateTime respondedAt;
+
+    public void updateStatus(Status acceptedStatus) {
+        this.status = acceptedStatus;
+    }
+
+    public void updateResponededAt(LocalDateTime now) {
+        this.respondedAt = now;
+    }
 }

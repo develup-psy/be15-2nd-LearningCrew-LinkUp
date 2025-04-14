@@ -5,8 +5,8 @@ import com.learningcrew.linkup.exception.BusinessException;
 import com.learningcrew.linkup.exception.ErrorCode;
 import com.learningcrew.linkup.meeting.query.dto.request.MeetingSearchRequest;
 import com.learningcrew.linkup.meeting.query.dto.response.MeetingDTO;
-import com.learningcrew.linkup.meeting.query.dto.response.MeetingDetailResponse;
 import com.learningcrew.linkup.meeting.query.dto.response.MeetingListResponse;
+import com.learningcrew.linkup.meeting.query.dto.response.MeetingSummaryDTO;
 import com.learningcrew.linkup.meeting.query.mapper.MeetingMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,18 +23,20 @@ public class MeetingQueryService {
 
     /* 모임 상세 조회 */
     @Transactional(readOnly = true)
-    public MeetingDetailResponse getMeeting(int meetingId) {
-
+    public MeetingDTO getMeeting(int meetingId) {
         MeetingDTO meeting = meetingMapper.selectMeetingById(meetingId);
-
-        return MeetingDetailResponse.builder()
-                .meeting(meeting)
-                .build();
+        if (meeting == null) {
+            throw new BusinessException(ErrorCode.MEETING_NOT_FOUND);
+        }
+        meeting.convertToStatusDescription();
+        return meeting;
     }
 
-    /* 모임 목록 조회 */
+    /* 모임 목록 조회 (페이징) */
     public MeetingListResponse getMeetings(MeetingSearchRequest meetingSearchRequest) {
-        List<MeetingDTO> meetings = meetingMapper.selectMeetings(meetingSearchRequest);
+        List<MeetingSummaryDTO> meetings = meetingMapper.selectMeetings(meetingSearchRequest);
+        meetings.forEach(MeetingSummaryDTO::convertToStatusDescription);
+
         long totalItems = meetingMapper.countMeetings(meetingSearchRequest);
 
         int page = meetingSearchRequest.getPage();

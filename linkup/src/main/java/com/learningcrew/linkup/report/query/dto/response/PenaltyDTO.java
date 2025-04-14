@@ -13,8 +13,8 @@ public class PenaltyDTO {
 
     private Long penaltyId;
 
-    private Long memberId;
-    private String memberName;
+    private Long userId;
+    private String userName;
 
     private String penaltyType;
 

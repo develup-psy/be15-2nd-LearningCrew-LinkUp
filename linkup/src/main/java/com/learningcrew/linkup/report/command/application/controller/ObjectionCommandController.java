@@ -21,7 +21,7 @@ public class ObjectionCommandController {
     private final ObjectionCommandService objectionCommandService;
 
     @PostMapping("/review/{reviewId}")
-    @Operation(summary = "장소 후기 제재 이의 신청", description = "사용자가 장소 후기 제재에 대해 이의를 신청합니다.")
+    @Operation(summary = "장소 후기 제재 이의 신청", description = "사업자가 장소 후기 제재에 대해 이의를 신청합니다.")
     public ResponseEntity<ObjectionRegisterResponse> submitReviewObjection(
             @PathVariable Integer reviewId,
             @RequestBody @Valid ReviewObjectionRequest request

@@ -6,36 +6,45 @@
 
     <!-- 특정 모임과 회원 기준 참여 이력 확인 (승인된 참여만) -->
     <select id="selectMeetingParticipationByMeetingIdAndMemberId" resultType="MeetingParticipationDTO">
-        SELECT participation_id, status_id, meeting_id, member_id
-        FROM meeting_participation_history
-        WHERE meeting_id = #{meetingId}
-        AND member_id = #{memberId}
-        AND status_id = 2
+
+        SELECT a.participation_id, b.status_type, a.meeting_id, a.member_id, a.participated_at
+        FROM meeting_participation_history a
+        JOIN status b ON a.status_id = b.status_id
+        WHERE a.meeting_id = #{ meetingId }
+        AND a.member_id = #{ memberId }
+        AND a.status_id = 2
     </select>
 
     <!-- 특정 모임의 승인된 참여자 ID 목록 -->
-    <select id="selectParticipantsByMeetingId" resultType="MemberDTO">
-        SELECT member_id
-        FROM meeting_participation_history
-        WHERE meeting_id = #{meetingId}
-        AND status_id = 2
+    <select id="selectParticipantsByMeetingId" resultType="MemberDTO">                                                                                                 
+        SELECT b.member_id, b.gender, b.nickname, b.birth_date, b.introduction,
+               b.manner_temperature, b.profile_image_url, c.status_id
+        FROM meeting_participation_history a
+        JOIN member b ON a.member_id = b.member_id
+        JOIN user c ON b.member_id = c.user_id
+        WHERE meeting_id = #{ meetingId }
+        AND a.status_id = 2
+        AND c.status_id != 4
     </select>
-
+  
     <!-- 모임 ID + 상태 ID로 참여 이력 조회 -->
-    <select id="selectHistoryByMeetingIdAndStatusId" resultType="MeetingParticipationDTO">
-        SELECT participation_id, status_id, meeting_id, member_id
-        FROM meeting_participation_history
-        WHERE meeting_id = #{meetingId}
-        AND status_id = #{statusId}
+    <select id="selectHistoriesByMeetingIdAndStatusId" resultType="MeetingParticipationDTO">
+        SELECT a.participation_id, b.status_type, a.meeting_id, a.member_id, a.participated_at
+        FROM meeting_participation_history a
+        JOIN status b ON a.status_id = b.status_id
+        WHERE a.meeting_id = #{meetingId}
+        AND a.status_id = #{statusId}
     </select>
 
     <!-- 모임 ID + 회원 ID로 참여 이력 조회 (상태 무관) -->
     <select id="selectHistoryByMeetingIdAndMemberId" resultType="MeetingParticipationDTO">
+
         SELECT participation_id, status_id, meeting_id, member_id
         FROM meeting_participation_history
         WHERE meeting_id = #{meetingId}
         AND member_id = #{memberId}
     </select>
+  
 
     <!-- 과거 모임 이력 (현재 날짜 이전) -->
     <select id="selectPastMeetingsByUserId" resultType="MeetingDTO">
@@ -90,16 +99,14 @@
         WHERE p.member_id = #{userId}
         AND m.date >= #{now}
     </select>
-
+  
     <!-- 회원 참여 이력 전체 조회 (상태 무관) -->
     <select id="selectMeetingParticipationsByUserId" resultType="MeetingParticipationDTO">
-        SELECT
-        participation_id AS participationId,
-        status_id AS statusId,
-        meeting_id AS meetingId,
-        member_id AS memberId
-        FROM meeting_participation_history
-        WHERE member_id = #{userId}
+        SELECT a.participation_id, b.status_type, a.meeting_id, a.member_id, a.participated_at
+        FROM meeting_participation_history a
+        JOIN status b ON a.status_id = b.status_id
+        WHERE a.meeting_id = #{meetingId}
+        AND a.member_id = #{memberId}
     </select>
 
 </mapper>

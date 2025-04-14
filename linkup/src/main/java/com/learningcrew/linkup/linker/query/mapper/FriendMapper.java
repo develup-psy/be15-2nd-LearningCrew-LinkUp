@@ -1,21 +1,19 @@
 package com.learningcrew.linkup.linker.query.mapper;
 
-import com.learningcrew.linkup.linker.query.dto.query.FriendInfoDTO;
-import com.learningcrew.linkup.linker.query.dto.query.FriendRequestStatusDTO;
+import com.learningcrew.linkup.linker.query.dto.query.FriendInfoDto;
+import com.learningcrew.linkup.linker.query.dto.query.FriendRequestStatusDto;
+import com.learningcrew.linkup.linker.query.dto.query.UserMeetingDto;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
 @Mapper
 public interface FriendMapper {
 
-    List<FriendInfoDTO> findAcceptedFriends(@Param("memberId") int memberId);
+    List<FriendInfoDto> findAcceptedFriends(int memberId);
 
-    List<FriendRequestStatusDTO> findIncomingFriendRequests(@Param("memberId") int memberId);
+    List<FriendRequestStatusDto> findIncomingFriendRequests(int addresseeId);
 
-    List<FriendRequestStatusDTO> findOutgoingFriendRequests(@Param("memberId") int memberId);
-
-    boolean existsFriendRequest(@Param("requesterId") int requesterId, @Param("adresseeId") int adresseeId);
+    List<UserMeetingDto> findMeetingsCreatedByFriends(int userId);
 }
 

@@ -2,14 +2,14 @@ package com.learningcrew.linkup.report.command.application.service;
 
 import com.learningcrew.linkup.exception.BusinessException;
 import com.learningcrew.linkup.exception.ErrorCode;
+import com.learningcrew.linkup.linker.command.domain.aggregate.User;
+import com.learningcrew.linkup.linker.command.domain.repository.UserRepository;
 import com.learningcrew.linkup.report.command.application.dto.request.BlacklistRegisterRequest;
 import com.learningcrew.linkup.report.command.application.dto.response.BlacklistRegisterResponse;
 import com.learningcrew.linkup.report.command.application.dto.response.BlacklistRemoveResponse;
 import com.learningcrew.linkup.report.command.domain.aggregate.Blacklist;
 import com.learningcrew.linkup.report.command.domain.repository.BlacklistRepository;
 import com.learningcrew.linkup.report.command.domain.repository.ReportHistoryRepository;
-import com.learningcrew.linkup.linker.command.domain.repository.UserRepository;
-import com.learningcrew.linkup.linker.command.domain.aggregate.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
