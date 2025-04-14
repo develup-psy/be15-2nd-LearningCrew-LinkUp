@@ -55,9 +55,16 @@ public class PlaceQueryService {
     }
 
     @Transactional(readOnly = true)
-    public PlaceDetailResponse getPlaceDetails(int placeId){
-        return placeMapper.selectPlaceDetail(placeId);
+    public PlaceDetailResponse getPlaceDetails(int placeId) {
+        PlaceDetailResponse detail = placeMapper.selectBasicPlaceDetail(placeId); // 단건 기본 정보만
+
+        detail.setImageUrl(placeMapper.selectImages(placeId));
+        detail.setOperationTimes(placeMapper.selectOperationTimes(placeId));
+        detail.setPlaceReviews(placeMapper.selectReviews(placeId));
+
+        return detail;
     }
+
 
     @Transactional(readOnly = true)
     public PlaceListResponse getPlacesByOwner(PlaceListRequest request) {
