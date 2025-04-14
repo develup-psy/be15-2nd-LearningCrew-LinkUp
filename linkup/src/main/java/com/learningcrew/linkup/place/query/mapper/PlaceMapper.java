@@ -29,4 +29,8 @@ public interface PlaceMapper {
     long countPlacesByOwner(PlaceListRequest placeListRequest);
 
 
+    Integer findOwnerIdByPlaceId(@Param("placeId") int placeId);
+
+    String findPlaceNameByPlaceId(@Param("placeId") int placeId);
+
 }

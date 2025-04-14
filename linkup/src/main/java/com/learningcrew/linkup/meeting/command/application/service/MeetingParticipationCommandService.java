@@ -15,6 +15,7 @@ import com.learningcrew.linkup.meeting.query.mapper.MeetingParticipationMapper;
 import com.learningcrew.linkup.meeting.query.service.MeetingParticipationQueryService;
 import com.learningcrew.linkup.meeting.query.service.MeetingQueryService;
 import com.learningcrew.linkup.meeting.query.service.StatusQueryService;
+import com.learningcrew.linkup.notification.command.application.helper.MeetingNotificationHelper;
 import com.learningcrew.linkup.notification.command.application.helper.NotificationHelper;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -35,6 +36,7 @@ public class MeetingParticipationCommandService {
     private final MeetingParticipationQueryService meetingParticipationQueryService;
     private final StatusQueryService statusQueryService;
     private final NotificationHelper notificationHelper;
+    private final MeetingNotificationHelper meetingNotificationHelper;
     private final JpaMeetingParticipationHistoryRepository jpaRepository;
     private StatusMapper statusMapper;
 
@@ -85,11 +87,13 @@ public class MeetingParticipationCommandService {
         repository.save(history);
         repository.flush();
 
-        notificationHelper.sendNotification(
-                meeting.getLeaderId(),  // 알림 받을 대상: 모임 개설자
-                1,                  // 알림 유형 ID
-                1                    // 도메인 ID
+        /* 참가 신청 알림 발송 */
+        if(meeting.getLeaderId() != request.getMemberId()){
+        meetingNotificationHelper.sendParticipationRequestNotification(
+                meeting.getLeaderId(),       // 알림 받을 사람 (모임 개설자)
+                meeting.getMeetingTitle()           // 모임 제목 (바인딩될 {meetingTitle})
         );
+        }
 
 
         return history.getParticipationId();
@@ -135,11 +139,13 @@ public class MeetingParticipationCommandService {
         repository.save(participation);
         repository.flush();
 
-        notificationHelper.sendNotification(
-                participation.getMemberId(),  // 알림 받을 대상: 모임 개설자
-                2,                  // 알림 유형 ID: 예) 모임 참가 신청
-                1                    // 도메인 ID: 예) 모임 도메인
+
+        /* 참가 승인 알림 발송 */
+        meetingNotificationHelper.sendParticipationAcceptNotification(
+                memberId,       // 알림 받을 사람 (모임 개설자)
+                meeting.getMeetingTitle()           // 모임 제목 (바인딩될 {meetingTitle})
         );
+
 
 
         return participation.getParticipationId();
@@ -172,6 +178,13 @@ public class MeetingParticipationCommandService {
         participation.setStatusId(statusQueryService.getStatusId("REJECTED"));
         repository.save(participation);
         repository.flush();
+
+
+        /* 참가 거절 알림 발송 */
+        meetingNotificationHelper.sendParticipationRejectNotification(
+                memberId,       // 알림 받을 사람 (모임 개설자)
+                meeting.getMeetingTitle()           // 모임 제목 (바인딩될 {meetingTitle})
+        );
 
         return participation.getParticipationId();
     }

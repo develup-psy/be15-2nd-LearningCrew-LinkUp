@@ -133,7 +133,5 @@ public class FriendCommandServiceImpl implements FriendCommandService{
         //친구 삭제
         friendRepository.delete(friend);
 
-        friendnotificationHelper.sendFriendDeleteNotification(requesterId, addresseeId);
-
     }
 }

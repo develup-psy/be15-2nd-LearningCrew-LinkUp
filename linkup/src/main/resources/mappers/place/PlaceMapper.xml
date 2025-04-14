@@ -167,6 +167,15 @@
             AND p.address LIKE CONCAT('%', #{address}, '%')
         </if>
     </select>
-
+    <select id="findOwnerIdByPlaceId" resultType="int" parameterType="int">
+        SELECT owner_id
+        FROM place
+        WHERE place_id = #{placeId}
+    </select>
+    <select id="findPlaceNameByPlaceId" resultType="String" parameterType="int">
+        SELECT place_name
+        FROM place
+        WHERE place_id = #{placeId}
+    </select>
 
 </mapper>
