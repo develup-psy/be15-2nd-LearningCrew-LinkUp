@@ -22,7 +22,7 @@ public class FriendCommandController {
     @PostMapping("/{targetMemberId}")
     @Operation(summary = "친구 요청 신청", description = "특정 회원에게 친구 요청을 보냅니다.")
     public ResponseEntity<ApiResponse<Void>> sendFriendRequest(@AuthenticationPrincipal CustomUserDetails customUserDetails, @PathVariable int targetMemberId){
-        log.info("친구 요청 신청 requestId: {}, addressId: {}", customUserDetails.getUserId(), targetMemberId);
+        log.info("친구 요청 신청 requestId: {}, addresseeId: {}", customUserDetails.getUserId(), targetMemberId);
         friendCommandService.sendFriendRequest(customUserDetails.getUserId(), targetMemberId);
         log.info("친구 요청 신청에 성공했습니다. ");
         return ResponseEntity.ok(ApiResponse.success(null, "친구 요청이 신청되었습니다."));
