@@ -1,117 +1,86 @@
 package com.learningcrew.linkup.meeting.command.application.controller;
 
 import com.learningcrew.linkup.common.dto.ApiResponse;
-import com.learningcrew.linkup.linker.query.service.UserQueryServiceImpl;
+import com.learningcrew.linkup.exception.BusinessException;
+import com.learningcrew.linkup.exception.ErrorCode;
 import com.learningcrew.linkup.meeting.command.application.dto.request.MeetingParticipationCreateRequest;
 import com.learningcrew.linkup.meeting.command.application.dto.response.MeetingParticipationCommandResponse;
 import com.learningcrew.linkup.meeting.command.application.service.MeetingParticipationCommandService;
 import com.learningcrew.linkup.meeting.command.domain.aggregate.Meeting;
 import com.learningcrew.linkup.meeting.command.domain.aggregate.MeetingParticipationHistory;
 import com.learningcrew.linkup.meeting.command.domain.repository.MeetingParticipationHistoryRepository;
-import com.learningcrew.linkup.meeting.command.infrastructure.repository.JpaMeetingParticipationHistoryRepository;
-import com.learningcrew.linkup.meeting.query.dto.response.MeetingParticipationDTO;
-import com.learningcrew.linkup.meeting.query.dto.response.MemberDTO;
-import com.learningcrew.linkup.meeting.query.mapper.MeetingParticipationMapper;
-import com.learningcrew.linkup.meeting.query.service.MeetingParticipationQueryService;
-import com.learningcrew.linkup.meeting.query.service.MeetingQueryService;
-import com.learningcrew.linkup.meeting.query.service.StatusQueryService;
-import com.learningcrew.linkup.notification.command.application.dto.EventNotificationRequest;
-import com.learningcrew.linkup.notification.command.application.helper.NotificationHelper;
+import com.learningcrew.linkup.meeting.command.domain.repository.MeetingRepository;
 import com.learningcrew.linkup.point.command.application.dto.response.MeetingPaymentResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/meetings")
 @RequiredArgsConstructor
 @Tag(name = "모임 참가 관리", description = "모임 참가 신청 및 취소 API")
 public class MeetingParticipationController {
-    private final MeetingParticipationCommandService service;
-    private final MeetingParticipationQueryService queryService;
-    private final MeetingParticipationMapper participationMapper;
-    private final StatusQueryService statusQueryService;
-    private final MeetingQueryService meetingQueryService;
-    private final ModelMapper modelMapper;
-    private final MeetingParticipationHistoryRepository meetingParticipationHistoryRepository;
 
-    @Operation(
-            summary = "모임 참가 신청 가능 여부 확인",
-            description = "해당 모임에 참가 신청을 할 수 있는지 (포인트 잔액 기준) 확인한다."
-    )
-    @GetMapping("/api/v1/meetings/{meetingId}/participation/check")
+    private final MeetingParticipationCommandService participationService;
+    private final MeetingRepository meetingRepository;
+    private final MeetingParticipationHistoryRepository participationRepository;
+
+    @Operation(summary = "모임 참가 신청 가능 여부 확인", description = "포인트 기준 참가 가능 여부 확인")
+    @GetMapping("/{meetingId}/participation/check")
     public ResponseEntity<ApiResponse<MeetingPaymentResponse>> checkEligibility(
             @PathVariable int meetingId,
             @RequestParam("userId") int userId
     ) {
-        MeetingPaymentResponse response = service.checkBalance(meetingId, userId);
+        // 포인트 잔액 확인
+        participationService.validateBalance(meetingId, userId);
+
+        MeetingPaymentResponse response = MeetingPaymentResponse.builder()
+                .message("참가 가능합니다.")
+                .build();
+
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
-    @Operation(
-            summary = "모임 참가 신청",
-            description = "회원이 개설된 모임에 참가를 신청한다."
-    )
+    @Operation(summary = "모임 참가 신청", description = "회원이 모임에 참가 신청")
     @PostMapping("/{meetingId}/participation")
     public ResponseEntity<ApiResponse<MeetingParticipationCommandResponse>> createMeetingParticipation(
             @RequestBody @Validated MeetingParticipationCreateRequest request,
             @PathVariable int meetingId
     ) {
-        Meeting meeting = modelMapper.map(meetingQueryService.getMeeting(meetingId), Meeting.class);
+        Meeting meeting = meetingRepository.findById(meetingId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.MEETING_NOT_FOUND));
 
-        service.validateBalance(meetingId, request.getMemberId());
+        // 포인트 잔액 확인
+        participationService.validateBalance(meetingId, request.getMemberId());
 
-
-        long participationId = service.createMeetingParticipation(request, meeting);
-
-        MeetingParticipationCommandResponse response
-                = MeetingParticipationCommandResponse
-                .builder()
-                .participationId(participationId)
-                .build();
+        // 참가 신청
+        long participationId = participationService.createMeetingParticipation(request, meeting);
 
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.success(response));
+                .body(ApiResponse.success(MeetingParticipationCommandResponse.builder()
+                        .participationId(participationId)
+                        .build()));
     }
 
-    @Operation(
-            summary = "모임 참가 취소",
-            description = "회원이 참가 신청이 승인된 모임의 참가를 취소한다."
-    )
+    @Operation(summary = "모임 참가 취소", description = "회원이 모임 참가 취소")
     @DeleteMapping("/{meetingId}/participation/{memberId}")
     public ResponseEntity<ApiResponse<MeetingParticipationCommandResponse>> deleteMeetingParticipation(
             @PathVariable int meetingId,
             @PathVariable int memberId
-    ) { // 1. 참가자 확인
-        List<MemberDTO> participants = queryService.getParticipantsByMeetingId(meetingId);
+    ) {
+        // 참여 이력 조회
+        MeetingParticipationHistory participation = participationRepository.findByMeetingIdAndMemberId(meetingId, memberId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "참여 정보를 찾을 수 없습니다."));
 
-        if (!participants.stream().anyMatch(x -> x.getMemberId() == memberId )) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
+        // soft delete 수행
+        long participationId = participationService.deleteMeetingParticipation(participation);
 
-        // 2. 참가 이력 조회
-        MeetingParticipationHistory requestedParticipation = meetingParticipationHistoryRepository.findByMeetingIdAndMemberId(meetingId, memberId);
-        MeetingParticipationDTO dto
-                = modelMapper.map(requestedParticipation, MeetingParticipationDTO.class);
-
-        // 3. soft delete 수행
-        long participationId = service.deleteMeetingParticipation(dto);
-
-        // 4. 응답 반환
-        MeetingParticipationCommandResponse response = MeetingParticipationCommandResponse.builder()
+        return ResponseEntity.ok(ApiResponse.success(MeetingParticipationCommandResponse.builder()
                 .participationId(participationId)
-                .build();
-
-        return ResponseEntity.ok(ApiResponse.success(response));
-
+                .build()));
     }
 }

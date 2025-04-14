@@ -1,35 +1,15 @@
 package com.learningcrew.linkup.meeting.command.application.service;
 
-import com.learningcrew.linkup.common.query.mapper.SportTypeMapper;
 import com.learningcrew.linkup.exception.BusinessException;
 import com.learningcrew.linkup.exception.ErrorCode;
-import com.learningcrew.linkup.linker.command.domain.aggregate.User;
-import com.learningcrew.linkup.linker.command.domain.repository.UserRepository;
 import com.learningcrew.linkup.meeting.command.application.dto.request.LeaderUpdateRequest;
 import com.learningcrew.linkup.meeting.command.application.dto.request.MeetingCreateRequest;
 import com.learningcrew.linkup.meeting.command.application.dto.request.MeetingParticipationCreateRequest;
-import com.learningcrew.linkup.meeting.command.application.dto.request.MeetingParticipationDeleteRequest;
 import com.learningcrew.linkup.meeting.command.domain.aggregate.Meeting;
 import com.learningcrew.linkup.meeting.command.domain.aggregate.MeetingParticipationHistory;
 import com.learningcrew.linkup.meeting.command.domain.repository.MeetingParticipationHistoryRepository;
 import com.learningcrew.linkup.meeting.command.domain.repository.MeetingRepository;
-import com.learningcrew.linkup.meeting.query.dto.response.MeetingDTO;
-import com.learningcrew.linkup.meeting.query.dto.response.MeetingParticipationDTO;
-import com.learningcrew.linkup.meeting.query.dto.response.MemberDTO;
-import com.learningcrew.linkup.meeting.query.mapper.MeetingMapper;
-import com.learningcrew.linkup.meeting.query.mapper.MeetingParticipationMapper;
-import com.learningcrew.linkup.meeting.query.service.MeetingParticipationQueryService;
-import com.learningcrew.linkup.meeting.query.service.StatusQueryService;
-
-import com.learningcrew.linkup.place.command.domain.aggregate.entity.Place;
-import com.learningcrew.linkup.place.query.service.PlaceQueryService;
-import com.learningcrew.linkup.point.command.domain.aggregate.PointTransaction;
-import com.learningcrew.linkup.point.command.domain.repository.PointRepository;
-
-import com.learningcrew.linkup.notification.command.application.helper.MeetingNotificationHelper;
-
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,177 +17,129 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor // 의존성 주입
+@RequiredArgsConstructor
 public class MeetingCommandService {
-    static final int MINIMUM_OF_MIN_USER = 1;
-    static final int MAXIMUM_OF_MAX_USER = 30;
 
     private final MeetingRepository meetingRepository;
     private final MeetingParticipationHistoryRepository participationRepository;
-    private final ModelMapper modelMapper;
-    private final MeetingMapper meetingMapper;
-    private final MeetingParticipationMapper participationMapper;
-    private final MeetingNotificationHelper meetingNotificationHelper;
-
-    private final MeetingParticipationCommandService commandService;
     private final MeetingParticipationCommandService participationCommandService;
-    private final MeetingParticipationQueryService participationQueryService;
-    private final StatusQueryService statusQueryService;
-    private final SportTypeMapper sportTypeMapper;
-    private final PlaceQueryService placeQueryService;
-    private final UserRepository userRepository;
-    private final PointRepository pointRepository;
 
-    /* 모임 등록 */
+    private static final int STATUS_PENDING = 1;
+    private static final int STATUS_ACCEPTED = 2;
+    private static final int STATUS_REJECTED = 3;
+    private static final int STATUS_DELETED = 4;
+
+    private static final int MIN_USER = 1;
+    private static final int MAX_USER = 30;
+
+    /** 1. 모임 생성 */
     @Transactional
-    public int createMeeting(MeetingCreateRequest meetingCreateRequest) {
-        /* 1. 검증 로직 */
-        LocalDate meetingDate = meetingCreateRequest.getDate();
-        LocalDate now = LocalDate.now();
+    public int createMeeting(MeetingCreateRequest request) {
+        validateMeetingCreateRequest(request);
 
-        // 2주 이내
-        if (meetingDate.isBefore(now) || meetingDate.isEqual(now.plusDays(15))) {
-            throw new BusinessException(ErrorCode.BAD_REQUEST);
-        }
-
-        // 30분 단위
-        if (meetingCreateRequest.getStartTime().getMinute() % 30 != 0 || meetingCreateRequest.getEndTime().getMinute() % 30 != 0) {
-            throw new BusinessException(ErrorCode.BAD_REQUEST);
-        }
-
-        // 최대 인원, 최소 인원
-        int minUser = meetingCreateRequest.getMinUser();
-        int maxUser = meetingCreateRequest.getMaxUser();
-
-        if (maxUser < minUser) {
-            throw new BusinessException(ErrorCode.BAD_REQUEST);
-        }
-
-        if (minUser < MINIMUM_OF_MIN_USER || maxUser > MAXIMUM_OF_MAX_USER) {
-            throw new BusinessException(ErrorCode.BAD_REQUEST);
-        }
-
-        /* 2. 모임 저장 */
-        Meeting meeting = modelMapper.map(meetingCreateRequest, Meeting.class);
-        meeting.setStatusId(statusQueryService.getStatusId("PENDING"));
-
-        meetingRepository.save(meeting);
-        meetingRepository.flush();
-
-        Meeting savedMeeting = meetingRepository.findById(meeting.getMeetingId()).orElseThrow(() -> new BusinessException(ErrorCode.MEETING_NOT_FOUND));
-
-
-        /* 3. 개설자를 모임 참가자에 등록 */
-        int leaderId = meetingCreateRequest.getLeaderId();
-
-        MeetingParticipationCreateRequest request
-                = MeetingParticipationCreateRequest.builder()
-                .memberId(leaderId)
-//                .participatedAt(createdAt)
+        Meeting meeting = Meeting.builder()
+                .leaderId(request.getLeaderId())
+                .placeId(request.getPlaceId())
+                .sportId(request.getSportId())
+                .statusId(STATUS_PENDING)
+                .meetingTitle(request.getMeetingTitle())
+                .meetingContent(request.getMeetingContent())
+                .date(request.getDate())
+                .startTime(request.getStartTime())
+                .endTime(request.getEndTime())
+                .minUser(request.getMinUser())
+                .maxUser(request.getMaxUser())
+                .gender(request.getGender())
+                .ageGroup(request.getAgeGroup())
+                .level(request.getLevel())
+                .customPlaceAddress(request.getCustomPlaceAddress())
+                .latitude(request.getLatitude())
+                .longitude(request.getLongitude())
                 .build();
 
-        participationCommandService.createMeetingParticipation(request, savedMeeting);
+        Meeting saved = meetingRepository.save(meeting);
 
-        return meeting.getMeetingId();
+        // 개설자 자동 참가 처리
+        MeetingParticipationCreateRequest participationRequest = MeetingParticipationCreateRequest.builder()
+                .memberId(saved.getLeaderId())
+                .build();
+
+        participationCommandService.createMeetingParticipation(participationRequest, saved);
+
+        return saved.getMeetingId();
     }
 
-    /* 개설자 변경 */
+    /** 2. 리더 변경 */
     @Transactional
-    public int updateLeader(int meetingId, int memberId, LeaderUpdateRequest leaderUpdateRequest) {
-        // 1. 모임 정보 조회
-        MeetingDTO meeting = meetingMapper.selectMeetingById(meetingId);
+    public int updateLeader(int meetingId, int newLeaderId, LeaderUpdateRequest request) {
+        Meeting meeting = meetingRepository.findById(meetingId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.MEETING_NOT_FOUND));
 
-        // 2. 권한 체크 (현재 리더가 요청한 사람인지 확인)
-        if (meeting.getLeaderId() != leaderUpdateRequest.getMemberId()) {
-            throw new BusinessException(ErrorCode.FORBIDDEN);
+        if (meeting.getLeaderId() != request.getMemberId()) {
+            throw new BusinessException(ErrorCode.FORBIDDEN, "리더만 리더 변경 권한이 있습니다.");
         }
 
-        // 3. 새로운 개설자가 모임 참여자인지 확인
-        List<MemberDTO> participants = participationMapper.selectParticipantsByMeetingId(meetingId);
-        if (participants.stream().noneMatch(p -> p.getMemberId() == memberId)) {
-            throw new BusinessException(ErrorCode.USER_NOT_FOUND, "모임에 속하지 않은 회원입니다.");
+        List<MeetingParticipationHistory> acceptedParticipants =
+                participationRepository.findByMeetingIdAndStatusId(meetingId, STATUS_ACCEPTED);
+
+        boolean isNewLeaderParticipant = acceptedParticipants.stream()
+                .anyMatch(p -> p.getMemberId() == newLeaderId);
+
+        if (!isNewLeaderParticipant) {
+            throw new BusinessException(ErrorCode.USER_NOT_FOUND, "해당 회원은 모임 참여자가 아닙니다.");
         }
 
-        // 4. 기존 개설자의 참여 내역 soft delete
-        MeetingParticipationDTO requestedParticipation = participationMapper.selectHistoryByMeetingIdAndMemberId(meetingId, leaderUpdateRequest.getMemberId());
+        participationRepository.findByMeetingIdAndMemberId(meetingId, request.getMemberId())
+                .ifPresent(oldLeaderHistory -> {
+                    oldLeaderHistory.setStatusId(STATUS_DELETED);
+                    participationRepository.save(oldLeaderHistory);
+                });
 
-        MeetingParticipationHistory history = modelMapper.map(requestedParticipation, MeetingParticipationHistory.class);
-        history.setStatusId(statusQueryService.getStatusId("DELETED")); // soft delete
-        participationRepository.save(history);
-        requestedParticipation.setStatusType("참가 취소");
-
-        // 5. 모임 리더 변경
-        meeting.setLeaderId(memberId);
-        Meeting meetingEntity = modelMapper.map(meeting, Meeting.class);
-
-        int sportId = sportTypeMapper.findBySportName(meeting.getSportName())
-                .orElseThrow(() -> new BusinessException(ErrorCode.BAD_REQUEST))
-                .getSportTypeId();
-        int statusId = statusQueryService.getStatusId("DELETED");
-
-        meetingEntity.setSportId(sportId);
-        meetingEntity.setStatusId(statusId);
-        meetingRepository.save(meetingEntity);
-
-        /* 개설자 변경 알림 발송 */
-        meetingNotificationHelper.sendLeaderChangeNotification(
-                memberId,       // 알림 받을 사람 (모임 개설자)
-                meeting.getMeetingTitle()           // 모임 제목 (바인딩될 {meetingTitle})
-        );
+        meeting.setLeaderId(newLeaderId);
+        meetingRepository.save(meeting);
 
         return meetingId;
     }
 
-    /* 모임 삭제 */
+    /** 3. 모임 삭제 */
     @Transactional
     public void deleteMeeting(int meetingId) {
+        Meeting meeting = meetingRepository.findById(meetingId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.MEETING_NOT_FOUND));
 
-        for (String string : List.of("PENDING", "ACCEPTED", "REJECTED")) { // history에서 status를 모두 DELETED로 변경
-            List<MeetingParticipationDTO> participants = participationQueryService.getHistories(
-                    meetingId, statusQueryService.getStatusId(string)
-            );
+        // 모든 상태 참가자들을 DELETED 처리
+        for (int statusId : new int[]{STATUS_PENDING, STATUS_ACCEPTED, STATUS_REJECTED}) {
+            List<MeetingParticipationHistory> participants =
+                    participationRepository.findByMeetingIdAndStatusId(meetingId, statusId);
 
-            participants.forEach(commandService::deleteMeetingParticipation);
+            for (MeetingParticipationHistory history : participants) {
+                history.setStatusId(STATUS_DELETED);
+                participationRepository.save(history);
+            }
         }
 
-        /* DTO와 Entity 간 필요한 변환 로직 */
-        MeetingDTO meeting = meetingMapper.selectMeetingById(meetingId);
-        meeting.setStatusType("모임 취소");
-
-        Meeting meetingEntity = modelMapper.map(meeting, Meeting.class);
-        meetingEntity.setSportId(
-                sportTypeMapper.findBySportName(meeting.getSportName())
-                        .orElseThrow(() -> new BusinessException(ErrorCode.BAD_REQUEST))
-                        .getSportTypeId()
-        );
-        /* 모임의 status를 deleted로 변경하고 update */
-        meetingEntity.setStatusId(statusQueryService.getStatusId("DELETED"));
-        meetingRepository.save(meetingEntity);
+        meeting.setStatusId(STATUS_DELETED);
+        meetingRepository.save(meeting);
     }
-    @Transactional
-    public void validateCreatorBalance(int creatorId, Integer placeId, int minUser) {
-        if (placeId == null) return; // 장소 없으면 돈 필요 없음
 
-        Place place = placeQueryService.getPlaceById(placeId);
-        int rentalCost = place.getRentalCost();
-        int costPerUser = rentalCost / minUser;
+    /** 유효성 검사 */
+    private void validateMeetingCreateRequest(MeetingCreateRequest request) {
+        LocalDate meetingDate = request.getDate();
+        LocalDate now = LocalDate.now();
 
-        User user = userRepository.findById(creatorId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
-
-        if (user.getPointBalance() < costPerUser) {
-            throw new BusinessException(ErrorCode.INSUFFICIENT_BALANCE,
-                    "개설자의 포인트가 부족합니다. 최소 필요 포인트: " + costPerUser);
+        if (meetingDate.isBefore(now) || meetingDate.isAfter(now.plusDays(14))) {
+            throw new BusinessException(ErrorCode.INVALID_MEETING_DATE_FILTER);
         }
-        user.subtractPointBalance(costPerUser);
-        userRepository.save(user);
-        PointTransaction transaction = new PointTransaction(
-                null,
-                creatorId,
-                costPerUser*(-1),
-                "PAYMENT", // 또는 다른 타입으로 구분 가능 eg. "CREATOR_PAYMENT"
-                null // createdAt은 DB default
-        );
-        pointRepository.save(transaction);
+
+        if (request.getStartTime().getMinute() % 30 != 0 || request.getEndTime().getMinute() % 30 != 0) {
+            throw new BusinessException(ErrorCode.BAD_REQUEST, "시작/종료 시간은 30분 단위여야 합니다.");
+        }
+
+        int minUser = request.getMinUser();
+        int maxUser = request.getMaxUser();
+
+        if (minUser < MIN_USER || maxUser > MAX_USER || minUser > maxUser) {
+            throw new BusinessException(ErrorCode.BAD_REQUEST, "유효하지 않은 인원 설정입니다.");
+        }
     }
 }

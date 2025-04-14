@@ -4,4 +4,6 @@ import com.learningcrew.linkup.meeting.command.domain.aggregate.ParticipantRevie
 
 public interface ParticipantReviewRepository {
     ParticipantReview save(ParticipantReview review);
+    boolean existsByMeetingIdAndReviewerIdAndRevieweeId(int meetingId, int reviewerId, int revieweeId);
+
 }

@@ -1,4 +1,4 @@
-package com.learningcrew.linkup.community.command.domain.aggregate;
+package com.learningcrew.linkup.meeting.command.domain.aggregate;
 
 import lombok.Getter;
 

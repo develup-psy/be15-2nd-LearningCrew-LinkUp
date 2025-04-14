@@ -1,6 +1,8 @@
 package com.learningcrew.linkup.meeting.command.application.controller;
 
 import com.learningcrew.linkup.common.dto.ApiResponse;
+import com.learningcrew.linkup.exception.BusinessException;
+import com.learningcrew.linkup.exception.ErrorCode;
 import com.learningcrew.linkup.meeting.command.application.dto.request.LeaderUpdateRequest;
 import com.learningcrew.linkup.meeting.command.application.dto.request.ManageParticipationRequest;
 import com.learningcrew.linkup.meeting.command.application.dto.request.MeetingCreateRequest;
@@ -9,10 +11,9 @@ import com.learningcrew.linkup.meeting.command.application.dto.response.ManagePa
 import com.learningcrew.linkup.meeting.command.application.dto.response.MeetingCommandResponse;
 import com.learningcrew.linkup.meeting.command.application.service.MeetingCommandService;
 import com.learningcrew.linkup.meeting.command.application.service.MeetingParticipationCommandService;
-import com.learningcrew.linkup.meeting.query.dto.response.MeetingDTO;
-import com.learningcrew.linkup.meeting.query.service.MeetingQueryService;
+import com.learningcrew.linkup.meeting.command.domain.aggregate.Meeting;
+import com.learningcrew.linkup.meeting.command.domain.repository.MeetingRepository;
 import com.learningcrew.linkup.place.command.application.dto.request.ReservationCreateRequest;
-import com.learningcrew.linkup.place.command.application.dto.response.ReservationCommandResponse;
 import com.learningcrew.linkup.place.command.application.service.ReservationCommandService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,131 +30,106 @@ import org.springframework.web.bind.annotation.*;
 public class MeetingCommandController {
 
     private final MeetingCommandService meetingCommandService;
-    private final MeetingParticipationCommandService service;
-    private final MeetingQueryService meetingQueryService;
+    private final MeetingParticipationCommandService participationService;
     private final ReservationCommandService reservationCommandService;
+    private final MeetingRepository meetingRepository;
 
-    @Operation(
-            summary = "모임 생성",
-            description = "회원이 운동 종목, 날짜(최대 2주 이내), 시간(30분 단위), 장소, 최소/최대 인원을 입력하여 모임을 개설한다."
-    )
-    @PostMapping // 어노테이션 생략 가능
+    @Operation(summary = "모임 생성", description = "회원이 운동 종목, 날짜(2주 이내), 시간, 장소, 인원을 입력해 모임을 개설한다.")
+    @PostMapping
     public ResponseEntity<ApiResponse<MeetingCommandResponse>> createMeeting(
-            @RequestBody @Validated MeetingCreateRequest meetingCreateRequest
+            @RequestBody @Validated MeetingCreateRequest request
     ) {
-        meetingCommandService.validateCreatorBalance(
-                meetingCreateRequest.getLeaderId(), // 또는 leaderId 필드
-                meetingCreateRequest.getPlaceId(),
-                meetingCreateRequest.getMinUser()
-        );
-        int meetingId = meetingCommandService.createMeeting(meetingCreateRequest);
-        // 2. "장소 Id가 존재하면" 예약 생성
-        if (meetingCreateRequest.getPlaceId() != null) {
+        int meetingId = meetingCommandService.createMeeting(request);
 
-            ReservationCreateRequest reservationCreateRequest = new ReservationCreateRequest(
+        // 장소가 있을 경우 예약도 함께 생성
+        if (request.getPlaceId() != null) {
+            ReservationCreateRequest reservationRequest = new ReservationCreateRequest(
                     meetingId,
-                    meetingCreateRequest.getPlaceId(),
-                    java.sql.Date.valueOf(meetingCreateRequest.getDate()),
-                    meetingCreateRequest.getStartTime(),
-                    meetingCreateRequest.getEndTime()
+                    request.getPlaceId(),
+                    java.sql.Date.valueOf(request.getDate()),
+                    request.getStartTime(),
+                    request.getEndTime()
             );
-            ReservationCommandResponse reservationResponse = reservationCommandService.createReservation(reservationCreateRequest);
-            System.out.println(reservationResponse.getMessage());
+            reservationCommandService.createReservation(reservationRequest);
         }
-
-        MeetingCommandResponse response = new MeetingCommandResponse(meetingId);
 
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.success(response));
+                .body(ApiResponse.success(new MeetingCommandResponse(meetingId)));
     }
 
-    @Operation(
-            summary = "참가 승인",
-            description = "개설자가 모임 신청 목록을 확인하여 참가 신청을 승인한다."
-    )
+    @Operation(summary = "참가 승인", description = "개설자가 참가 신청을 승인한다.")
     @PutMapping("/{meetingId}/participation/{memberId}/accept")
     public ResponseEntity<ApiResponse<ManageParticipationResponse>> acceptParticipation(
-            @PathVariable int meetingId, @PathVariable int memberId, @RequestBody ManageParticipationRequest manageParticipationRequest
+            @PathVariable int meetingId,
+            @PathVariable int memberId,
+            @RequestBody ManageParticipationRequest request
     ) {
-        // 1. 요청된 모임의 개설자가 맞는지 확인
-        MeetingDTO meeting = meetingQueryService.getMeeting(meetingId);
+        Meeting meeting = meetingRepository.findById(meetingId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.MEETING_NOT_FOUND));
 
-        if (meeting.getLeaderId() != manageParticipationRequest.getMemberId()) {
+        if (meeting.getLeaderId() != request.getMemberId()) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-        // 2. 참가 승인
-        long participationId = service.acceptParticipation(meeting, memberId);
 
-        ManageParticipationResponse response
-                = ManageParticipationResponse.builder()
-                .participationId(participationId)
-                .statusType("ACCEPTED")
-                .build();
+        long participationId = participationService.acceptParticipation(meeting, memberId);
 
-        return ResponseEntity.ok().body(ApiResponse.success(response));
+        return ResponseEntity.ok(ApiResponse.success(
+                ManageParticipationResponse.builder()
+                        .participationId(participationId)
+                        .statusType("승인")
+                        .build()
+        ));
     }
 
-    @Operation(
-            summary = "참가 거절",
-            description = "개설자가 모임 신청자 목록을 확인하여 참가 신청을 거절한다."
-    )
+    @Operation(summary = "참가 거절", description = "개설자가 참가 신청을 거절한다.")
     @PutMapping("/{meetingId}/participation/{memberId}/reject")
     public ResponseEntity<ApiResponse<ManageParticipationResponse>> rejectParticipation(
-            @PathVariable int meetingId, @PathVariable int memberId, @RequestBody ManageParticipationRequest manageParticipationRequest
+            @PathVariable int meetingId,
+            @PathVariable int memberId,
+            @RequestBody ManageParticipationRequest request
     ) {
-        // 1. 요청된 모임의 개설자가 맞는지 확인
-        MeetingDTO meeting = meetingQueryService.getMeeting(meetingId);
+        Meeting meeting = meetingRepository.findById(meetingId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.MEETING_NOT_FOUND));
 
-        if (meeting.getLeaderId() != manageParticipationRequest.getMemberId()) {
+        if (meeting.getLeaderId() != request.getMemberId()) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
-        // 2. 참가 거절
-        long participationId = service.rejectParticipation(meeting, memberId);
+        long participationId = participationService.rejectParticipation(meeting, memberId);
 
-        ManageParticipationResponse response
-                = ManageParticipationResponse.builder()
-                .participationId(participationId)
-                .statusType("거절")
-                .build();
-
-        return ResponseEntity.ok().body(ApiResponse.success(response));
+        return ResponseEntity.ok(ApiResponse.success(
+                ManageParticipationResponse.builder()
+                        .participationId(participationId)
+                        .statusType("거절")
+                        .build()
+        ));
     }
 
-    @Operation(
-            summary = "개설자 참가 취소",
-            description = "개설자가 다른 모임 참가자에게 개설자 권한을 넘기고 모임 참가를 취소한다."
-    )
+    @Operation(summary = "개설자 변경", description = "리더가 권한을 다른 참여자에게 넘긴다.")
     @PutMapping("/{meetingId}/change-leader/{memberId}")
     public ResponseEntity<ApiResponse<LeaderUpdateResponse>> updateLeader(
-            @PathVariable int meetingId, @PathVariable int memberId, @RequestBody LeaderUpdateRequest leaderUpdateRequest
+            @PathVariable int meetingId,
+            @PathVariable int memberId,
+            @RequestBody LeaderUpdateRequest request
     ) {
-        meetingCommandService.updateLeader(meetingId, memberId, leaderUpdateRequest);
-        LeaderUpdateResponse response = new LeaderUpdateResponse(meetingId);
-
-        return ResponseEntity.ok(ApiResponse.success(response));
+        meetingCommandService.updateLeader(meetingId, memberId, request);
+        return ResponseEntity.ok(ApiResponse.success(new LeaderUpdateResponse(meetingId)));
     }
 
-    @Operation(
-            summary = "모집 취소",
-            description = "개설자가 인원 모집을 취소한다."
-    )
+    @Operation(summary = "모집 취소", description = "개설자가 모임을 취소한다.")
     @DeleteMapping("/{meetingId}/cancel")
     public ResponseEntity<ApiResponse<MeetingCommandResponse>> deleteMeeting(
-            @PathVariable int meetingId, @RequestParam int memberId
-    ) {  /* 요청자가 개설자인지 확인 */
-        int leaderId = meetingQueryService.getMeeting(meetingId)
-                .getLeaderId();
+            @PathVariable int meetingId,
+            @RequestParam int memberId
+    ) {
+        Meeting meeting = meetingRepository.findById(meetingId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.MEETING_NOT_FOUND));
 
-        if (leaderId != memberId) {
+        if (meeting.getLeaderId() != memberId) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
-        MeetingCommandResponse response = new MeetingCommandResponse(meetingId);
-
         meetingCommandService.deleteMeeting(meetingId);
-        return ResponseEntity.ok().body(ApiResponse.success(response));
+        return ResponseEntity.ok(ApiResponse.success(new MeetingCommandResponse(meetingId)));
     }
-
-
 }
