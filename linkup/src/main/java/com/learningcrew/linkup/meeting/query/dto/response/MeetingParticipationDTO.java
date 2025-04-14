@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 public class MeetingParticipationDTO {
 
     private long participationId;
-    private int statusId;
+    private String statusType;
     private int memberId;
     private int meetingId;
     private LocalDateTime participatedAt;

@@ -12,6 +12,6 @@ import lombok.ToString;
 public class MeetingParticipationDeleteRequest {
     private int memberId;
     private int meetingId;
-    private int statusId = 4;
+//    private int statusId = 4;
 
 }

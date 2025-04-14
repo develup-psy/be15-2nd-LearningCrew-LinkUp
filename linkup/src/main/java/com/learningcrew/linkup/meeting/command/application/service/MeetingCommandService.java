@@ -57,7 +57,7 @@ public class MeetingCommandService {
         }
 
         // 30분 단위
-        if (meetingCreateRequest.getStartTime().getMinute() % 30 != 0 || meetingCreateRequest.getEndTime().getMinute() % 30 != 0 ) {
+        if (meetingCreateRequest.getStartTime().getMinute() % 30 != 0 || meetingCreateRequest.getEndTime().getMinute() % 30 != 0) {
             throw new BusinessException(ErrorCode.BAD_REQUEST);
         }
 
@@ -78,11 +78,12 @@ public class MeetingCommandService {
         meeting.setStatusId(statusQueryService.getStatusId("PENDING"));
 
         meetingRepository.save(meeting);
+        meetingRepository.flush();
 
         Meeting savedMeeting = meetingRepository.findById(meeting.getMeetingId()).orElseThrow(() -> new BusinessException(ErrorCode.MEETING_NOT_FOUND));
 
 
-        /* 3. 주최자를 모임 참가자에 등록 */
+        /* 3. 개설자를 모임 참가자에 등록 */
         int leaderId = meetingCreateRequest.getLeaderId();
 
         MeetingParticipationCreateRequest request
@@ -96,7 +97,7 @@ public class MeetingCommandService {
         return meeting.getMeetingId();
     }
 
-    /* 주최자 변경 */
+    /* 개설자 변경 */
     @Transactional
     public int updateLeader(int meetingId, int memberId, LeaderUpdateRequest leaderUpdateRequest) {
         // 1. 모임 정보 조회
@@ -107,18 +108,19 @@ public class MeetingCommandService {
             throw new BusinessException(ErrorCode.FORBIDDEN);
         }
 
-        // 3. 새로운 주최자가 모임 참여자인지 확인
+        // 3. 새로운 개설자가 모임 참여자인지 확인
         List<MemberDTO> participants = participationMapper.selectParticipantsByMeetingId(meetingId);
         if (participants.stream().noneMatch(p -> p.getMemberId() == memberId)) {
             throw new BusinessException(ErrorCode.USER_NOT_FOUND, "모임에 속하지 않은 회원입니다.");
         }
 
-        // 4. 기존 주최자의 참여 내역 soft delete
+        // 4. 기존 개설자의 참여 내역 soft delete
         MeetingParticipationDTO requestedParticipation = participationMapper.selectHistoryByMeetingIdAndMemberId(meetingId, leaderUpdateRequest.getMemberId());
-        int statusId = statusQueryService.getStatusId("DELETED");
 
-        requestedParticipation.setStatusId(statusId); // soft delete
-        participationRepository.save(modelMapper.map(requestedParticipation, MeetingParticipationHistory.class));
+        MeetingParticipationHistory history = modelMapper.map(requestedParticipation, MeetingParticipationHistory.class);
+        history.setStatusId(statusQueryService.getStatusId("DELETED")); // soft delete
+        participationRepository.save(history);
+        requestedParticipation.setStatusType("참가 취소");
 
         // 5. 모임 리더 변경
         meeting.setLeaderId(memberId);
@@ -127,6 +129,7 @@ public class MeetingCommandService {
         int sportId = sportTypeMapper.findBySportName(meeting.getSportName())
                 .orElseThrow(() -> new BusinessException(ErrorCode.BAD_REQUEST))
                 .getSportTypeId();
+        int statusId = statusQueryService.getStatusId("DELETED");
 
         meetingEntity.setSportId(sportId);
         meetingEntity.setStatusId(statusId);
@@ -138,23 +141,27 @@ public class MeetingCommandService {
     /* 모임 삭제 */
     @Transactional
     public void deleteMeeting(int meetingId) {
-        for (int i : new int[]{1, 2, 3}) { // history에서 status를 모두 DELETED로 변경
-            List<MeetingParticipationDTO> participants = participationQueryService.getHistories(meetingId, i);
 
-            participants.forEach(
-                    participation -> {
-                        int statusId = statusQueryService.getStatusId("DELETED");
-
-                        MeetingParticipationDeleteRequest deleteRequest
-                                = new MeetingParticipationDeleteRequest(participation.getMemberId(), meetingId, statusId);
-
-                        commandService.deleteMeetingParticipation(participation);
-                    }
+        for (String string : List.of("PENDING", "ACCEPTED", "REJECTED")) { // history에서 status를 모두 DELETED로 변경
+            List<MeetingParticipationDTO> participants = participationQueryService.getHistories(
+                    meetingId, statusQueryService.getStatusId(string)
             );
+
+            participants.forEach(commandService::deleteMeetingParticipation);
         }
 
+        /* DTO와 Entity 간 필요한 변환 로직 */
         MeetingDTO meeting = meetingMapper.selectMeetingById(meetingId);
         meeting.setStatusType("모임 취소");
-        meetingRepository.save(modelMapper.map(meeting, Meeting.class));
+
+        Meeting meetingEntity = modelMapper.map(meeting, Meeting.class);
+        meetingEntity.setSportId(
+                sportTypeMapper.findBySportName(meeting.getSportName())
+                        .orElseThrow(() -> new BusinessException(ErrorCode.BAD_REQUEST))
+                        .getSportTypeId()
+        );
+        /* 모임의 status를 deleted로 변경하고 update */
+        meetingEntity.setStatusId(statusQueryService.getStatusId("DELETED"));
+        meetingRepository.save(meetingEntity);
     }
 }
