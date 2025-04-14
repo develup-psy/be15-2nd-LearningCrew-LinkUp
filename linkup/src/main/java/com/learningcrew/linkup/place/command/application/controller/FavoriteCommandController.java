@@ -28,4 +28,13 @@ FavoriteCommandController {
                 .status(HttpStatus.CREATED)
                 .body(ApiResponse.success(response));
     }
+    @DeleteMapping("/places/{placeId}")
+    public ResponseEntity<ApiResponse<Void>> deleteFavorite(
+            @PathVariable("placeId") int placeId,
+            @RequestParam("memberId") int memberId
+    ) {
+        favoriteCommandService.deleteFavorite(memberId, placeId);
+        return ResponseEntity.ok(ApiResponse.success(null));
+    }
+
 }
