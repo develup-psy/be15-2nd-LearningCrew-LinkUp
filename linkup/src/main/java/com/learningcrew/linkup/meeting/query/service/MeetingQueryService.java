@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -40,6 +41,20 @@ public class MeetingQueryService {
 
         int page = meetingSearchRequest.getPage();
         int size = meetingSearchRequest.getSize();
+        LocalDate today = LocalDate.now();
+
+        // 최소 날짜: 오늘 이전 불가
+        if (meetingSearchRequest.getMinDate() == null) {
+            meetingSearchRequest.setMinDate(today);
+        }
+        if (meetingSearchRequest.getMaxDate() == null) {
+            meetingSearchRequest.setMaxDate(today.plusDays(14));
+        }
+
+        // 날짜 유효성 검사
+        if (meetingSearchRequest.getMinDate().isBefore(today) || meetingSearchRequest.getMaxDate().isAfter(today.plusDays(14))) {
+            throw new BusinessException(ErrorCode.INVALID_MEETING_DATE_FILTER);
+        }
 
         return MeetingListResponse.builder()
                 .meetings(meetings)
