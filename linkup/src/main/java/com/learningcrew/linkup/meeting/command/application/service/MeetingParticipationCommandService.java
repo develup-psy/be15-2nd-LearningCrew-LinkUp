@@ -20,6 +20,7 @@ import com.learningcrew.linkup.meeting.query.service.MeetingQueryService;
 import com.learningcrew.linkup.meeting.query.service.StatusQueryService;
 import com.learningcrew.linkup.notification.command.application.helper.MeetingNotificationHelper;
 import com.learningcrew.linkup.notification.command.application.helper.NotificationHelper;
+import com.learningcrew.linkup.notification.command.application.helper.PointNotificationHelper;
 import com.learningcrew.linkup.place.command.domain.aggregate.entity.Place;
 import com.learningcrew.linkup.place.query.service.PlaceQueryService;
 import com.learningcrew.linkup.point.command.application.dto.response.MeetingPaymentResponse;
@@ -48,6 +49,7 @@ public class MeetingParticipationCommandService {
     private final StatusQueryService statusQueryService;
     private final NotificationHelper notificationHelper;
     private final MeetingNotificationHelper meetingNotificationHelper;
+    private final PointNotificationHelper pointNotificationHelper;
     private final JpaMeetingParticipationHistoryRepository jpaRepository;
     private final MemberRepository memberRepository;
     private final UserRepository userRepository;
@@ -226,6 +228,14 @@ public class MeetingParticipationCommandService {
                 null
         );
         pointRepository.save(transaction);
+
+        /* 모임 신청자 포인트 사용 알림 발송 */
+        pointNotificationHelper.sendPaymentNotification(
+                memberId,
+                meeting.getMeetingTitle(),
+                amountPerPerson,
+                user.getPointBalance()
+        );
 
         return new PointTransactionResponse("결제가 완료되었습니다.", user.getPointBalance());
     }
