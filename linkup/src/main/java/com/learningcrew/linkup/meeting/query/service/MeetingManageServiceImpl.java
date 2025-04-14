@@ -4,6 +4,7 @@ import com.learningcrew.linkup.common.dto.Pagination;
 import com.learningcrew.linkup.meeting.query.dto.request.MeetingSearchRequest;
 import com.learningcrew.linkup.meeting.query.dto.response.MeetingDTO;
 import com.learningcrew.linkup.meeting.query.dto.response.MeetingListResponse;
+import com.learningcrew.linkup.meeting.query.dto.response.MeetingSummaryDTO;
 import com.learningcrew.linkup.meeting.query.dto.response.UserMeetingActivityResponse;
 import com.learningcrew.linkup.meeting.query.mapper.AdminMeetingMapper;
 import com.learningcrew.linkup.meeting.query.mapper.MeetingParticipationMapper;
@@ -22,7 +23,7 @@ public class MeetingManageServiceImpl implements MeetingManageService {
 
     @Override
     public MeetingListResponse getAllMeetings(MeetingSearchRequest request) {
-        List<MeetingDTO> meetings = adminMeetingMapper.selectAllMeetings(request);
+        List<MeetingSummaryDTO> meetings = adminMeetingMapper.selectAllMeetings(request);
         long totalItems = adminMeetingMapper.countAllMeetings(request);
 
         return MeetingListResponse.builder()
