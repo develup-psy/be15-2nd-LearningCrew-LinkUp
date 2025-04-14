@@ -46,6 +46,9 @@ public class UserAccountCommandController {
 
     /* 회원 탈퇴 */
     @DeleteMapping("/withdraw")
+    @Operation(
+            summary = "회원탈퇴", description = "회원 id로 탈퇴할 수 있다."
+    )
     public ResponseEntity<ApiResponse<Void>> deleteUser(@AuthenticationPrincipal String userId, @RequestBody WithdrawUserRequest request) {
         log.info("회원탈퇴 요청: password={}",
                 request.getPassword());
@@ -56,6 +59,9 @@ public class UserAccountCommandController {
 
     /* 계정 복구 */
     @PostMapping("/recover")
+    @Operation(
+            summary = "계정복구", description = "계정을 복구할 수 있다."
+    )
     public ResponseEntity<ApiResponse<Void>> recoverUser(@RequestBody UserRecoverRequestDTO request){
         userCommandService.recoverUser(request.getEmail(),request.getPassword());
         return ResponseEntity.ok(ApiResponse.success(null,"계정이 복구되었습니다."));
@@ -63,7 +69,7 @@ public class UserAccountCommandController {
 
 
     /* 프로필 수정 */
-    @Operation(summary = "프로필 수정")
+    @Operation(summary = "프로필 수정", description = "프로필을 수정할 수 있다. ")
     @PutMapping("/me/profile")
     public ResponseEntity<ApiResponse<Void>> updateProfile(@AuthenticationPrincipal String userId, @RequestBody ProfileUpdateRequest request){
         userCommandService.updateProfile(Integer.parseInt(userId), request);

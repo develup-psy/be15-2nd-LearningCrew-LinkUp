@@ -16,7 +16,7 @@ public class SwaggerConfig {
     private Info swaggerInfo() {
         return new Info()
                 .title("Linkup API") //서비스명
-                .description("운동 매칭 플랫폼 Linkup의 REST API 명세입니다.")
+                .description("운동 매칭 플랫폼 Linkup의 User Service API 명세입니다.")
                 .version("1.0.0");
     }
 }

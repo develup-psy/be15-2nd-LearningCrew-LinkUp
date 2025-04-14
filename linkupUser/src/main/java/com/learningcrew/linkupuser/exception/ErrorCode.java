@@ -46,6 +46,7 @@ public enum ErrorCode {
     DUPLICATE_CONTACT_NUMBER(HttpStatus.BAD_REQUEST, "이미 존재하는 번호입니다."),
     DUPLICATE_NICKNAME(HttpStatus.BAD_REQUEST, "이미 존재하는 닉네임입니다."),
     INVALID_CREDENTIALS(HttpStatus.BAD_REQUEST, "아이디 혹은 비밀번호가 올바르지 않습니다."),
+    BEREADY_USER(HttpStatus.BAD_REQUEST,"회원가입을 신청한 상태입니다. 이메일 인증을 완료해주세요"),
     ALREADY_VERIFIED(HttpStatus.BAD_REQUEST, "이미 인증을 거친 계정입니다"),
     INVALID_STATUS(HttpStatus.BAD_REQUEST, "유효하지 않은 상태입니다."),
     INVALID_ROLE(HttpStatus.BAD_REQUEST, "올바르지 않는 권한입니다. "),

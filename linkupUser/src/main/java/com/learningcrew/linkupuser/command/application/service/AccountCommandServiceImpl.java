@@ -34,12 +34,15 @@ public class AccountCommandServiceImpl implements AccountCommandService {
 
     private final MemberRepository memberRepository;
 
-
-
     /* 유저 생성 - 회원 가입 */
     @Transactional
     public RegisterResponse registerUser(@Valid UserCreateRequest request) {
         User user = modelMapper.map(request, User.class);
+
+        // 회원신청 상태 체크
+        if(user.getStatus().getStatusType().equals(LinkerStatusType.PENDING.name())){
+            throw new BusinessException(ErrorCode.BEREADY_USER);
+        }
 
         // 중복 체크
         userValidatorService.validateDuplicateEmail(request.getEmail());

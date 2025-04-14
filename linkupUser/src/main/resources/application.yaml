@@ -56,3 +56,9 @@ image:
   image-dir: ${IMAGE_DIR}
   image-url: ${IMAGE_URL}
   default-profile: ${DEFAULT_PROFILE_IMAGE}
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
