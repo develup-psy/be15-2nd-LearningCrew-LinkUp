@@ -34,10 +34,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try{
             if(jwtTokenProvider.validateToken(token)) {
                 // 토큰 Payload에서 Email 추출
-                String userEmail = jwtTokenProvider.getEmailFromJWT(token);
+                String userId = jwtTokenProvider.getUserIdFromJWt(token);
 
-                // 이메일 기반 사용자 정보 로드
-                UserDetails userDetails = userDetailsService.loadUserByUsername(userEmail);
+                // user_id 기반 사용자 정보 로드
+                UserDetails userDetails = userDetailsService.loadUserByUsername(userId);
 
                 // 인증 객체 생성
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(

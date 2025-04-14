@@ -30,11 +30,11 @@ public class JwtTokenProvider {
     }
 
     /* accessToken 생성 메서드 */
-    public String createToken(String userEmail, String role){
+    public String createToken(int userId, String role){
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + expiration);
         return Jwts.builder()
-                .subject(userEmail)
+                .subject(String.valueOf(userId))
                 .claim("role", role)
                 .issuedAt(now)
                 .expiration(expiryDate)
@@ -43,11 +43,11 @@ public class JwtTokenProvider {
     }
 
     /* refreshToken 생성 메서드*/
-    public String createRefreshToken(String userEmail, String role){
+    public String createRefreshToken(int userId, String role){
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + refreshExpiration);
         return Jwts.builder()
-                .subject(userEmail)
+                .subject(String.valueOf(userId))
                 .claim("role", role)
                 .issuedAt(now)
                 .expiration(expiryDate)
@@ -76,7 +76,7 @@ public class JwtTokenProvider {
     }
 
     /* Payload에서 이메일 추출 */
-    public String getEmailFromJWT(String token) {
+    public String getUserIdFromJWt(String token) {
         Claims claims = Jwts.parser()
                 .verifyWith(secretKey)
                 .build()

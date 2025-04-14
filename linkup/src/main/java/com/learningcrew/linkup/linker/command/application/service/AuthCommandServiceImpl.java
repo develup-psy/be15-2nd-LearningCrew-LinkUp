@@ -75,9 +75,9 @@ public class AuthCommandServiceImpl implements AuthCommandService {
     @Transactional
     public TokenResponse refreshToken(String providedRefreshToken) {
         jwtTokenProvider.validateToken(providedRefreshToken);
-        String email = jwtTokenProvider.getEmailFromJWT(providedRefreshToken);
+        String userId = jwtTokenProvider.getUserIdFromJWt(providedRefreshToken);
 
-        RefreshToken storedToken = refreshtokenRepository.findById(email).orElseThrow(()->new CustomJwtException(ErrorCode.USER_NOT_FOUND));
+        RefreshToken storedToken = refreshtokenRepository.findById(Integer.parseInt(userId)).orElseThrow(()->new CustomJwtException(ErrorCode.USER_NOT_FOUND));
 
         if(!storedToken.getToken().equals(providedRefreshToken)) {
             throw new CustomJwtException(ErrorCode.REFRESH_TOKEN_MISMATCH);
@@ -87,7 +87,7 @@ public class AuthCommandServiceImpl implements AuthCommandService {
             throw new CustomJwtException(ErrorCode.EXPIRED_JWT);
         }
 
-        User user = userRepository.findByEmail(email).orElseThrow(
+        User user = userRepository.findById(Integer.parseInt(userId)).orElseThrow(
                 () -> new BusinessException(ErrorCode.USER_NOT_FOUND)
         );
 
@@ -110,8 +110,8 @@ public class AuthCommandServiceImpl implements AuthCommandService {
     public void logout(RefreshTokenRequest request) {
         String token = request.getRefreshToken();
         jwtTokenProvider.validateToken(request.getRefreshToken());
-        String email = jwtTokenProvider.getEmailFromJWT(token);
-        refreshtokenRepository.deleteById(email);
+        String userId = jwtTokenProvider.getUserIdFromJWt(token);
+        refreshtokenRepository.deleteById(Integer.parseInt(userId));
     }
 
     /* 이메일 인증 */
