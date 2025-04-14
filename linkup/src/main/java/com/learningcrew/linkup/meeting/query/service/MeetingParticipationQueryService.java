@@ -99,6 +99,10 @@ public class MeetingParticipationQueryService {
     public MeetingParticipationResponse getParticipation(int meetingId, int memberId) {
         MeetingParticipationDTO response = mapper.selectMeetingParticipationByMeetingIdAndMemberId(meetingId, memberId);
 
+        if (response == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND, "참가 이력이 존재하지 않습니다.");
+        }
+
         return MeetingParticipationResponse.builder()
                 .participationId(response.getParticipationId())
                 .build();

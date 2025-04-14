@@ -58,6 +58,9 @@ public class MeetingParticipationQueryController {
             @PathVariable int memberId
     ) {
         MeetingParticipationResponse response = service.getParticipation(meetingId, memberId);
+        if (response == null) {
+            return ResponseEntity.notFound().build();
+        }
 
         return ResponseEntity.ok(ApiResponse.success(response));
     }

@@ -1,6 +1,8 @@
 package com.learningcrew.linkup.meeting.query.service;
 
 import com.learningcrew.linkup.common.dto.Pagination;
+import com.learningcrew.linkup.exception.BusinessException;
+import com.learningcrew.linkup.exception.ErrorCode;
 import com.learningcrew.linkup.meeting.query.dto.request.MeetingSearchRequest;
 import com.learningcrew.linkup.meeting.query.dto.response.MeetingDTO;
 import com.learningcrew.linkup.meeting.query.dto.response.MeetingListResponse;
@@ -21,8 +23,10 @@ public class MeetingQueryService {
     /* 모임 상세 조회 */
     @Transactional(readOnly = true)
     public MeetingDTO getMeeting(int meetingId) {
-
         MeetingDTO meeting = meetingMapper.selectMeetingById(meetingId);
+        if (meeting == null) {
+            throw new BusinessException(ErrorCode.MEETING_NOT_FOUND);
+        }
         meeting.convertToStatusDescription();
         return meeting;
     }
