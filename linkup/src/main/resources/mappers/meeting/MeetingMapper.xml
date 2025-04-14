@@ -65,7 +65,7 @@
         <foreach item="item" collection="ageGroups" separator=" OR ">
             FIND_IN_SET(#{item}, age_group)
         </foreach>
-        )                           
+        ) AND (
         <foreach item="item" collection="levels" separator=" OR ">
             FIND_IN_SET(#{item}, level)
         </foreach>
@@ -99,7 +99,6 @@
         WHEN a.status_id IN (1, 2) THEN a.status_id
         ELSE 3
         END ASC
-        ORDER BY meeting_id
         LIMIT #{limit} OFFSET #{offset}
     </select>
   
