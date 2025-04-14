@@ -21,6 +21,7 @@ import com.learningcrew.linkup.meeting.query.mapper.MeetingParticipationMapper;
 import com.learningcrew.linkup.meeting.query.service.MeetingParticipationQueryService;
 import com.learningcrew.linkup.meeting.query.service.StatusQueryService;
 
+import com.learningcrew.linkup.notification.command.application.helper.PointNotificationHelper;
 import com.learningcrew.linkup.place.command.domain.aggregate.entity.Place;
 import com.learningcrew.linkup.place.query.service.PlaceQueryService;
 import com.learningcrew.linkup.point.command.domain.aggregate.PointTransaction;
@@ -48,6 +49,7 @@ public class MeetingCommandService {
     private final MeetingMapper meetingMapper;
     private final MeetingParticipationMapper participationMapper;
     private final MeetingNotificationHelper meetingNotificationHelper;
+    private final PointNotificationHelper pointNotificationHelper;
 
     private final MeetingParticipationCommandService commandService;
     private final MeetingParticipationCommandService participationCommandService;
@@ -208,6 +210,15 @@ public class MeetingCommandService {
                 "PAYMENT", // 또는 다른 타입으로 구분 가능 eg. "CREATOR_PAYMENT"
                 null // createdAt은 DB default
         );
+
+        /* 개설자 포인트 사용 알림 발송 */
+        pointNotificationHelper.sendPaymentNotification(
+                creatorId,
+                place.getPlaceName(),
+                costPerUser,
+                user.getPointBalance()
+        );
+
         pointRepository.save(transaction);
     }
 }
