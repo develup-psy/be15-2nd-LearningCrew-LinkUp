@@ -117,8 +117,10 @@ public class MeetingCommandService {
         // 4. 기존 개설자의 참여 내역 soft delete
         MeetingParticipationDTO requestedParticipation = participationMapper.selectHistoryByMeetingIdAndMemberId(meetingId, leaderUpdateRequest.getMemberId());
 
-        requestedParticipation.setStatusType("참가 취소"); // soft delete
-        participationRepository.save(modelMapper.map(requestedParticipation, MeetingParticipationHistory.class));
+        MeetingParticipationHistory history = modelMapper.map(requestedParticipation, MeetingParticipationHistory.class);
+        history.setStatusId(statusQueryService.getStatusId("DELETED")); // soft delete
+        participationRepository.save(history);
+        requestedParticipation.setStatusType("참가 취소");
 
         // 5. 모임 리더 변경
         meeting.setLeaderId(memberId);
