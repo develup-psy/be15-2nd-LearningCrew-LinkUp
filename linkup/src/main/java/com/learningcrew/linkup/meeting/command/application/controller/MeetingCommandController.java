@@ -41,6 +41,11 @@ public class MeetingCommandController {
     public ResponseEntity<ApiResponse<MeetingCommandResponse>> createMeeting(
             @RequestBody @Validated MeetingCreateRequest meetingCreateRequest
     ) {
+        meetingCommandService.validateCreatorBalance(
+                meetingCreateRequest.getLeaderId(), // 또는 leaderId 필드
+                meetingCreateRequest.getPlaceId(),
+                meetingCreateRequest.getMinUser()
+        );
         int meetingId = meetingCommandService.createMeeting(meetingCreateRequest);
         // 2. "장소 Id가 존재하면" 예약 생성
         if (meetingCreateRequest.getPlaceId() != null) {
@@ -82,7 +87,7 @@ public class MeetingCommandController {
         ManageParticipationResponse response
                 = ManageParticipationResponse.builder()
                 .participationId(participationId)
-                .statusType("승인")
+                .statusType("ACCEPTED")
                 .build();
 
         return ResponseEntity.ok().body(ApiResponse.success(response));

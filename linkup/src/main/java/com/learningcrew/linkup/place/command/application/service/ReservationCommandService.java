@@ -1,6 +1,11 @@
 package com.learningcrew.linkup.place.command.application.service;
 
+
+import com.learningcrew.linkup.meeting.command.domain.aggregate.Meeting;
+import com.learningcrew.linkup.meeting.command.domain.repository.MeetingRepository;
+
 import com.learningcrew.linkup.notification.command.application.helper.MeetingNotificationHelper;
+
 import com.learningcrew.linkup.place.command.application.dto.request.ReservationCreateRequest;
 import com.learningcrew.linkup.place.command.application.dto.response.ReservationCommandResponse;
 import com.learningcrew.linkup.place.command.domain.aggregate.entity.Reservation;
@@ -9,13 +14,19 @@ import com.learningcrew.linkup.place.query.mapper.PlaceMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class ReservationCommandService {
 
     private final ReservationRepository reservationRepository;
+
+    private final MeetingRepository meetingRepository;
+
     private final MeetingNotificationHelper meetingNotificationHelper;
     private final PlaceMapper placeMapper;
+
 
     public ReservationCommandResponse createReservation(ReservationCreateRequest request) {
         // 겹치는 예약이 있는지 체크
@@ -38,6 +49,11 @@ public class ReservationCommandService {
         if (conflictCount > 0) {
             statusId = 3;
             message = "예약이 거절되었습니다. 이미 해당 시간에 예약이 존재합니다.";
+            Optional<Meeting> meetingOpt = meetingRepository.findById(request.getMeetingId());
+            meetingOpt.ifPresent(meeting -> {
+                meeting.setStatusId(3);
+                meetingRepository.save(meeting);
+            });
         } else {
             statusId = 2;
             message = "예약이 성공적으로 완료되었습니다.";

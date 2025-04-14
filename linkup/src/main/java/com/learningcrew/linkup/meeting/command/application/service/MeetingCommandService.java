@@ -3,6 +3,8 @@ package com.learningcrew.linkup.meeting.command.application.service;
 import com.learningcrew.linkup.common.query.mapper.SportTypeMapper;
 import com.learningcrew.linkup.exception.BusinessException;
 import com.learningcrew.linkup.exception.ErrorCode;
+import com.learningcrew.linkup.linker.command.domain.aggregate.User;
+import com.learningcrew.linkup.linker.command.domain.repository.UserRepository;
 import com.learningcrew.linkup.meeting.command.application.dto.request.LeaderUpdateRequest;
 import com.learningcrew.linkup.meeting.command.application.dto.request.MeetingCreateRequest;
 import com.learningcrew.linkup.meeting.command.application.dto.request.MeetingParticipationCreateRequest;
@@ -18,7 +20,14 @@ import com.learningcrew.linkup.meeting.query.mapper.MeetingMapper;
 import com.learningcrew.linkup.meeting.query.mapper.MeetingParticipationMapper;
 import com.learningcrew.linkup.meeting.query.service.MeetingParticipationQueryService;
 import com.learningcrew.linkup.meeting.query.service.StatusQueryService;
+
+import com.learningcrew.linkup.place.command.domain.aggregate.entity.Place;
+import com.learningcrew.linkup.place.query.service.PlaceQueryService;
+import com.learningcrew.linkup.point.command.domain.aggregate.PointTransaction;
+import com.learningcrew.linkup.point.command.domain.repository.PointRepository;
+
 import com.learningcrew.linkup.notification.command.application.helper.MeetingNotificationHelper;
+
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -45,6 +54,9 @@ public class MeetingCommandService {
     private final MeetingParticipationQueryService participationQueryService;
     private final StatusQueryService statusQueryService;
     private final SportTypeMapper sportTypeMapper;
+    private final PlaceQueryService placeQueryService;
+    private final UserRepository userRepository;
+    private final PointRepository pointRepository;
 
     /* 모임 등록 */
     @Transactional
@@ -171,5 +183,31 @@ public class MeetingCommandService {
         /* 모임의 status를 deleted로 변경하고 update */
         meetingEntity.setStatusId(statusQueryService.getStatusId("DELETED"));
         meetingRepository.save(meetingEntity);
+    }
+    @Transactional
+    public void validateCreatorBalance(int creatorId, Integer placeId, int minUser) {
+        if (placeId == null) return; // 장소 없으면 돈 필요 없음
+
+        Place place = placeQueryService.getPlaceById(placeId);
+        int rentalCost = place.getRentalCost();
+        int costPerUser = rentalCost / minUser;
+
+        User user = userRepository.findById(creatorId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+
+        if (user.getPointBalance() < costPerUser) {
+            throw new BusinessException(ErrorCode.INSUFFICIENT_BALANCE,
+                    "개설자의 포인트가 부족합니다. 최소 필요 포인트: " + costPerUser);
+        }
+        user.subtractPointBalance(costPerUser);
+        userRepository.save(user);
+        PointTransaction transaction = new PointTransaction(
+                null,
+                creatorId,
+                costPerUser*(-1),
+                "PAYMENT", // 또는 다른 타입으로 구분 가능 eg. "CREATOR_PAYMENT"
+                null // createdAt은 DB default
+        );
+        pointRepository.save(transaction);
     }
 }

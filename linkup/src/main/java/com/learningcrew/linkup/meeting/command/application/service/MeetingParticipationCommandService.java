@@ -174,7 +174,7 @@ public class MeetingParticipationCommandService {
         // 3. 참가 승인 처리
         participation.setStatusId(statusQueryService.getStatusId("ACCEPTED"));
         MeetingParticipationDTO dto = modelMapper.map(participation, MeetingParticipationDTO.class);
-        dto.setStatusType("승인");
+        dto.setStatusType("ACCEPTED");
 
         repository.save(participation);
         repository.flush();
@@ -193,22 +193,25 @@ public class MeetingParticipationCommandService {
 
     private PointTransactionResponse payParticipation(int meetingId, int memberId) {
         MeetingDTO meeting = meetingQueryService.getMeeting(meetingId);
-        int placeId = meeting.getPlaceId();
+        Integer placeId = meeting.getPlaceId();
+        if(placeId == null) {
+            return new PointTransactionResponse("결제할 장소가 없는 모임입니다.",
+                    userRepository.findById(memberId)
+                            .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND))
+                            .getPointBalance());
+        }
         Place place = placeQueryService.getPlaceById(placeId);
         int rentalCost = place.getRentalCost();
-
-        List<MemberDTO> participants = meetingParticipationQueryService.getParticipants(
-                meetingId, statusQueryService.getStatusId("ACCEPTED"));
-        int numberOfParticipants = participants.size() + 1; // 새로 승인될 사람 포함
-        int amountPerPerson = rentalCost / numberOfParticipants;
+        int minUser = meeting.getMinUser();
+        int amountPerPerson = rentalCost / minUser;
 
         User user = userRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
 
-        // 포인트 부족 검사
         if (user.getPointBalance() < amountPerPerson) {
             throw new BusinessException(ErrorCode.INSUFFICIENT_BALANCE, "포인트가 부족합니다.");
         }
+
 
         user.subtractPointBalance(amountPerPerson);
         userRepository.save(user);
@@ -216,7 +219,7 @@ public class MeetingParticipationCommandService {
         PointTransaction transaction = new PointTransaction(
                 null,
                 memberId,
-                amountPerPerson,
+                -amountPerPerson,
                 "PAYMENT",
                 null
         );
@@ -281,7 +284,10 @@ public class MeetingParticipationCommandService {
     @Transactional(readOnly = true)
     public void validateBalance(int meetingId, int userId) {
         MeetingDTO meeting = meetingQueryService.getMeeting(meetingId);
-        int placeId = meeting.getPlaceId();
+        Integer placeId = meeting.getPlaceId();
+        if(placeId == null) {
+            return;
+        }
 
         Place place = placeQueryService.getPlaceById(placeId);
         int rentalCost = place.getRentalCost();
@@ -296,6 +302,7 @@ public class MeetingParticipationCommandService {
                     "포인트 잔액이 부족합니다. 최소 필요 포인트: " + costPerUser);
         }
     }
+
 
 }
 
