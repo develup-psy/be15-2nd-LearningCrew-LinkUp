@@ -25,9 +25,9 @@ spring:
           starttls:
             enable: true        # starttls 활성화 여부
 
-
   main:
     allow-bean-definition-overriding: true
+
 mybatis:
   configuration:
     map-underscore-to-camel-case: true
