@@ -46,4 +46,5 @@ public class MeetingQueryController {
 
         return ResponseEntity.ok(ApiResponse.success(response));
     }
+
 }

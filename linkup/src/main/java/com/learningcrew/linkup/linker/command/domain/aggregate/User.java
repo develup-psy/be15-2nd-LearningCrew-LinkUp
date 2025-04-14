@@ -2,6 +2,8 @@ package com.learningcrew.linkup.linker.command.domain.aggregate;
 
 import com.learningcrew.linkup.common.domain.Role;
 import com.learningcrew.linkup.common.domain.Status;
+import com.learningcrew.linkup.exception.BusinessException;
+import com.learningcrew.linkup.exception.ErrorCode;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -61,5 +63,18 @@ public class User {
 
     public void setDeletedAt(LocalDateTime deletedAt) {
         this.deletedAt = deletedAt;
+    }
+
+    public void addPointBalance(int amount) {
+        if (amount <= 0) {
+            throw new IllegalArgumentException("충전 금액은 0보다 커야 합니다.");
+        }
+        this.pointBalance += amount;
+    }
+    public void subtractPointBalance(int amount) {
+        if (this.pointBalance < amount) {
+            throw new BusinessException(ErrorCode.INSUFFICIENT_BALANCE);
+        }
+        this.pointBalance -= amount;
     }
 }

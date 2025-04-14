@@ -1,6 +1,7 @@
 package com.learningcrew.linkup.place.query.service;
 
 import com.learningcrew.linkup.common.dto.Pagination;
+import com.learningcrew.linkup.place.command.domain.aggregate.entity.Place;
 import com.learningcrew.linkup.place.query.dto.request.PlaceListRequest;
 import com.learningcrew.linkup.place.query.dto.response.*;
 import com.learningcrew.linkup.place.query.mapper.PlaceMapper;
@@ -74,6 +75,9 @@ public class PlaceQueryService {
                         .totalItems(totalItems)
                         .build())
                 .build();
+    }
+    public Place getPlaceById(int placeId) {
+        return placeMapper.selectPlaceById(placeId);
     }
 
 }
