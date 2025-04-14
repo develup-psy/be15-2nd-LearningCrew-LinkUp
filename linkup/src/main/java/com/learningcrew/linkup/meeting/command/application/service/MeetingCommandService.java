@@ -10,19 +10,25 @@ import com.learningcrew.linkup.meeting.command.domain.aggregate.MeetingParticipa
 import com.learningcrew.linkup.meeting.command.domain.repository.MeetingParticipationHistoryRepository;
 import com.learningcrew.linkup.meeting.command.domain.repository.MeetingRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MeetingCommandService {
+    private List<Meeting> cachedTodaysMeetings;
 
     private final MeetingRepository meetingRepository;
-    private final MeetingParticipationHistoryRepository participationRepository;
-    private final MeetingParticipationCommandService participationCommandService;
+    private final MeetingParticipationHistoryRepository meetingParticipationHistoryRepository;
+    private final MeetingParticipationCommandService meetingParticipationCommandService;
 
     private static final int STATUS_PENDING = 1;
     private static final int STATUS_ACCEPTED = 2;
@@ -64,7 +70,7 @@ public class MeetingCommandService {
                 .memberId(saved.getLeaderId())
                 .build();
 
-        participationCommandService.createMeetingParticipation(participationRequest, saved);
+        meetingParticipationCommandService.createMeetingParticipation(participationRequest, saved);
 
         return saved.getMeetingId();
     }
@@ -80,7 +86,7 @@ public class MeetingCommandService {
         }
 
         List<MeetingParticipationHistory> acceptedParticipants =
-                participationRepository.findByMeetingIdAndStatusId(meetingId, STATUS_ACCEPTED);
+                meetingParticipationHistoryRepository.findByMeetingIdAndStatusId(meetingId, STATUS_ACCEPTED);
 
         boolean isNewLeaderParticipant = acceptedParticipants.stream()
                 .anyMatch(p -> p.getMemberId() == newLeaderId);
@@ -89,10 +95,10 @@ public class MeetingCommandService {
             throw new BusinessException(ErrorCode.USER_NOT_FOUND, "해당 회원은 모임 참여자가 아닙니다.");
         }
 
-        participationRepository.findByMeetingIdAndMemberId(meetingId, request.getMemberId())
+        meetingParticipationHistoryRepository.findByMeetingIdAndMemberId(meetingId, request.getMemberId())
                 .ifPresent(oldLeaderHistory -> {
                     oldLeaderHistory.setStatusId(STATUS_DELETED);
-                    participationRepository.save(oldLeaderHistory);
+                    meetingParticipationHistoryRepository.save(oldLeaderHistory);
                 });
 
         meeting.setLeaderId(newLeaderId);
@@ -110,11 +116,11 @@ public class MeetingCommandService {
         // 모든 상태 참가자들을 DELETED 처리
         for (int statusId : new int[]{STATUS_PENDING, STATUS_ACCEPTED, STATUS_REJECTED}) {
             List<MeetingParticipationHistory> participants =
-                    participationRepository.findByMeetingIdAndStatusId(meetingId, statusId);
+                    meetingParticipationHistoryRepository.findByMeetingIdAndStatusId(meetingId, statusId);
 
             for (MeetingParticipationHistory history : participants) {
                 history.setStatusId(STATUS_DELETED);
-                participationRepository.save(history);
+                meetingParticipationHistoryRepository.save(history);
             }
         }
 
@@ -142,4 +148,49 @@ public class MeetingCommandService {
             throw new BusinessException(ErrorCode.BAD_REQUEST, "유효하지 않은 인원 설정입니다.");
         }
     }
+
+    @Scheduled(cron = "0 0 0 * * *") // 자정에 한 번 오늘 모임 목록 캐싱
+    public void cacheTodaysMeetings() {
+        LocalDate today = LocalDate.now();
+        cachedTodaysMeetings = meetingRepository.findAllByDate(today);
+        log.info("오늘 모임 {}건 캐싱 완료", cachedTodaysMeetings.size());
+    }
+
+    @Transactional
+    @Scheduled(cron = "0 0,30 * * * *") // 매 30분마다 상태 갱신 시도
+    public void updateMeetingStatuses() {
+        if (cachedTodaysMeetings == null) {
+            log.warn("오늘 모임 목록이 캐싱되지 않았습니다.");
+            return;
+        }
+
+        LocalDateTime now = LocalDateTime.now().withSecond(0).withNano(0);
+        List<Meeting> updatedMeetings = new ArrayList<>();
+
+        for (Meeting meeting : cachedTodaysMeetings) {
+            LocalDateTime startAt = meeting.getDate().atTime(meeting.getStartTime());
+
+            if (!startAt.isEqual(now)) {
+                continue;
+            }
+
+            List<MeetingParticipationHistory> histories =
+                    meetingParticipationHistoryRepository.findAllByMeetingIdAndStatusId(meeting.getMeetingId(), STATUS_ACCEPTED);
+
+            if (histories.size() < meeting.getMinUser()) {
+                histories.forEach(h -> h.setStatusId(STATUS_DELETED));
+                meeting.setStatusId(STATUS_DELETED);
+            }
+
+            updatedMeetings.add(meeting);
+        }
+
+        if (!updatedMeetings.isEmpty()) {
+            updatedMeetings.forEach(meetingRepository::save);
+            log.info("총 {}건의 모임 상태 변경 완료", updatedMeetings.size());
+        } else {
+            log.info("변경할 모임이 없습니다.");
+        }
+    }
+
 }
