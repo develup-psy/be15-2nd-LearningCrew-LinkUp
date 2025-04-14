@@ -44,7 +44,7 @@
     <resultMap id="placeDetailResultMap" type="com.learningcrew.linkup.place.query.dto.response.PlaceDetailResponse">
         <id property="placeId" column="place_id"/>
         <result property="placeName" column="place_name"/>
-        <result property="address" column="address" jdbcType="VARCHAR"/>
+        <result property="address" column="address"/>
         <result property="description" column="description"/>
         <result property="equipment" column="equipment"/>
         <result property="rentalCost" column="rental_cost"/>
@@ -65,37 +65,35 @@
     </resultMap>
 
 
-    <select id="selectPlaceDetail" parameterType="int"
-            resultMap="placeDetailResultMap">
-    SELECT
-            p.place_id,
-            p.place_name,
-            p.address,
-            p.description,
-            p.equipment,
-            p.rental_cost,
-            pi.image_url,
-            ot.day_of_week,
-            ot.start_time,
-            ot.end_time,
-            pr.review_content,
-            pr.review_image_url,
-            pr.review_score
-            FROM place p
-            LEFT JOIN place_image pi ON p.place_id = pi.place_id
-            LEFT JOIN operation_time ot ON p.place_id = ot.place_id
-            LEFT JOIN place_review pr ON p.place_id = pr.place_id
-            WHERE p.place_id = #{placeId}
-            AND (pr.status_id = 2 OR pr.status_id = 3)
+    <select id="selectBasicPlaceDetail" resultType="PlaceDetailResponse">
+        SELECT place_id, place_name, address, description, equipment, rental_cost
+        FROM place
+        WHERE place_id = #{placeId}
     </select>
+
+    <select id="selectImages" resultType="String">
+        SELECT image_url FROM place_image WHERE place_id = #{placeId}
+    </select>
+
+    <select id="selectOperationTimes" resultType="OperationTimeResponse">
+        SELECT day_of_week, start_time, end_time FROM operation_time WHERE place_id = #{placeId}
+    </select>
+
+    <select id="selectReviews" resultType="PlaceReviewResponse">
+        SELECT review_content, review_image_url, review_score
+        FROM place_review
+        WHERE place_id = #{placeId} AND status_id IN (2, 3)
+    </select>
+
+
     <!-- 전체 장소 조회 쿼리(관리자용) -->
     <select id="selectAllPlacesByAdmin" parameterType="com.learningcrew.linkup.place.query.dto.request.PlaceListRequest"
             resultType="com.learningcrew.linkup.place.query.dto.response.PlaceDto">
         SELECT
-        p.place_id AS placeId,
-        p.place_name AS placeName,
-        p.address AS address,
-        COALESCE(AVG(r.review_score), 0) AS reviewRating
+            p.place_id AS placeId,
+            p.place_name AS placeName,
+            p.address AS address,
+            COALESCE(AVG(r.review_score), 0) AS reviewRating
         FROM place p
         LEFT JOIN place_review r ON p.place_id = r.place_id
         WHERE 1 = 1
@@ -112,7 +110,7 @@
         ORDER BY p.place_id DESC
         LIMIT #{limit} OFFSET #{offset}
     </select>
-    <!-- 전체 장소 개수 조회 쿼리(관리자용) -->
+
     <select id="countPlacesByAdmin" parameterType="com.learningcrew.linkup.place.query.dto.request.PlaceListRequest"
             resultType="long">
         SELECT COUNT(*)
@@ -134,10 +132,10 @@
             parameterType="PlaceListRequest"
             resultType="PlaceDto">
         SELECT
-        p.place_id AS placeId,
-        p.place_name AS placeName,
-        p.address AS address,
-        COALESCE(AVG(r.review_score), 0) AS reviewRating
+            p.place_id AS placeId,
+            p.place_name AS placeName,
+            p.address AS address,
+            COALESCE(AVG(r.review_score), 0) AS reviewRating
         FROM place p
         LEFT JOIN place_review r ON p.place_id = r.place_id
         WHERE 1 = 1
@@ -177,5 +175,14 @@
         FROM place
         WHERE place_id = #{placeId}
     </select>
+
+    <!-- PlaceMapper.xml -->
+    <select id="selectPlaceById" resultType="com.learningcrew.linkup.place.command.domain.aggregate.entity.Place">
+        SELECT *
+        FROM place
+        WHERE place_id = #{placeId}
+    </select>
+
+
 
 </mapper>

@@ -9,5 +9,6 @@ public class PlaceDto {
     private Integer placeId;
     private String placeName;
     private Double reviewRating;
+    private String address;
 
 }

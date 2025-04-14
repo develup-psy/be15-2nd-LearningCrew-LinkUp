@@ -8,6 +8,7 @@ import com.learningcrew.linkup.meeting.command.domain.aggregate.MeetingParticipa
 import com.learningcrew.linkup.meeting.command.domain.repository.MeetingParticipationHistoryRepository;
 import com.learningcrew.linkup.meeting.command.infrastructure.repository.JpaMeetingParticipationHistoryRepository;
 import com.learningcrew.linkup.meeting.query.dto.response.MeetingParticipationDTO;
+import com.learningcrew.linkup.meeting.query.dto.response.MeetingParticipationListResponse;
 import com.learningcrew.linkup.meeting.query.dto.response.MeetingParticipationResponse;
 import com.learningcrew.linkup.meeting.query.dto.response.MemberDTO;
 import com.learningcrew.linkup.meeting.query.mapper.MeetingParticipationMapper;
@@ -105,6 +106,15 @@ public class MeetingParticipationQueryService {
 
         return MeetingParticipationResponse.builder()
                 .participationId(response.getParticipationId())
+                .build();
+    }
+
+    @Transactional(readOnly = true)
+    public MeetingParticipationListResponse getUserMeetingHistory(int userId) {
+        List<MeetingParticipationDTO> participations = mapper.selectMeetingParticipationsByUserId(userId);
+
+        return MeetingParticipationListResponse.builder()
+                .meetingParticipations(participations)
                 .build();
     }
 }

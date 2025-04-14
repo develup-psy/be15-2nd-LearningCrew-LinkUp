@@ -1,6 +1,7 @@
 package com.learningcrew.linkup.place.query.service;
 
 import com.learningcrew.linkup.common.dto.Pagination;
+import com.learningcrew.linkup.place.command.domain.aggregate.entity.Place;
 import com.learningcrew.linkup.place.query.dto.request.PlaceListRequest;
 import com.learningcrew.linkup.place.query.dto.response.*;
 import com.learningcrew.linkup.place.query.mapper.PlaceMapper;
@@ -54,9 +55,16 @@ public class PlaceQueryService {
     }
 
     @Transactional(readOnly = true)
-    public PlaceDetailResponse getPlaceDetails(int placeId){
-        return placeMapper.selectPlaceDetail(placeId);
+    public PlaceDetailResponse getPlaceDetails(int placeId) {
+        PlaceDetailResponse detail = placeMapper.selectBasicPlaceDetail(placeId); // 단건 기본 정보만
+
+        detail.setImageUrl(placeMapper.selectImages(placeId));
+        detail.setOperationTimes(placeMapper.selectOperationTimes(placeId));
+        detail.setPlaceReviews(placeMapper.selectReviews(placeId));
+
+        return detail;
     }
+
 
     @Transactional(readOnly = true)
     public PlaceListResponse getPlacesByOwner(PlaceListRequest request) {
@@ -74,6 +82,9 @@ public class PlaceQueryService {
                         .totalItems(totalItems)
                         .build())
                 .build();
+    }
+    public Place getPlaceById(int placeId) {
+        return placeMapper.selectPlaceById(placeId);
     }
 
 }

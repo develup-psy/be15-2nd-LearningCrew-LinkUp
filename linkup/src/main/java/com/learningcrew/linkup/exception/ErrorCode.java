@@ -85,6 +85,9 @@ public enum ErrorCode {
     MEETING_PARTICIPATION_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "모임 최대 인원을 초과했습니다."),
     MEETING_ALREADY_JOINED(HttpStatus.BAD_REQUEST, "이미 참여 중인 모임입니다."),
     MEETING_CREATOR_CANNOT_EXIT(HttpStatus.BAD_REQUEST, "모임 생성자는 모임을 나갈 수 없습니다."),
+    INVALID_MEETING_DATE_FILTER(HttpStatus.BAD_REQUEST, "모임 날짜는 오늘부터 2주 이내까지만 조회할 수 있습니다."),
+    INSUFFICIENT_BALANCE(HttpStatus.BAD_REQUEST,"포인트 잔액이 부족합니다."),
+
 
     // 장소 예약
     RESERVATION_NOT_FOUND(HttpStatus.NOT_FOUND, "예약 정보를 찾을 수 없습니다."),
