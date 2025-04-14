@@ -13,12 +13,14 @@ import com.learningcrew.linkup.meeting.command.domain.aggregate.Meeting;
 import com.learningcrew.linkup.meeting.command.domain.aggregate.MeetingParticipationHistory;
 import com.learningcrew.linkup.meeting.command.domain.repository.MeetingParticipationHistoryRepository;
 import com.learningcrew.linkup.meeting.command.domain.repository.MeetingRepository;
+import com.learningcrew.linkup.meeting.command.infrastructure.repository.JpaMeetingParticipationHistoryRepository;
 import com.learningcrew.linkup.meeting.query.dto.response.MeetingDTO;
 import com.learningcrew.linkup.meeting.query.dto.response.MeetingParticipationDTO;
 import com.learningcrew.linkup.meeting.query.dto.response.MemberDTO;
 import com.learningcrew.linkup.meeting.query.mapper.MeetingMapper;
 import com.learningcrew.linkup.meeting.query.mapper.MeetingParticipationMapper;
 import com.learningcrew.linkup.meeting.query.service.MeetingParticipationQueryService;
+import com.learningcrew.linkup.meeting.query.service.MeetingQueryService;
 import com.learningcrew.linkup.meeting.query.service.StatusQueryService;
 
 import com.learningcrew.linkup.place.command.domain.aggregate.entity.Place;
@@ -57,6 +59,8 @@ public class MeetingCommandService {
     private final PlaceQueryService placeQueryService;
     private final UserRepository userRepository;
     private final PointRepository pointRepository;
+    private final MeetingQueryService meetingQueryService;
+    private final JpaMeetingParticipationHistoryRepository jpaMeetingParticipationHistoryRepository;
 
     /* 모임 등록 */
     @Transactional
@@ -134,7 +138,7 @@ public class MeetingCommandService {
         MeetingParticipationHistory history = modelMapper.map(requestedParticipation, MeetingParticipationHistory.class);
         history.setStatusId(statusQueryService.getStatusId("DELETED")); // soft delete
         participationRepository.save(history);
-        requestedParticipation.setStatusType("참가 취소");
+        requestedParticipation.setStatusId(2);
 
         // 5. 모임 리더 변경
         meeting.setLeaderId(memberId);
@@ -161,6 +165,7 @@ public class MeetingCommandService {
     /* 모임 삭제 */
     @Transactional
     public void deleteMeeting(int meetingId) {
+        cancelMeetingByLeader(meetingId);
 
         for (String string : List.of("PENDING", "ACCEPTED", "REJECTED")) { // history에서 status를 모두 DELETED로 변경
             List<MeetingParticipationDTO> participants = participationQueryService.getHistories(
@@ -210,4 +215,26 @@ public class MeetingCommandService {
         );
         pointRepository.save(transaction);
     }
+    @Transactional
+    public void cancelMeetingByLeader(int meetingId) {
+        // 1. 모임 상태를 DELETED로 변경
+        Meeting meeting = meetingRepository.findById(meetingId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND));
+        meeting.setStatusId(statusQueryService.getStatusId("DELETED"));
+        meetingRepository.save(meeting);
+
+        // 2. 참여자 중 상태가 ACCEPTED인 애들만 골라서 환불
+        List<MeetingParticipationHistory> acceptedParticipants =
+                participationRepository.findByMeetingIdAndStatusId(
+                        meetingId,
+                        statusQueryService.getStatusId("ACCEPTED")
+                );
+
+        // 3. 참여자 환불 (cancelParticipation 재사용)
+        for (MeetingParticipationHistory participant : acceptedParticipants) {
+            commandService.cancelParticipation(meetingId, participant.getMemberId());
+        }
+    }
+
+
 }

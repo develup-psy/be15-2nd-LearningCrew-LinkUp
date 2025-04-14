@@ -27,6 +27,7 @@ import com.learningcrew.linkup.point.command.application.dto.response.PointTrans
 import com.learningcrew.linkup.point.command.domain.aggregate.PointTransaction;
 import com.learningcrew.linkup.point.command.domain.repository.PointRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor // 의존성 주입
 public class MeetingParticipationCommandService {
@@ -174,7 +176,7 @@ public class MeetingParticipationCommandService {
         // 3. 참가 승인 처리
         participation.setStatusId(statusQueryService.getStatusId("ACCEPTED"));
         MeetingParticipationDTO dto = modelMapper.map(participation, MeetingParticipationDTO.class);
-        dto.setStatusType("ACCEPTED");
+        dto.setStatusId(2);
 
         repository.save(participation);
         repository.flush();
@@ -250,7 +252,7 @@ public class MeetingParticipationCommandService {
 
         // 3. 참가 거절 처리
         MeetingParticipationDTO dto = modelMapper.map(participation, MeetingParticipationDTO.class);
-        dto.setStatusType("거절");
+        dto.setStatusId(3);
 
         participation.setStatusId(statusQueryService.getStatusId("REJECTED"));
         repository.save(participation);
@@ -272,14 +274,26 @@ public class MeetingParticipationCommandService {
             throw new BusinessException(ErrorCode.NOT_FOUND, "참여 정보가 없습니다.");
         }
 
+        int acceptedStatusId = statusQueryService.getStatusId("ACCEPTED");
+        System.out.println("✅ 현재 상태 ID: " + history.getStatusId());
+        System.out.println("✅ ACCEPTED ID: " + acceptedStatusId);
+
+        if (history.getStatusId()+2 != acceptedStatusId) {
+            throw new BusinessException(ErrorCode.BAD_REQUEST, "환불 가능한 참가 정보가 아닙니다.");
+        }
+
+        // 취소 로직 실행
+        cancelParticipation(history.getMeetingId(), history.getMemberId());
+
         MeetingParticipationHistory entity = modelMapper.map(history, MeetingParticipationHistory.class);
         entity.setStatusId(statusQueryService.getStatusId("DELETED"));
         repository.save(entity);
         repository.flush();
 
-        history.setStatusType("참가 취소"); // soft delete
+        history.setStatusId(statusQueryService.getStatusId("DELETED")); // soft delete
         return history.getParticipationId();
     }
+
 
     @Transactional(readOnly = true)
     public void validateBalance(int meetingId, int userId) {
@@ -302,7 +316,47 @@ public class MeetingParticipationCommandService {
                     "포인트 잔액이 부족합니다. 최소 필요 포인트: " + costPerUser);
         }
     }
+    @Transactional
+    public void cancelParticipation(int meetingId, int memberId) {
+        // 1. 참여 기록 확인
+        MeetingParticipationHistory participation = jpaRepository.findByMeetingIdAndMemberId(meetingId, memberId);
+        if (participation == null) {
+            throw new BusinessException(ErrorCode.BAD_REQUEST, "참여 기록이 없습니다.");
+        }
 
+        int acceptedId = statusQueryService.getStatusId("ACCEPTED");
+        System.out.println(acceptedId);
+        System.out.println(participation.getStatusId());
+
+
+        // 2. 환불 금액 계산
+        MeetingDTO meeting = meetingQueryService.getMeeting(meetingId);
+        Integer placeId = meeting.getPlaceId();
+        if (placeId == null) return; // 장소 없으면 환불 불필요
+
+        Place place = placeQueryService.getPlaceById(placeId);
+        int refundAmount = place.getRentalCost() / meeting.getMinUser();
+
+        // 3. 포인트 환불
+        User user = userRepository.findById(memberId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        user.addPointBalance(refundAmount);
+        userRepository.save(user);
+
+        // 4. 환불 기록
+        PointTransaction transaction = new PointTransaction(
+                null,
+                memberId,
+                refundAmount,
+                "REFUND",
+                null
+        );
+        pointRepository.save(transaction);
+
+        // 5. 참여 기록 상태 변경
+        participation.setStatusId(statusQueryService.getStatusId("DELETED"));
+        repository.save(participation);
+    }
 
 }
 
