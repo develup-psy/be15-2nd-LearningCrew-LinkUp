@@ -9,6 +9,7 @@ import com.learningcrew.linkupuser.command.application.dto.response.TokenRespons
 import com.learningcrew.linkupuser.command.application.service.AuthCommandService;
 import com.learningcrew.linkupuser.common.dto.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,11 +20,13 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/auth")
+@RequestMapping("/auth")
+@Tag(name = "회원 인증", description = " 로그인, 인증 관련 API")
 public class UserAuthCommandController {
     private final AuthCommandService userAuthCommandService;
 
     /* 자체 로그인 */
+    @Operation(summary = "로그인", description = "자체 로그인 후 JWT를 발급합니다.")
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<TokenResponse>> login(@Valid @RequestBody LoginRequest request){
         log.info("로그인 요청: email={}", request.getEmail());
@@ -33,6 +36,7 @@ public class UserAuthCommandController {
     }
 
     /* 이메일 인증 */
+    @Operation(summary = "이메일 인증")
     @GetMapping("/verify-email")
     public ResponseEntity<ApiResponse<Void>> verifyEmail(@RequestParam("token") String token) {
         log.info("이메일 인증 요청: token={}", token);
@@ -45,6 +49,7 @@ public class UserAuthCommandController {
     }
 
     /* 토큰 재발급 */
+    @Operation(summary = "토큰 재발급")
     @PostMapping("/refresh")
     public ResponseEntity<ApiResponse<TokenResponse>> getAccessTokenByRefreshToken(@Valid @RequestBody RefreshTokenRequest request){
         log.info("토큰 재발급 요청: refreshToken={}", request.getRefreshToken());
@@ -54,6 +59,7 @@ public class UserAuthCommandController {
     }
 
     /* 로그아웃 */
+    @Operation(summary = "로그아웃")
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<Void>> logout(@Valid @RequestBody RefreshTokenRequest request){
         log.info("로그아웃 요청: refreshToken={}", request.getRefreshToken());
@@ -71,6 +77,7 @@ public class UserAuthCommandController {
     }
 
     /* 비밀번호 재설정 */
+    @Operation(summary = "비밀번호 재설정")
     @PostMapping("/password/reset")
     public ResponseEntity<ApiResponse<Void>> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
         log.info("비밀번호 재설정 요청: email={}, token={}, password={}", request.getEmail(), request.getToken(), request.getNewPassword());

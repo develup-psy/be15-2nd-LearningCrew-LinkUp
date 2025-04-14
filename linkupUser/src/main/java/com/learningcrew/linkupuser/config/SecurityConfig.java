@@ -12,6 +12,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -40,22 +41,78 @@ public class SecurityConfig {
                                 .authenticationEntryPoint(restAuthenticationEntryPoint)     // 인증 실패
                                 .accessDeniedHandler(restAccessDeniedHandler)          // 인가 실패
                 )
-                // 요청 http method, url 기준으로 인증, 인가 필요 여부 설정
-                .authorizeHttpRequests(auth ->
-                                auth.requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                                .requestMatchers("/api/v1/users/register", "/api/v1/auth/login", "/api/v1/auth/refresh", "/api/v1/auth/verify-email").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/v1/users/**").hasAuthority("USER") //추후에 hasRole로 수정
-                                .requestMatchers(HttpMethod.DELETE, "/api/v1/users/**").hasAuthority("USER")
-                                .requestMatchers(HttpMethod.PUT, "/api/v1/users/**").hasAuthority("USER")
-                                .requestMatchers(HttpMethod.GET, "/api/v1/admin/**").hasAuthority("ADMIN")
-                                .anyRequest().authenticated()
-                )
+                .authorizeHttpRequests(auths -> {
+                    permitAllEndpoints(auths);
+                    userEndpoints(auths);
+                    adminEndpoints(auths);
+                    businessEndpoints(auths);
+
+                    auths.anyRequest().authenticated();
+                })
                 // 커스텀 인증 필터(jwt 토큰 필터)
                 .addFilterBefore(headerAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
         ;
 
         return http.build();
     }
+
+    /* 공통 api */
+    private void permitAllEndpoints(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auths) {
+        auths.requestMatchers(
+                "/swagger-ui/**",
+                "/v3/api-docs/**",
+                "/users/register",
+                "/auth/login",
+                "/auth/password/reset-link",
+                "/auth/password/reset",
+                "/users/recover",
+                "/auth/refresh",
+                "/auth/verify-email"
+        ).permitAll();
+    }
+
+    /* 사용자 접근 api */
+    private void userEndpoints(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auths) {
+        auths.requestMatchers(
+                "/users/me",
+                "/users/me/profile",
+                "/users/me/manner-temperature",
+                "/users/me/posts",
+                "/users/me/comments",
+                "/users/me/meetings/participated",
+                "/users/me/point",
+                "/accounts/**",
+                "/auth/logout",
+                "/users/withdraw"
+        ).hasAuthority("USER");
+
+        auths.requestMatchers(
+                "/friends/**",
+                "/payments/**",
+                "/members/**",
+                "/user/**",
+                "/businesses/me"
+        ).hasAuthority("USER");
+
+        auths.requestMatchers(HttpMethod.POST, "/businesses").hasAuthority("USER");
+    }
+
+    /* 사업자 api */
+    private void businessEndpoints(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auths) {
+        auths.requestMatchers(
+                HttpMethod.PUT, "/businesses"
+        ).hasAuthority("BUSINESS");
+    }
+
+    /* 관리자 api */
+    private void adminEndpoints(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auths) {
+
+        auths.requestMatchers(
+                "/admin/**"
+        ).hasAuthority("ADMIN");
+
+    }
+
 
     @Bean
     public HeaderAuthenticationFilter headerAuthenticationFilter(){

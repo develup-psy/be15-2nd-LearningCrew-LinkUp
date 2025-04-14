@@ -10,6 +10,7 @@ import com.learningcrew.linkupuser.query.service.PaymentQueryService;
 import com.learningcrew.linkupuser.query.service.UserQueryServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -22,9 +23,9 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/users/me")
+@RequestMapping("/users/me")
 @RequiredArgsConstructor
-@Schema(name = "유저 활동 조회", description = "유저의 프로필, 게시글, 댓글, 모임, 포인트, 친구 관련 이력을 조회합니다.")
+@Tag(name = "유저 활동 조회", description = "유저의 프로필, 게시글, 댓글, 모임, 포인트, 친구 관련 이력을 조회합니다.")
 public class UserActivityQueryController {
     private final UserQueryServiceImpl userQueryService;
     private final CommunityQueryService communityQueryService;

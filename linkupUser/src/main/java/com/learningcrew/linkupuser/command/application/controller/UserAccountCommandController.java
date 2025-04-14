@@ -19,10 +19,10 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
-@Tag(name = "User API", description = "회원 관련 API")
+@Tag(name = "내 계정", description = "프로필, 탈퇴, 계정 복구 API")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/users")
+@RequestMapping("/users")
 public class UserAccountCommandController {
 
     private final AccountCommandService userCommandService;
@@ -63,6 +63,7 @@ public class UserAccountCommandController {
 
 
     /* 프로필 수정 */
+    @Operation(summary = "프로필 수정")
     @PutMapping("/me/profile")
     public ResponseEntity<ApiResponse<Void>> updateProfile(@AuthenticationPrincipal String userId, @RequestBody ProfileUpdateRequest request){
         userCommandService.updateProfile(Integer.parseInt(userId), request);

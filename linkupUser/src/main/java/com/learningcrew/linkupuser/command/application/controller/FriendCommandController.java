@@ -3,6 +3,7 @@ package com.learningcrew.linkupuser.command.application.controller;
 import com.learningcrew.linkupuser.command.application.service.FriendCommandService;
 import com.learningcrew.linkupuser.common.dto.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -12,7 +13,8 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/friends")
+@RequestMapping("/friends")
+@Tag(name = "친구 관리", description = "친구 신청, 수락, 삭제")
 public class FriendCommandController {
 
     private final FriendCommandService friendCommandService;
