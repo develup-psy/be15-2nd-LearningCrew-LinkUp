@@ -40,5 +40,5 @@ public class PlaceCommandController {
         placeCommandService.updatePlace(placeId,placeUpdateRequest);
         return ResponseEntity
                 .ok(ApiResponse.success(null));
-    }
+    };
 }

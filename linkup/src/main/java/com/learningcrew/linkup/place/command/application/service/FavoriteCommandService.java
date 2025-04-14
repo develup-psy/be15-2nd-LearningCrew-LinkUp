@@ -5,6 +5,7 @@ import com.learningcrew.linkup.exception.ErrorCode;
 import com.learningcrew.linkup.place.command.application.dto.request.FavoriteCreateRequest;
 import com.learningcrew.linkup.place.command.application.dto.response.FavoriteCommandResponse;
 import com.learningcrew.linkup.place.command.domain.aggregate.entity.Favorite;
+import com.learningcrew.linkup.place.command.domain.aggregate.entity.FavoriteId;
 import com.learningcrew.linkup.place.command.domain.repository.FavoriteRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -34,6 +35,14 @@ public class FavoriteCommandService {
         return FavoriteCommandResponse.builder()
                 .message("장소가 성공적으로 등록되었습니다. ")
                 .build();
+    }
+
+    /*즐겨찾기 삭제*/
+    @Transactional
+    public void deleteFavorite(int memberId, int placeId) {
+        FavoriteId favoriteId = new FavoriteId(memberId, placeId);
+        System.out.println("삭제 시도: memberId = " + memberId + ", placeId = " + placeId);
+        favoriteRepository.deleteById(favoriteId);
     }
 }
 
