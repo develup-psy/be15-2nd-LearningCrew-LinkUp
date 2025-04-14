@@ -175,5 +175,18 @@ public class MeetingCommandController {
         return ResponseEntity.ok().body(ApiResponse.success(response));
     }
 
+    @Operation(
+            summary = "모임 성사",
+            description = "모임 성사 시 차액을 반환해준다."
+    )
+    @PutMapping("/{meetingId}/refund")
+    public ResponseEntity<ApiResponse<MeetingCommandResponse>> completeMeeting(
+            @PathVariable int meetingId
+    ) {
+        meetingCommandService.forceCompleteMeeting(meetingId);
+        return ResponseEntity.ok(ApiResponse.success(new MeetingCommandResponse(meetingId)));
+    }
+
+
 
 }

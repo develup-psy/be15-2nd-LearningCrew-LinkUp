@@ -274,4 +274,43 @@ public class MeetingCommandService {
     }
 
 
+    @Transactional
+    public void forceCompleteMeeting(int meetingId) {
+        Meeting meeting = meetingRepository.findById(meetingId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND));
+
+        int rentalCost = placeQueryService.getPlaceById(meeting.getPlaceId()).getRentalCost();
+        List<MeetingParticipationHistory> participants =
+                participationQueryService.getAcceptedParticipants(meetingId);
+
+        int perPersonCost = rentalCost / participants.size();
+        int prePaid = rentalCost / meeting.getMinUser();
+
+        for (MeetingParticipationHistory p : participants) {
+            if (prePaid > perPersonCost) {
+                int refundAmount = prePaid - perPersonCost;
+
+                User user = userRepository.findById(p.getMemberId())
+                        .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+                user.addPointBalance(refundAmount);
+                userRepository.save(user);
+
+                pointRepository.save(new PointTransaction(
+                        null,
+                        user.getUserId(),
+                        refundAmount,
+                        "REFUND",
+                        null
+                ));
+            }
+
+            // 상태 DONE 처리
+            p.setStatusId(statusQueryService.getStatusId("DONE"));
+        }
+
+        // 모임 상태도 DONE으로 업데이트
+        meeting.setStatusId(statusQueryService.getStatusId("DONE"));
+        meetingRepository.save(meeting);
+    }
+
 }
