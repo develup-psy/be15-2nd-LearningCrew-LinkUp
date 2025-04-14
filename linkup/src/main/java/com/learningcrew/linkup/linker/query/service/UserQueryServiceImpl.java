@@ -8,6 +8,7 @@ import com.learningcrew.linkup.exception.ErrorCode;
 import com.learningcrew.linkup.linker.command.domain.aggregate.User;
 
 import com.learningcrew.linkup.linker.query.dto.query.MemberProfileDto;
+import com.learningcrew.linkup.linker.query.dto.query.MemberProfileDto;
 import com.learningcrew.linkup.linker.query.dto.query.UserMannerTemperatureDto;
 import com.learningcrew.linkup.linker.query.dto.query.UserProfileDto;
 
@@ -61,6 +62,7 @@ public class UserQueryServiceImpl implements UserQueryService {
     public Optional<User> getUserName(Integer userId) {
         return Optional.ofNullable(userMapper.findUserNameByUserId(userId))
                 .orElseThrow(() -> new RuntimeException("사용자 이름을 찾을 수 없습니다."));
+    }
 
     /* 매너 온도 조회 */
     @Override
