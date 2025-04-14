@@ -1,5 +1,6 @@
 package com.learningcrew.linkup.linker.query.service;
 
+import com.learningcrew.linkup.linker.query.dto.query.UserMeetingDto;
 import com.learningcrew.linkup.linker.query.dto.response.FriendRequestResponse;
 import com.learningcrew.linkup.linker.query.dto.response.FriendInfoResponse;
 
@@ -12,5 +13,6 @@ public interface FriendQueryService {
 
     /* 받은 친구 요청 목록 조회 */
     List<FriendRequestResponse> getReceivedRequests(int adresseeId);
-    
+
+    List<UserMeetingDto> findMeetingsCreatedByFriends(int userId);
 }

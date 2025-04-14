@@ -61,6 +61,7 @@ public enum ErrorCode {
     ALREADY_REQUESTED_BY_OTHER(HttpStatus.BAD_REQUEST, "이미 회원을 친구 신청한 회원입니다"),
     IS_NOT_FRIEND(HttpStatus.BAD_REQUEST, "대상이 친구가 아닙니다"),
 
+
     //메일
     SEND_MAIL_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "메일 발송에 실패했습니다."),
     NOT_AUTHORIZED_USER_EMAIL(HttpStatus.BAD_REQUEST, "이메일이 인증되지 않아 회원 가입에 실패했습니다."),
@@ -69,6 +70,9 @@ public enum ErrorCode {
     INVALID_VERIFICATION_TOKEN(HttpStatus.BAD_REQUEST, "이메일 인증코드가 일치하지 않습니다. "),
     INVALID_TOKEN_TYPE(HttpStatus.BAD_REQUEST, "이메일 타입이 일치하지 않습니다."),
 
+    //계좌
+    ACCOUNT_NOT_FOUND(HttpStatus.BAD_REQUEST, "계좌가 존재하지 않습니다."),
+    ALREADY_REGISTED_ACCOUNT(HttpStatus.BAD_REQUEST, "이미 등록된 계좌입니다"),
 
     // 토큰
     REFRESH_TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "refresh 토큰이 존재하지 않습니다."),
@@ -81,7 +85,7 @@ public enum ErrorCode {
     MEETING_PARTICIPATION_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "모임 최대 인원을 초과했습니다."),
     MEETING_ALREADY_JOINED(HttpStatus.BAD_REQUEST, "이미 참여 중인 모임입니다."),
     MEETING_CREATOR_CANNOT_EXIT(HttpStatus.BAD_REQUEST, "모임 생성자는 모임을 나갈 수 없습니다."),
-    INSUFFICIENT_BALANCE(HttpStatus.BAD_REQUEST,"포인트 잔액이 부족합니다."),
+    INVALID_MEETING_DATE_FILTER(HttpStatus.BAD_REQUEST, "모임 날짜는 오늘부터 2주 이내까지만 조회할 수 있습니다."),
 
     // 장소 예약
     RESERVATION_NOT_FOUND(HttpStatus.NOT_FOUND, "예약 정보를 찾을 수 없습니다."),

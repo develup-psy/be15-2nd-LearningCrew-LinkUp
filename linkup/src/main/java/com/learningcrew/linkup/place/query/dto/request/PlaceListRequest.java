@@ -11,6 +11,7 @@ public class PlaceListRequest {
     private Integer sportId;
     private String address;
     private Integer ownerId;
+    private boolean isActive;
 
     public int getOffset(){
         return (page - 1) * size;

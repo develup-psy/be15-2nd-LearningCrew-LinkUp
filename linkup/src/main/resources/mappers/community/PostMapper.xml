@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learningcrew.linkup.community.query.mapper.CommunityMapper">
+    <select id="findPostsByUserId" resultType="UserPostDto">
+        SELECT
+                p.post_id AS postId
+              , p.title
+              , p.content
+              , p.created_at AS createdAt
+              ,
+        -- 좋아요 수
+               (SELECT
+                      COUNT(*)
+                  FROM post_like pl
+                 WHERE pl.post_id = p.post_id) AS likeCount
+              ,
+        -- 댓글 수
+               (SELECT COUNT(*)
+                  FROM community_comment cc
+                 WHERE cc.post_id = p.post_id) AS commentCount
+        FROM community_post p
+        WHERE p.user_id = #{ userId }
+        ORDER BY p.created_at DESC
+    </select>
+</mapper>

@@ -35,7 +35,7 @@ public class Notification implements Serializable {
     // 읽음 상태 (false이면 미확인)
     @Column(name = "is_read", nullable = false)
     @Enumerated(EnumType.STRING)
-    private NotificationReadStatus isRead = NotificationReadStatus.N;
+    private NotificationEnumStatus isRead = NotificationEnumStatus.N;
 
     // 알림 생성 시간 (자동 설정)
     @Column(name = "created_at", nullable = false)
@@ -58,6 +58,6 @@ public class Notification implements Serializable {
     }
 
     public void markAsRead() {
-        this.isRead = NotificationReadStatus.Y;
+        this.isRead = NotificationEnumStatus.Y;
     }
 }
