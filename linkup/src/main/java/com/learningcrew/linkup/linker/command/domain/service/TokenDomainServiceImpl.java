@@ -17,11 +17,11 @@ public class TokenDomainServiceImpl implements TokenDomainService {
     private final RefreshtokenRepository refreshtokenRepository;
 
     public String generateToken(User user) {
-        return jwtTokenProvider.createToken(user.getEmail(), user.getRole().getRoleName());
+        return jwtTokenProvider.createToken(user.getUserId(), user.getRole().getRoleName());
     }
 
     public String generateRefreshToken(User user) {
-        return jwtTokenProvider.createRefreshToken(user.getEmail(), user.getRole().getRoleName());
+        return jwtTokenProvider.createRefreshToken(user.getUserId(), user.getRole().getRoleName());
     }
 
     public void saveRefreshToken(int userId, String email, String refreshToken) {

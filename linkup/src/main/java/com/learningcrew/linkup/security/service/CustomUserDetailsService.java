@@ -1,5 +1,7 @@
 package com.learningcrew.linkup.security.service;
 
+import com.learningcrew.linkup.exception.ErrorCode;
+import com.learningcrew.linkup.exception.security.CustomJwtException;
 import com.learningcrew.linkup.linker.command.domain.aggregate.User;
 import com.learningcrew.linkup.linker.command.domain.repository.UserRepository;
 import com.learningcrew.linkup.security.jwt.CustomUserDetails;
@@ -15,14 +17,15 @@ public class CustomUserDetailsService implements UserDetailsService {
     private final UserRepository userRepository;
 
     @Override
-    public CustomUserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("해당 이메일이 존재하지 않습니다" + email));
+    public CustomUserDetails loadUserByUsername(String stringUserId) throws UsernameNotFoundException {
+        int intUserId = Integer.parseInt(stringUserId);
+        User user = userRepository.findById(intUserId)
+                .orElseThrow(() -> new CustomJwtException(ErrorCode.USER_NOT_FOUND));
 
         return new CustomUserDetails(
                 user.getUserId(),
                 user.getEmail(),
-                user.getPassword(),
+                user.getPassword(), //보안상 암호화된 비밀번호
                 user.getRole().getRoleName()
         );
     }
