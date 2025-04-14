@@ -30,11 +30,13 @@ public class MeetingCommandService {
     private final MeetingRepository meetingRepository;
     private final MeetingParticipationHistoryRepository meetingParticipationHistoryRepository;
     private final MeetingParticipationCommandService meetingParticipationCommandService;
+    private final MeetingStatusService meetingStatusService;
 
     private static final int STATUS_PENDING = 1;
     private static final int STATUS_ACCEPTED = 2;
     private static final int STATUS_REJECTED = 3;
     private static final int STATUS_DELETED = 4;
+    private static final int STATUS_DONE = 5;
 
     private static final int MIN_USER = 1;
     private static final int MAX_USER = 30;
@@ -65,7 +67,7 @@ public class MeetingCommandService {
                 .build();
 
         Meeting saved = meetingRepository.save(meeting);
-        changeStatusByMemberCount(saved); // 혹시 minUser 1이면 status 바로 변경
+        meetingStatusService.changeStatusByMemberCount(saved); // 혹시 minUser 1이면 status 바로 변경
 
         // 개설자 자동 참가 처리
         MeetingParticipationCreateRequest participationRequest = MeetingParticipationCreateRequest.builder()
@@ -105,7 +107,7 @@ public class MeetingCommandService {
 
         meeting.setLeaderId(newLeaderId);
         Meeting saved = meetingRepository.save(meeting);
-        changeStatusByMemberCount(saved);
+        meetingStatusService.changeStatusByMemberCount(saved);
 
         return meetingId;
     }
@@ -152,27 +154,7 @@ public class MeetingCommandService {
         }
     }
 
-    void changeStatusByMemberCount(Meeting meeting) { // 정합성 체크
-        meeting = meetingRepository.findById(meeting.getMeetingId())
-                .orElseThrow(() -> new BusinessException(ErrorCode.MEETING_NOT_FOUND));
 
-        List<MeetingParticipationHistory> meetingParticipationHistories
-                = meetingParticipationHistoryRepository.findAllByMeetingIdAndStatusId(meeting.getMeetingId(), STATUS_ACCEPTED);
-
-        int participantsCount = meetingParticipationHistories.size();
-
-        if (participantsCount < meeting.getMinUser()) {
-            meeting.setStatusId(STATUS_PENDING);
-        }
-        if (participantsCount >= meeting.getMinUser() && participantsCount < meeting.getMaxUser()) {
-            meeting.setStatusId(STATUS_ACCEPTED);
-        }
-        if (participantsCount == meeting.getMaxUser()) {
-            meeting.setStatusId(STATUS_REJECTED);
-        }
-
-        meetingRepository.save(meeting);
-    }
 
     @Scheduled(cron = "0 0 0 * * *") // 자정에 한 번 오늘 모임 목록 캐싱
     public void cacheTodaysMeetings() {

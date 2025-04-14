@@ -31,7 +31,7 @@ public class MeetingParticipationCommandService {
     private final NotificationHelper notificationHelper;
     private final PlaceRepository placeRepository;
     private final MeetingRepository meetingRepository;
-    private final MeetingCommandService meetingCommandService;
+    private final MeetingStatusService meetingStatusService;
 
     private static final int STATUS_PENDING = 1;
     private static final int STATUS_ACCEPTED = 2;
@@ -81,7 +81,7 @@ public class MeetingParticipationCommandService {
         );
 
         participationRepository.save(participation);
-        meetingCommandService.changeStatusByMemberCount(meeting);
+        meetingStatusService.changeStatusByMemberCount(meeting);
 
         return participation.getParticipationId();
     }
@@ -126,7 +126,7 @@ public class MeetingParticipationCommandService {
         );
 
         participationRepository.save(participation);
-        meetingCommandService.changeStatusByMemberCount(meeting);
+        meetingStatusService.changeStatusByMemberCount(meeting);
         return participation.getParticipationId();
     }
 
@@ -185,7 +185,7 @@ public class MeetingParticipationCommandService {
         history.setStatusId(STATUS_DELETED);
         participationRepository.save(history);
 
-        meetingCommandService.changeStatusByMemberCount(meeting);
+        meetingStatusService.changeStatusByMemberCount(meeting);
         return history.getParticipationId();
     }
 
