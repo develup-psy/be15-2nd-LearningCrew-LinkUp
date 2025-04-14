@@ -107,4 +107,13 @@ public class MeetingParticipationQueryService {
                 .participationId(response.getParticipationId())
                 .build();
     }
+
+    @Transactional(readOnly = true)
+    public MeetingParticipationListResponse getUserMeetingHistory(int userId) {
+        List<MeetingParticipationDTO> participations = mapper.selectMeetingParticipationsByUserId(userId);
+
+        return MeetingParticipationListResponse.builder()
+                .meetingParticipations(participations)
+                .build();
+    }
 }
