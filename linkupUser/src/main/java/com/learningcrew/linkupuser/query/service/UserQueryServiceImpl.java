@@ -5,9 +5,7 @@ import com.learningcrew.linkupuser.common.dto.query.RoleDTO;
 import com.learningcrew.linkupuser.common.query.mapper.RoleMapper;
 import com.learningcrew.linkupuser.exception.BusinessException;
 import com.learningcrew.linkupuser.exception.ErrorCode;
-import com.learningcrew.linkupuser.query.dto.query.MemberProfileDto;
-import com.learningcrew.linkupuser.query.dto.query.UserMannerTemperatureDto;
-import com.learningcrew.linkupuser.query.dto.query.UserProfileDto;
+import com.learningcrew.linkupuser.query.dto.query.*;
 import com.learningcrew.linkupuser.query.dto.response.UserListResponse;
 import com.learningcrew.linkupuser.query.dto.response.UserProfileResponse;
 import com.learningcrew.linkupuser.query.mapper.MemberMapper;
@@ -60,5 +58,27 @@ public class UserQueryServiceImpl implements UserQueryService {
         return memberMapper.findUserMannerTemperature(userId).orElseThrow(
                 () -> new BusinessException(ErrorCode.BAD_REQUEST)
         );
+    }
+
+    @Override
+    public UserInfoResponse getUserInfo(int userId) {
+        return userMapper.findUserInfoById(userId);
+    }
+
+    @Override
+    public MeetingMemberDto getMeetingMember(int memberId) {
+        return userMapper.findMeetingMemberById(memberId).orElseThrow(
+                () -> new BusinessException(ErrorCode.BAD_REQUEST)
+        );
+    }
+
+    @Override
+    public Boolean getExistsUser(int userId) {
+        return userMapper.existsByUserId(userId);
+    }
+
+    @Override
+    public Optional<String> getUserEmail(int userId) {
+        return userMapper.findUserEmailByUserId(userId);
     }
 }

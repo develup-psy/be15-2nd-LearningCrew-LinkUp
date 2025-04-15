@@ -1,6 +1,8 @@
 package com.learningcrew.linkup.notification.command.infrastructure;
 
-import com.learningcrew.linkup.linker.command.domain.repository.UserRepository;
+import com.learningcrew.linkup.common.infrastructure.UserFeignClient;
+import com.learningcrew.linkup.exception.BusinessException;
+import com.learningcrew.linkup.exception.ErrorCode;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
@@ -23,15 +25,13 @@ import java.nio.charset.StandardCharsets;
 public class GmailNotificationClientImpl implements GmailNotificationClient {
 
     private final JavaMailSender mailSender;
-
-    private final UserRepository userRepository;
-
+    private final UserFeignClient userFeignClient;
 
     @Override
     public void sendEmailNotification(String userId, String subject, String content) {
-        String to = userRepository.findById(Integer.valueOf(userId))
-                .map(user -> user.getEmail())
-                .orElseThrow(() -> new IllegalArgumentException("해당 사용자 이메일을 찾을 수 없습니다."));
+        String to = userFeignClient.getEmailByUserId(Integer.parseInt(userId)).orElseThrow(
+                () -> new BusinessException(ErrorCode.USER_NOT_FOUND)
+        );
 
         try {
             MimeMessage message = mailSender.createMimeMessage();

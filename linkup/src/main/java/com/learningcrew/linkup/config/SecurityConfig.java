@@ -91,7 +91,6 @@ public class SecurityConfig {
         ).hasAuthority("USER");
 
         auths.requestMatchers(
-                "/meetings/**",
                 "/friends/**",
                 "/posts/**",
                 "/comments/**",
@@ -103,7 +102,6 @@ public class SecurityConfig {
                 "/owner/**",
                 "/members/**",
                 "/user/**",
-                "/meetings/**",
                 "/businesses/me",
                 "/objections/review/{reivewId}",
                 "/objections/post/{postId}",
@@ -184,19 +182,19 @@ public class SecurityConfig {
                 "/meetings",
                 "/meetings/user/{userId}",
                 "/meetings/user/{userId}/done",
-                "/my-meetings/{meetingId}/participation",
+                "/meetings/{meetingId}/participation",
                 "/posts",
                 "/posts/{postId}",
                 "/posts/{postId}/delete",
                 "/postComment",
                 "/postComment/{postCommentId}"
-        ).hasAnyRole("USER", "ADMIN");
+        ).hasAuthority("ADMIN");
 
         //사업자 OR 관리자
         auths.requestMatchers(
                 "/owner/{ownerId}/reserve",
                 "/owner/{ownerId}/reserve"
-        ).hasAnyRole("BUSINESS", "ADMIN");
+        ).hasAuthority("ADMIN");
 
         //사업자 OR ADMIN
 

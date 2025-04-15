@@ -85,9 +85,6 @@ public enum ErrorCode {
     MEETING_PARTICIPATION_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "모임 최대 인원을 초과했습니다."),
     MEETING_ALREADY_JOINED(HttpStatus.BAD_REQUEST, "이미 참여 중인 모임입니다."),
     MEETING_CREATOR_CANNOT_EXIT(HttpStatus.BAD_REQUEST, "모임 생성자는 모임을 나갈 수 없습니다."),
-    INVALID_MEETING_DATE_FILTER(HttpStatus.BAD_REQUEST, "모임 날짜는 오늘부터 2주 이내까지만 조회할 수 있습니다."),
-    INSUFFICIENT_BALANCE(HttpStatus.BAD_REQUEST,"포인트 잔액이 부족합니다."),
-
 
     // 장소 예약
     RESERVATION_NOT_FOUND(HttpStatus.NOT_FOUND, "예약 정보를 찾을 수 없습니다."),
@@ -138,7 +135,14 @@ public enum ErrorCode {
     REVIEW_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "이미 후기를 작성하셨습니다."),
     UNAUTHORIZED_REVIEW_EDIT(HttpStatus.FORBIDDEN, "해당 후기를 수정할 수 없습니다."),
     INVALID_REVIEW_SCORE(HttpStatus.BAD_REQUEST, "유효하지 않은 평점입니다."),
-    REVIEW_NOT_ALLOWED(HttpStatus.BAD_REQUEST,"참여하지 않은 장소는 리뷰가 불가능합니다.");
+
+    // 서버 통신
+    // 통신 / 서버 간 에러
+    SERVICE_UNAVAILABLE(HttpStatus.SERVICE_UNAVAILABLE,  "요청한 서비스를 사용할 수 없습니다."),
+    GATEWAY_TIMEOUT(HttpStatus.GATEWAY_TIMEOUT, "게이트웨이 요청 시간이 초과되었습니다."),
+    BAD_GATEWAY(HttpStatus.BAD_GATEWAY,  "게이트웨이가 잘못된 응답을 수신했습니다."),
+    REMOTE_CALL_FAILED(HttpStatus.INTERNAL_SERVER_ERROR,  "외부 서비스 호출에 실패했습니다.");
+
 
 
     private final HttpStatus status;

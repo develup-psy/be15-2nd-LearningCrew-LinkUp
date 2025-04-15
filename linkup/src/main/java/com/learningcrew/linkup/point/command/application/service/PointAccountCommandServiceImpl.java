@@ -1,15 +1,14 @@
 package com.learningcrew.linkup.point.command.application.service;
 
 import com.learningcrew.linkup.common.domain.Status;
+import com.learningcrew.linkup.common.repository.StatusRepository;
 import com.learningcrew.linkup.exception.BusinessException;
 import com.learningcrew.linkup.exception.ErrorCode;
-import com.learningcrew.linkup.linker.command.domain.constants.LinkerStatusType;
-import com.learningcrew.linkup.linker.command.domain.repository.StatusRepository;
 import com.learningcrew.linkup.point.command.application.dto.request.AccountRequest;
 import com.learningcrew.linkup.point.command.domain.aggregate.Account;
+import com.learningcrew.linkup.point.command.domain.constants.AccountStatusType;
 import com.learningcrew.linkup.point.command.domain.repository.AccountRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,7 +27,7 @@ public class PointAccountCommandServiceImpl implements PointAccountCommandServic
         }
 
         // 상태 설정
-        Status status = statusRepository.findByStatusType(LinkerStatusType.PENDING.name()).orElseThrow(
+        Status status = statusRepository.findByStatusType(AccountStatusType.PENDING.name()).orElseThrow(
                 () -> new BusinessException(ErrorCode.INVALID_STATUS)
         );
 

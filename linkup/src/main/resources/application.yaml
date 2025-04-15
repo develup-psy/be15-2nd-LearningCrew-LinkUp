@@ -39,7 +39,7 @@ mybatis:
     mybatis.configuration.auto-mapping-behavior: NONE
   mapper-locations: classpath:/mappers/**/*.xml
   type-aliases-package: >
-    com.learningcrew.linkup.linker.query.dto,
+    com.learningcrew.linkup.common.dto.query,
     com.learningcrew.linkup.community.query.dto,
     com.learningcrew.linkup.meeting.query.dto,
     com.learningcrew.linkup.notification.query.dto,
