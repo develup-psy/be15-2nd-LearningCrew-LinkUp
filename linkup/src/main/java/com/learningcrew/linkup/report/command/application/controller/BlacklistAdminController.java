@@ -12,7 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/blacklist")
+@RequestMapping("/blacklist")
 @RequiredArgsConstructor
 @Tag(name = "블랙리스트 관리", description = "관리자의 블랙리스트 관리 API")
 public class BlacklistAdminController {

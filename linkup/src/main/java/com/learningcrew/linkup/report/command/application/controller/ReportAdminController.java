@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/report")
+@RequestMapping("/report")
 @RequiredArgsConstructor
 @Tag(name = "신고 관리", description = "관리자의 사용자 신고 관리 API")
 public class ReportAdminController {

@@ -1,7 +1,6 @@
 package com.learningcrew.linkup.config;
 
-import com.learningcrew.linkup.security.jwt.JwtAuthenticationFilter;
-import com.learningcrew.linkup.security.jwt.JwtTokenProvider;
+import com.learningcrew.linkup.security.filter.HeaderAuthenticationFilter;
 import com.learningcrew.linkup.security.handler.RestAccessDeniedHandler;
 import com.learningcrew.linkup.security.handler.RestAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +13,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -25,8 +23,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableMethodSecurity //컨트롤 메서드 제어 가능하도록 활성화
 @EnableWebSecurity
 public class SecurityConfig {
-    private final JwtTokenProvider jwtTokenProvider;
-    private final UserDetailsService userDetailsService;
     private final RestAccessDeniedHandler restAccessDeniedHandler;
     private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
 
@@ -53,15 +49,15 @@ public class SecurityConfig {
                     auths.anyRequest().authenticated();
                 })
                 // 커스텀 인증 필터(jwt 토큰 필터)
-                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(headerAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
         ;
 
         return http.build();
     }
 
     @Bean
-    public JwtAuthenticationFilter jwtAuthenticationFilter(){
-        return new JwtAuthenticationFilter(jwtTokenProvider, userDetailsService);
+    public HeaderAuthenticationFilter headerAuthenticationFilter(){
+        return new HeaderAuthenticationFilter();
     }
 
     /* 공통 api */
@@ -69,84 +65,141 @@ public class SecurityConfig {
         auths.requestMatchers(
                 "/swagger-ui/**",
                 "/v3/api-docs/**",
-                "/api/v1/users/register",
-                "/api/v1/auth/login",
-                "/api/v1/auth/password/reset-link",
-                "/api/v1/auth/password/reset",
-                "/api/v1/users/recover",
-                "/api/v1/auth/refresh",
-                "/api/v1/auth/verify-email"
+                "/users/register",
+                "/auth/login",
+                "/auth/password/reset-link",
+                "/auth/password/reset",
+                "/users/recover",
+                "/auth/refresh",
+                "/auth/verify-email"
         ).permitAll();
     }
 
     /* 사용자 접근 api */
     private void userEndpoints(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auths) {
         auths.requestMatchers(
-                "/api/v1/users/me",
-                "/api/v1/users/me/profile",
-                "/api/v1/users/me/manner-temperature",
-                "/api/v1/users/me/posts",
-                "/api/v1/users/me/comments",
-                "/api/v1/users/me/meetings/participated",
-                "/api/v1/users/me/point",
-                "/api/v1/accounts/**",
-                "/api/v1/auth/logout",
-                "/api/v1/users/withdraw"
+                "/users/me",
+                "/users/me/profile",
+                "/users/me/manner-temperature",
+                "/users/me/posts",
+                "/users/me/comments",
+                "/users/me/meetings/participated",
+                "/users/me/point",
+                "/accounts/**",
+                "/auth/logout",
+                "/users/withdraw"
         ).hasAuthority("USER");
 
         auths.requestMatchers(
-                "/api/v1/meetings/**",
-                "/api/v1/friends/**",
-                "/api/v1/posts/**",
-                "/api/v1/comments/**",
-                "/api/v1/postComment/**",
-                "/api/v1/payments/**",
-                "/api/v1/settlements/**",
-                "/api/v1/place/**",
-                "/api/v1/places/**",
-                "/api/v1/owner/**",
-                "/api/v1/owner/**",
-                "/api/v1/members/**",
-                "/api/v1/user/**",
-                "/api/v1/meetings/**",
-                "/api/v1/businesses/me"
+                "/meetings/**",
+                "/friends/**",
+                "/posts/**",
+                "/comments/**",
+                "/postComment/**",
+                "/payments/**",
+                "/place/**",
+                "/places/**",
+                "/owner/**",
+                "/owner/**",
+                "/members/**",
+                "/user/**",
+                "/meetings/**",
+                "/businesses/me",
+                "/objections/review/{reivewId}",
+                "/objections/post/{postId}",
+                "/objections/comment/{commentId}"
         ).hasAuthority("USER");
 
-        auths.requestMatchers(HttpMethod.POST, "/api/v1/businesses").hasAuthority("USER");
+        auths.requestMatchers(HttpMethod.POST, "/businesses").hasAuthority("USER");
     }
 
     /* 사업자 api */
     private void businessEndpoints(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auths) {
         auths.requestMatchers(
-                HttpMethod.PUT, "/api/v1/businesses"
+                HttpMethod.PUT, "/businesses"
+        ).hasAuthority("BUSINESS");
+
+        auths.requestMatchers(
+            "/settlements/**",
+            "/place",
+            "/place/:id",
+            "/place/:id/times",
+            "/place/:id/images",
+                "/owner/{ownerId}/places"
         ).hasAuthority("BUSINESS");
     }
 
     /* 관리자 api */
     private void adminEndpoints(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auths) {
         auths.requestMatchers(
-                "/api/v1/report/**",
-                "/api/v1/report/**",
-                "/api/v1/penalty/**",
-                "/api/v1/objections/**",
-                "/api/v1/objections/**",
-                "/api/v1/blacklist/**"
+            "/report",
+            "/report/reportType/{reportTypeId}",
+            "/report/reporter-user",
+            "/report/reportee-user",
+            "/report/reporter-user/{reportedId}",
+            "/report/reportee-user/{reporteeId}",
+            "/report/{reportId}/rejected",
+            "/report/{reportId}/accepted",
+            "/penalty",
+            "/penalty/{penaltyType}",
+            "/penalty/user/{memberId}",
+            "/penalty/user/{memberId}/{penaltyType}",
+            "/penalty/post/{postId}",
+            "/penalty/comment/{commentId}",
+            "/penalty/placeReview/{reviewId}",
+            "/penalty/placerRview/{reviewId}/done",
+            "/penalty/{penaltyId}",
+            "/objections",
+            "/objections/status/{statusId}",
+            "/objections/user/{memberId}",
+            "/objections/{objectionId}/accept",
+            "/objections/{objectionId}/reject",
+            "/blacklist",
+            "/blacklist/{memberId}",
+            "/blacklist/{memberId}/clear",
+            "/posts/list",
+            "/post/user/{userId}",
+            "/admin/users",
+            "/admin/businesses/pending",
+            "/admin/businesses/{businessId}/approve",
+            "/admin/businesses/{businessId}/reject",
+            "/meetings/list",
+            "/meetings/review",
+            "/meetings/review/reviewer/{memberId}",
+            "/meetings/review/reviewee/{memberId}",
+            "/admin/places"
         ).hasAuthority("ADMIN");
 
         auths.requestMatchers(
-                "/api/v1/admin/**"
+                "/admin/**"
         ).hasAuthority("ADMIN");
 
     }
 
-    /* 인증만 필요 api */
+    /* 다중 권한 api */
     private void sharedAuthEndpoints(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auths) {
+        //회원 OR 관리자
         auths.requestMatchers(
-                "api/v1/report/**",
-                "api/v1/penalty/**",
-                "api/v1/objections/**",
-                "api/v1/blacklist/**"
-        ).authenticated();
+                "/meetings",
+                "/meetings",
+                "/meetings/user/{userId}",
+                "/meetings/user/{userId}/done",
+                "/my-meetings/{meetingId}/participation",
+                "/posts",
+                "/posts/{postId}",
+                "/posts/{postId}/delete",
+                "/postComment",
+                "/postComment/{postCommentId}"
+        ).hasAnyRole("USER", "ADMIN");
+
+        //사업자 OR 관리자
+        auths.requestMatchers(
+                "/owner/{ownerId}/reserve",
+                "/owner/{ownerId}/reserve"
+        ).hasAnyRole("BUSINESS", "ADMIN");
+
+        //사업자 OR ADMIN
+
     }
 
 

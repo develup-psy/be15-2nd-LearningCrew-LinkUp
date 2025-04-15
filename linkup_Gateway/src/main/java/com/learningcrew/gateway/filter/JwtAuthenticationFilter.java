@@ -16,9 +16,6 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
 
     private final GatewayJwtTokenProvider jwtTokenProvider;
 
-    /* Reactive Gateway 에서는 WebFlux 기술이 사용 된다.
-    비동기/논블로킹 특징으로 대규모 어플리케이션에서 성능적인 부분이 좋다.
-    */
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
 
@@ -41,10 +38,8 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
                 .header("X-User-Role", role)
                 .build();
 
-        // 변경 된 요청 객체를 포함하는 새로운 ServerWebExchange를 생성한다.
         ServerWebExchange mutatedExchange = exchange.mutate().request(mutateRequest).build();
 
-        // 다음 필터로 요청 전달한다.
         return chain.filter(mutatedExchange);
     }
 

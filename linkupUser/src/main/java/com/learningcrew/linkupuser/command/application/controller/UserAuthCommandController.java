@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -44,7 +45,7 @@ public class UserAuthCommandController {
         log.info("이메일 인증 성공");
         // 리다이렉트 주소를 헤더로 반환
         return ResponseEntity.status(HttpStatus.FOUND) // 302
-                .header("Location", "http://localhost:8080/api/v1/register/success")
+                .header("Location", "http://localhost:8000/api/v1/user-service/register/success")
                 .build();
     }
 

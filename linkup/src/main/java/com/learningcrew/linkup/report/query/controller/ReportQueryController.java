@@ -17,7 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/report")
+@RequestMapping("/report")
 @RequiredArgsConstructor
 @Tag(name = "신고 조회", description = "관리자 전용 신고 조회 API")
 public class ReportQueryController {

@@ -13,6 +13,7 @@ import com.learningcrew.linkupuser.command.domain.repository.UserRepository;
 import com.learningcrew.linkupuser.command.domain.service.MemberDomainServiceImpl;
 import com.learningcrew.linkupuser.command.domain.service.UserDomainServiceImpl;
 import com.learningcrew.linkupuser.command.domain.service.UserValidatorServiceImpl;
+import com.learningcrew.linkupuser.common.domain.Status;
 import com.learningcrew.linkupuser.exception.BusinessException;
 import com.learningcrew.linkupuser.exception.ErrorCode;
 import jakarta.validation.Valid;
@@ -20,6 +21,8 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 
 @Service
@@ -37,12 +40,23 @@ public class AccountCommandServiceImpl implements AccountCommandService {
     /* 유저 생성 - 회원 가입 */
     @Transactional
     public RegisterResponse registerUser(@Valid UserCreateRequest request) {
+
+        Optional<User> existingUser = userRepository.findByEmail(request.getEmail());
+
+        if (existingUser.isPresent()) {
+            Status currentStatus = existingUser.get().getStatus();
+            if (currentStatus.getStatusType().equals(LinkerStatusType.ACCEPTED.name())) {
+                throw new BusinessException(ErrorCode.DUPLICATE_EMAIL);
+            }
+
+            if (currentStatus.getStatusType().equals(LinkerStatusType.PENDING.name())) {
+                throw new BusinessException(ErrorCode.BEREADY_USER);
+            }
+        }
+
+
         User user = modelMapper.map(request, User.class);
 
-        // 회원신청 상태 체크
-        if(user.getStatus().getStatusType().equals(LinkerStatusType.PENDING.name())){
-            throw new BusinessException(ErrorCode.BEREADY_USER);
-        }
 
         // 중복 체크
         userValidatorService.validateDuplicateEmail(request.getEmail());

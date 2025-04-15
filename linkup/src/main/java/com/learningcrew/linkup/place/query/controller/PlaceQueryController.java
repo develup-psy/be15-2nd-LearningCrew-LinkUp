@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("")
 @RequiredArgsConstructor
 @Tag(name = "장소 조회", description = "등록된 장소 조회 API")
 public class PlaceQueryController {

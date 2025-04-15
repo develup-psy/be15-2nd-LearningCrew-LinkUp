@@ -12,7 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/penalty")
+@RequestMapping("/penalty")
 @RequiredArgsConstructor
 @Tag(name = "사용자 제재 조회", description = "관리자 전용 사용자 제재 내역 조회 API")
 public class PenaltyQueryController {

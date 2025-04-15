@@ -49,7 +49,6 @@ public class SecurityConfig {
 
                     auths.anyRequest().authenticated();
                 })
-                // 커스텀 인증 필터(jwt 토큰 필터)
                 .addFilterBefore(headerAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
         ;
 
@@ -67,7 +66,8 @@ public class SecurityConfig {
                 "/auth/password/reset",
                 "/users/recover",
                 "/auth/refresh",
-                "/auth/verify-email"
+                "/auth/verify-email",
+                "/register/success"
         ).permitAll();
     }
 

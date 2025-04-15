@@ -1,7 +1,7 @@
 package com.learningcrew.linkup.security.jwt;
 
-import com.learningcrew.linkup.exception.security.CustomJwtException;
 import com.learningcrew.linkup.exception.ErrorCode;
+import com.learningcrew.linkup.exception.security.CustomJwtException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;

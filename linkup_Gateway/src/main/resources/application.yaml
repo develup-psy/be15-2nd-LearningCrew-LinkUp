@@ -13,6 +13,12 @@ spring:
             - Path=/api/v1/user-service/**
           filters:
             - RewritePath=/api/v1/user-service/(?<segment>.*), /$\{segment}
+        - id: LINKUPCOMMON
+          uri: lb://LINKUPCOMMON
+          predicates:
+            - Path=/api/v1/common-service/**
+          filters:
+            - RewritePath=/api/v1/common-service/(?<segment>.*), /$\{segment}
 
 eureka:
   client:

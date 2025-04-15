@@ -28,7 +28,7 @@ public class MeetingQueryController {
             summary = "모임 상세 조회",
             description = "회원이 개설된 모임 목록에서 특정 모임의 상세 정보를 조회한다"
     )
-    @GetMapping("/api/v1/meetings/{meetingId}")
+    @GetMapping("/meetings/{meetingId}")
     public ResponseEntity<ApiResponse<MeetingDTO>> getMeetingDetails(@PathVariable int meetingId) {
         MeetingDTO response = meetingQueryService.getMeeting(meetingId);
         return ResponseEntity.ok(ApiResponse.success(response));
@@ -38,7 +38,7 @@ public class MeetingQueryController {
             summary = "모임 조회 (목록별, 조건별 조회)",
             description = "회원이 검색 조건을 설정하여 모임 목록을 조회한다."
     )
-    @GetMapping("/api/v1/meetings")
+    @GetMapping("/meetings")
     public ResponseEntity<ApiResponse<MeetingListResponse>> getMeetingsWithPaging(
             @RequestBody MeetingSearchRequest meetingSearchRequest
     ) {
