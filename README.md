@@ -411,7 +411,7 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 📦 LinkUp.src.main
 ├── 📁 java.com.learningcrew.linkup
 │   ├── 📁 common
-│   │   ├── 📁 util ( 논의 )
+│   │   ├── 📁 util
 │   │   ├── 📁 dto
 │   │   └── 📁 service
 │   │   
@@ -431,7 +431,7 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 │   │   │   │   ├── 📁 aggregate
 │   │   │   │   └── 📁 repository
 │   │   │   └── 📁 infrastructure
-│   │   │       └── 📄 ...
+│   │   │       └── 📁 repository
 │   │   │
 │   │   └── 📁 query
 │   │       ├── 📁 controller
@@ -807,7 +807,12 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 ## 11. ⚙️ 시스템 아키텍쳐
 
 > 전체 시스템 구성 다이어그램  
-(예: DB, 서버, 사용자 흐름 등 시각화)
+
+<img src="assets/images/sysetem_architecture.jpg" alt="sysetem_architecture"/>
+
+<br>
+
+<img src="assets/images/gateway.png" alt="gateway" width="500"/>
 
 <br>
 
@@ -830,30 +835,400 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 - 회원가입, 로그인, 계정 찾기, 프로필 등
 </details>
 
+<br>
+
 <details>
 <summary>🎯 포인트 관련</summary>
-- 결제 및 반환 등
+
+- 포인트 충전
+<img src="assets/test_cases/TEST-036.png" alt="TEST-036"/>
 </details>
+
+</details>
+
+<br>
 
 <details>
 <summary>📅 모임</summary>
-- 모임 생성, 참가, 진행, 찜 등
+- 모임 개설
+<img src="assets/test_cases/meeting/create_meeting_TEST-052.png" alt="create_meeting_TEST-052"/>
+- 참가 승인
+<img src="assets/test_cases/meeting/accept_participation_TEST-054.png" alt="accept_participation_TEST-054"/>
+- 참가 거절
+<img src="assets/test_cases/meeting/reject_participation_TEST-055.png" alt="reject_participation_TEST-055"/>
+- 개설자 참가 취소
+<img src="assets/test_cases/meeting/leader_update_TEST-056.png" alt="leader_update_TEST-056"/>
+- 모임 취소
+<img src="assets/test_cases/meeting/cancel_meeting_TEST-057.png" alt="cancel_meeting_TEST-057"/>
+- 참가 신청 성공
+<img src="assets/test_cases/meeting/apply_participation_success_TEST-059.png" alt="apply_participation_success_TEST-059"/>
+- 참가 신청 실패 <!-- 이건 필요 없으면 생략 가능 -->
+<img src="assets/test_cases/meeting/apply_participation_fail_TEST-059.png" alt="apply_participation_fail_TEST-059"/>
+- 모임 참가 취소
+<img src="assets/test_cases/meeting/cancle_participation_TEST-060.png" alt="cancle_participation_TEST-060"/>
+- 모임 찜 등록
+<img src="assets/test_cases/meeting/create_interested_meeting_TEST-062.png" alt=create_interested_meeting_TEST-062"/>
+- 모임 찜 취소
+<img src="assets/test_cases/meeting/delete_interested_meeting_TEST-063.png" alt="delete_interested_meeting_TEST-063"/>
+- 참가자 평가 작성 성공
+<img src="assets/test_cases/meeting/participant_review_success_TEST-067.png" alt="participant_review_success_TEST-067"/>
+- 참가자 평가 작성 실패
+<img src="assets/test_cases/meeting/participant_review_fail_TEST-067.png" alt="participant_review_fail_TEST-067"/>
 </details>
 
-<details>
-<summary>🗣️ 커뮤니티</summary>
-- 후기 게시판, 댓글, 좋아요, 신고 등
-</details>
+<br>
 
 <details>
 <summary>📅 장소 관련</summary>
-- 사업자 - 장소 등록, 관리, 대금 등
-- 회원 - 장소 조회, 예약, 후기 등
+
+
+<details>
+<summary>장소 목록</summary>
+
+- 장소 전체 목록 조회
+
+<img src="assets/test_cases/place/TEST-069.png" alt="TEST-069"/>
+
+<br>
+
+- 사업자 장소 목록 조회
+
+<img src="assets/test_cases/place/Test_70.png" alt="TEST-070"/>
+
+<br>
+
+- 예약 장소 목록 조회
+
+<img src="assets/test_cases/place/TEST-071.png" alt="TEST-071"/>
+
+<br>
+
+- 장소 상세 조회
+
+<img src="assets/test_cases/place/TEST-072.png" alt="TEST-072"/>
+
+<br>
+
+- 운동/지역 별 장소 조회
+
+<img src="assets/test_cases/place/TEST-073.png" alt="TEST-073"/>
+
+<br>
+
+- 장소 즐겨찾기 조회
+
+<img src="assets/test_cases/place/TEST-074.png" alt="TEST-074"/>
+
+<br>
+
+- 장소 즐겨찾기 등록
+
+<img src="assets/test_cases/place/TEST-075.png" alt="TEST-075"/>
+
+<br>
+
+- 장소 즐겨찾기 해제
+
+<img src="assets/test_cases/place/TEST-076.png" alt="TEST-076"/>
+
+</details>
+
+<br>
+
+<details>
+<summary>장소 관리</summary>
+
+- 장소 등록 
+
+<img src="assets/test_cases/place/TEST-077.png" alt="TEST-077"/>
+
+<br>
+
+- 장소 수정
+
+<img src="assets/test_cases/place/TEST-078.png" alt="TEST-078"/>
+
+<br>
+
+- 운영시간 수정
+
+<img src="assets/test_cases/place/TEST-079.png" alt="TEST-079"/>
+
+<br>
+
+- 장소 사진 수정
+
+<img src="assets/test_cases/place/TEST-080.png" alt="TEST-080"/>
+
+</details>
+
+<br>
+
+<details>
+<summary>예약</summary>
+
+- 사업자별 예약 전체 조회
+
+<img src="assets/test_cases/place/TEST-081.png" alt="TEST-081"/>
+
+<br>
+
+- 사업자/상태별 예약 조회
+
+<img src="assets/test_cases/place/TEST-082.png" alt="TEST-082"/>
+
+</details>
+
+<br>
+
+</details>
+
+<br>
+
+<details>
+<summary>🗣️ 커뮤니티</summary>
+
+
+<details>
+<summary>게시글 기능 </summary>
+
+- 게시글 삭제
+
+<img src="assets/test_cases/community/TEST-093.jpg" alt="커뮤니티"/>
+
+<br>
+
+- 게시글 수정
+
+<img src="assets/test_cases/community/TEST-091.jpg" alt="커뮤니티"/>
+
 </details>
 
 <details>
+<summary>댓글 기능</summary>
+
+- 댓글 작성
+
+<img src="assets/test_cases/community/TEST-096.jpg" alt="커뮤니티"/>
+
+<br>
+
+- 댓글 삭제
+
+<img src="assets/test_cases/community/TEST-097.jpg" alt="커뮤니티"/>
+
+</details>
+
+</details>
+
+<br>
+
+<details>
 <summary>🛡️ 관리자 기능</summary>
-- 사용자 등급, 블랙리스트 관리
+
+
+<details>
+<summary>신고 기능</summary>
+
+- 전체 신고 내역 조회
+
+<img src="assets/test_cases/report/Test_124.png" alt="관리자"/>
+
+<br>
+
+- 신고 유형별 내역 조회
+
+<img src="assets/test_cases/report/Test_125.png" alt="관리자"/>
+
+<br>
+
+- 누적 신고 횟수별 신고자 목록 조회
+
+<img src="assets/test_cases/report/Test_126.png" alt="관리자"/>
+
+<br>
+
+- 누적 신고 점수별 피신고자 목록 조회
+
+<img src="assets/test_cases/report/Test_127.png" alt="관리자"/>
+
+<br>
+
+- 신고자별 신고 내역 조회
+
+<img src="assets/test_cases/report/Test_128.png" alt="관리자"/>
+
+<br>
+
+- 피신고자별 신고 내역 조회
+
+<img src="assets/test_cases/report/Test_129.png" alt="관리자"/>
+
+<br>
+
+- 사용자 신고
+
+<img src="assets/test_cases/report/Test_130.png" alt="관리자"/>
+
+<br>
+
+- 게시글 신고
+
+<img src="assets/test_cases/report/Test_131.png" alt="관리자"/>
+
+<br>
+
+- 댓글 신고
+
+<img src="assets/test_cases/report/Test_132.png" alt="관리자"/>
+
+<br>
+
+- 허위 신고 처리
+
+<img src="assets/test_cases/report/Test_133.png" alt="관리자"/>
+
+<br>
+
+- 신고 처리
+
+<img src="assets/test_cases/report/Test_134.png" alt="관리자"/>
+
+</details>
+
+
+<details>
+<summary>사용자 제재 기능 </summary>
+
+- 제재 내역 전체 조회
+
+<img src="assets/test_cases/report/Test_135.png" alt="관리자"/>
+
+<br>
+
+- 종류별 제재 내역 조회
+
+<img src="assets/test_cases/report/Test_136.png" alt="관리자"/>
+
+<br>
+
+- 사용자별 제재 내역 조회
+
+<img src="assets/test_cases/report/Test_137.png" alt="관리자"/>
+
+<br>
+
+- 사용자 및 종류별 제재 내역 조회
+
+<img src="assets/test_cases/report/Test_138.png" alt="관리자"/>
+
+<br>
+
+- 게시글 제재
+
+<img src="assets/test_cases/report/Test_139.png" alt="관리자"/>
+
+<br>
+
+- 댓글 제재
+
+<img src="assets/test_cases/report/Test_140.png" alt="관리자"/>
+
+<br>
+
+- 장소 후기 제재 요청
+
+<img src="assets/test_cases/report/Test_141.png" alt="관리자"/>
+
+<br>
+
+- 장소 후기 제재 확정
+
+<img src="assets/test_cases/report/Test_142.png" alt="관리자"/>
+
+<br>
+
+- 제재 철회
+
+<img src="assets/test_cases/report/Test_143.png" alt="관리자"/>
+
+</details>
+
+
+<details>
+<summary>이의 제기 기능 </summary>
+
+- 이의 제기 전체 내역 조회
+
+<img src="assets/test_cases/report/Test_144.png" alt="관리자"/>
+
+<br>
+
+- 상태별 이의 내역 조회
+
+<img src="assets/test_cases/report/Test_145.png" alt="관리자"/>
+
+<br>
+
+- 사용자별 이의 내역 조회
+
+<img src="assets/test_cases/report/Test_146.png" alt="관리자"/>
+
+<br>
+
+- 장소 후기 이의 신청
+
+<img src="assets/test_cases/report/Test_147.png" alt="관리자"/>
+
+<br>
+
+- 댓글 제재 이의 신청
+
+<img src="assets/test_cases/report/Test_148.png" alt="관리자"/>
+
+<br>
+
+- 댓글 제재 이의 신청
+
+<img src="assets/test_cases/report/Test_149.png" alt="관리자"/>
+
+<br>
+
+- 이의 제기 승인
+
+<img src="assets/test_cases/report/Test_150.png" alt="관리자"/>
+
+<br>
+
+- 이의 제기 거절
+
+<img src="assets/test_cases/report/Test_151.png" alt="관리자"/>
+
+</details>
+
+
+<details>
+<summary>블랙리스트 기능 </summary>
+
+- 블랙리스트 조회
+
+<img src="assets/test_cases/report/Test_152.png" alt="관리자"/>
+
+<br>
+
+- 블랙리스트 등록
+
+<img src="assets/test_cases/report/Test_153.png" alt="관리자"/>
+
+<br>
+
+- 블랙리스트 해제
+
+<img src="assets/test_cases/report/Test_154.png" alt="관리자"/>
+
+
+</details>
+
 </details>
 
 <br>
