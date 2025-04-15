@@ -32,11 +32,11 @@ public class ParticipantReviewCommandService {
     @Transactional
     public long createParticipantReview(ParticipantReviewCreateRequest request, int revieweeId, int reviewerId, int meetingId) {
 
-        // 1. 모임 존재 여부
+        // 1. 모임 존재 여부 (아예 3번과 합쳐서 status 5를 받아와도 될 듯)
         Meeting meeting = meetingRepository.findById(meetingId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEETING_NOT_FOUND));
 
-        // 2. 참가 완료된 사람들만 리뷰 가능 (STATUS_DONE = 5)
+        // 2. 참가 완료된 사람들만 리뷰 가능 (STATUS_DONE = 5) // TODO: 모임 진행 완료 처리할 때 참가자들도 모두 참가 완료 처리
         List<MeetingParticipationHistory> doneParticipants =
                 participationRepository.findByMeetingIdAndStatusId(meetingId, STATUS_DONE);
 
