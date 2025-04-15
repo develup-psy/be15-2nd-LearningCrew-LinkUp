@@ -36,6 +36,13 @@
         AND a.status_id = #{statusId}
     </select>
 
+    <resultMap id="meetingParticipationMap" type="MeetingParticipationDTO">
+        <result column="participation_id" property="participationId"/>
+        <result column="status_id" property="statusId"/>
+        <result column="meeting_id" property="meetingId"/>
+        <result column="member_id" property="memberId"/>
+        <result column="participated_at" property="participatedAt"/>
+    </resultMap>
     <!-- 모임 ID + 회원 ID로 참여 이력 조회 (상태 무관) -->
     <select id="selectHistoryByMeetingIdAndMemberId" resultType="MeetingParticipationDTO">
 

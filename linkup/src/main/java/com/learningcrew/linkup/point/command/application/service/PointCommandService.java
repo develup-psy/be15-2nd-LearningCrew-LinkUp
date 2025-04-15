@@ -40,6 +40,6 @@ public class PointCommandService {
             userRepository.save(user);
         }
 
-        return new PointTransactionResponse("충전이 완료됐습니다", user.getPointBalance());
+        return new PointTransactionResponse("포인트가 적립되었습니다.", user.getPointBalance());
     }
 }

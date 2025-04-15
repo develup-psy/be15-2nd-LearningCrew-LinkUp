@@ -29,6 +29,8 @@ public class MeetingParticipationQueryService {
     private final ModelMapper modelMapper;
     private final MeetingParticipationHistoryRepository meetingParticipationHistoryRepository;
 
+
+
     /* 모임에 속한 참가자 전체 조회 */
     @Transactional(readOnly = true)
     public List<MemberDTO> getParticipantsByMeetingId(int meetingId) {
@@ -116,5 +118,10 @@ public class MeetingParticipationQueryService {
         return MeetingParticipationListResponse.builder()
                 .meetingParticipations(participations)
                 .build();
+    }
+
+    public List<MeetingParticipationHistory> getAcceptedParticipants(int meetingId) {
+        int acceptedStatusId = statusQueryService.getStatusId("ACCEPTED");
+        return meetingParticipationHistoryRepository.findByMeetingIdAndStatusId(meetingId, acceptedStatusId);
     }
 }
