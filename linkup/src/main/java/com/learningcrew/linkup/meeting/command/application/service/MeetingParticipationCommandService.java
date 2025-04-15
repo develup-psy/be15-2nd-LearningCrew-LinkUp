@@ -49,8 +49,12 @@ public class MeetingParticipationCommandService {
         int memberId = request.getMemberId();
 
         // 중복 참가 확인
-        if (participationRepository.existsByMeetingIdAndMemberId(meetingId, memberId)) {
+        if (participationRepository.existsByMeetingIdAndMemberIdAndStatusId(meetingId, memberId, STATUS_ACCEPTED)) {
             throw new BusinessException(ErrorCode.MEETING_ALREADY_JOINED);
+        }
+
+        if (participationRepository.existsByMeetingIdAndMemberIdAndStatusId(meetingId, memberId, STATUS_REJECTED)) {
+            throw new BusinessException(ErrorCode.BAD_REQUEST, "거절된 모임에는 참여할 수 없습니다.");
         }
 
         // 모임 상태 확인
@@ -116,7 +120,9 @@ public class MeetingParticipationCommandService {
             throw new BusinessException(ErrorCode.BAD_REQUEST, "모임 상태가 유효하지 않아 승인할 수 없습니다.");
         }
 
+
         payParticipation(meeting, memberId);
+        participation.setStatusId(STATUS_ACCEPTED);
 
         // 알림 발송
         notificationHelper.sendNotification(

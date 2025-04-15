@@ -171,7 +171,7 @@ public class MeetingCommandService {
             return;
         }
 
-        LocalDateTime now = LocalDateTime.now().withSecond(0).withNano(0);
+        LocalDateTime now = LocalDateTime.now();
 
         List<Meeting> updatedMeetings = new ArrayList<>();
 
