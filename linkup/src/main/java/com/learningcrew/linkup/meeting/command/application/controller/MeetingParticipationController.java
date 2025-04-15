@@ -46,7 +46,7 @@ public class MeetingParticipationController {
 
     @Operation(
             summary = "모임 참가 신청 가능 여부 확인",
-            description = "해당 모임에 참가 신청을 할 수 있는지 (포인트 잔액 기준) 확인한다."
+            description = "해당 모임에 참가 신청을 할 수 있는지 확인한다."
     )
     @GetMapping("/api/v1/meetings/{meetingId}/participation/check")
     public ResponseEntity<ApiResponse<MeetingPaymentResponse>> checkEligibility(

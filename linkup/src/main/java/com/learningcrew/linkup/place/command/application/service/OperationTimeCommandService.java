@@ -37,12 +37,14 @@ public class OperationTimeCommandService {
         }
 
         for (OperationTimeRequest req : operationTimeRequests) {
-            Optional<OperationTime> optionalOpTime = operationTimeRepository.findByPlaceIdAndDayOfWeek(placeId, req.getDayOfWeek());
-            if (optionalOpTime.isPresent()) {
-                OperationTime existingOpTime = optionalOpTime.get();
-                existingOpTime.setStartTime(req.getStartTime());
-                existingOpTime.setEndTime(req.getEndTime());
-                operationTimeRepository.save(existingOpTime);
+            List<OperationTime> opTimes = operationTimeRepository.findByPlaceIdAndDayOfWeek(placeId, req.getDayOfWeek());
+
+            if (!opTimes.isEmpty()) {
+                for (OperationTime existingOpTime : opTimes) {
+                    existingOpTime.setStartTime(req.getStartTime());
+                    existingOpTime.setEndTime(req.getEndTime());
+                    operationTimeRepository.save(existingOpTime);
+                }
             } else {
                 OperationTime opEntity = new OperationTime();
                 opEntity.setPlaceId(placeId);
@@ -57,4 +59,5 @@ public class OperationTimeCommandService {
                 .message("시간 수정 완료")
                 .build();
     }
+
 }

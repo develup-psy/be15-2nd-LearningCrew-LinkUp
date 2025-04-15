@@ -9,6 +9,7 @@ import java.util.Optional;
 
 //@Repository
 public interface OperationTimeRepository extends JpaRepository<OperationTime, Integer> {
-    Optional<OperationTime> findByPlaceIdAndDayOfWeek(int placeId, String dayOfWeek);
+    List<OperationTime> findByPlaceIdAndDayOfWeek(int placeId, String dayOfWeek);
+
 }
 
