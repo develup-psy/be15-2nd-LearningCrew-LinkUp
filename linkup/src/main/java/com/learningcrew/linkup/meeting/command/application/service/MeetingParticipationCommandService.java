@@ -1,11 +1,8 @@
 package com.learningcrew.linkup.meeting.command.application.service;
 
-import com.learningcrew.linkup.common.query.mapper.StatusMapper;
+import com.learningcrew.linkup.common.infrastructure.UserFeignClient;
 import com.learningcrew.linkup.exception.BusinessException;
 import com.learningcrew.linkup.exception.ErrorCode;
-import com.learningcrew.linkup.linker.command.domain.aggregate.User;
-import com.learningcrew.linkup.linker.command.domain.repository.MemberRepository;
-import com.learningcrew.linkup.linker.command.domain.repository.UserRepository;
 import com.learningcrew.linkup.meeting.command.application.dto.request.MeetingParticipationCreateRequest;
 import com.learningcrew.linkup.meeting.command.domain.aggregate.Meeting;
 import com.learningcrew.linkup.meeting.command.domain.aggregate.MeetingParticipationHistory;
@@ -13,13 +10,10 @@ import com.learningcrew.linkup.meeting.command.domain.repository.MeetingParticip
 import com.learningcrew.linkup.meeting.command.infrastructure.repository.JpaMeetingParticipationHistoryRepository;
 import com.learningcrew.linkup.meeting.query.dto.response.MeetingDTO;
 import com.learningcrew.linkup.meeting.query.dto.response.MeetingParticipationDTO;
-import com.learningcrew.linkup.meeting.query.dto.response.MemberDTO;
-import com.learningcrew.linkup.meeting.query.mapper.MeetingParticipationMapper;
 import com.learningcrew.linkup.meeting.query.service.MeetingParticipationQueryService;
 import com.learningcrew.linkup.meeting.query.service.MeetingQueryService;
 import com.learningcrew.linkup.meeting.query.service.StatusQueryService;
 import com.learningcrew.linkup.notification.command.application.helper.MeetingNotificationHelper;
-import com.learningcrew.linkup.notification.command.application.helper.NotificationHelper;
 import com.learningcrew.linkup.notification.command.application.helper.PointNotificationHelper;
 import com.learningcrew.linkup.place.command.domain.aggregate.entity.Place;
 import com.learningcrew.linkup.place.query.service.PlaceQueryService;
@@ -42,20 +36,16 @@ import java.util.List;
 public class MeetingParticipationCommandService {
 
     private final MeetingParticipationHistoryRepository repository;
-    private final MeetingParticipationMapper mapper;
     private final MeetingQueryService meetingQueryService;
     private final ModelMapper modelMapper;
     private final MeetingParticipationQueryService meetingParticipationQueryService;
     private final StatusQueryService statusQueryService;
-//    private final NotificationHelper notificationHelper;
     private final MeetingNotificationHelper meetingNotificationHelper;
     private final PointNotificationHelper pointNotificationHelper;
     private final JpaMeetingParticipationHistoryRepository jpaRepository;
-    private final MemberRepository memberRepository;
-    private final UserRepository userRepository;
-    private StatusMapper statusMapper;
     private final PlaceQueryService placeQueryService;
     private final PointRepository pointRepository;
+    private final UserFeignClient userFeignClient;
 
     @Transactional(readOnly = true)
     public MeetingPaymentResponse checkBalance(int meetingId, int userId) {
@@ -67,16 +57,16 @@ public class MeetingParticipationCommandService {
         int minUser = meeting.getMinUser();
         int costPerUser = rentalCost / minUser;
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        // 3. 사용자 포인트 조회 (Remote via FeignClient)
+        int pointBalance = userFeignClient.getPointBalance(userId);
 
-        boolean hasEnoughPoint = user.getPointBalance() >= costPerUser;
+        boolean hasEnoughPoint = pointBalance >= costPerUser;
 
         String message = hasEnoughPoint
                 ? "참가 신청이 가능합니다."
                 : "포인트 잔액이 부족합니다. 최소 필요 포인트: " + costPerUser;
 
-        return new MeetingPaymentResponse(message, user.getPointBalance());
+        return new MeetingPaymentResponse(message, pointBalance);
     }
 
     /* 모임 참가 신청 */
@@ -196,29 +186,30 @@ public class MeetingParticipationCommandService {
     }
 
     private PointTransactionResponse payParticipation(int meetingId, int memberId) {
+        // 모임 조회
         MeetingDTO meeting = meetingQueryService.getMeeting(meetingId);
         Integer placeId = meeting.getPlaceId();
+
+        int pointBalance = userFeignClient.getPointBalance(memberId);
+
+        // 2. 장소 정보 없을 경우 → 메시지만 반환
         if(placeId == null) {
-            return new PointTransactionResponse("결제할 장소가 없는 모임입니다.",
-                    userRepository.findById(memberId)
-                            .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND))
-                            .getPointBalance());
+            return new PointTransactionResponse("결제할 장소가 없는 모임입니다.", pointBalance);
         }
+
+        // 장소 요금 계산
         Place place = placeQueryService.getPlaceById(placeId);
         int rentalCost = place.getRentalCost();
         int minUser = meeting.getMinUser();
         int amountPerPerson = rentalCost / minUser;
 
-        User user = userRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
-
-        if (user.getPointBalance() < amountPerPerson) {
+        // 4. 사용자 포인트 조회 (Feign)
+        if (pointBalance < amountPerPerson) {
             throw new BusinessException(ErrorCode.INSUFFICIENT_BALANCE, "포인트가 부족합니다.");
         }
 
-
-        user.subtractPointBalance(amountPerPerson);
-        userRepository.save(user);
+        // 사용자 포인트 차감 요청
+        userFeignClient.decreasePoint(memberId, amountPerPerson); // 예외는 fallbackFactory로
 
         PointTransaction transaction = new PointTransaction(
                 null,
@@ -229,15 +220,15 @@ public class MeetingParticipationCommandService {
         );
         pointRepository.save(transaction);
 
-//        /* 모임 신청자 포인트 사용 알림 발송 */
-//        pointNotificationHelper.sendPaymentNotification(
-//                memberId,
-//                meeting.getMeetingTitle(),
-//                amountPerPerson,
-//                user.getPointBalance()
-//        );
+        /* 모임 신청자 포인트 사용 알림 발송 */
+        pointNotificationHelper.sendPaymentNotification(
+                memberId,
+                meeting.getMeetingTitle(),
+                amountPerPerson,
+                pointBalance
+        );
 
-        return new PointTransactionResponse("결제가 완료되었습니다.", user.getPointBalance());
+        return new PointTransactionResponse("결제가 완료되었습니다.", pointBalance);
     }
 
     @Transactional
@@ -321,10 +312,9 @@ public class MeetingParticipationCommandService {
         int minUser = meeting.getMinUser();
         int costPerUser = rentalCost / minUser;
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        int currentPointBalance = userFeignClient.getPointBalance(userId);
 
-        if (user.getPointBalance() < costPerUser) {
+        if (currentPointBalance < costPerUser) {
             throw new BusinessException(ErrorCode.INSUFFICIENT_BALANCE,
                     "포인트 잔액이 부족합니다. 최소 필요 포인트: " + costPerUser);
         }
@@ -351,10 +341,7 @@ public class MeetingParticipationCommandService {
         int refundAmount = place.getRentalCost() / meeting.getMinUser();
 
         // 3. 포인트 환불
-        User user = userRepository.findById(memberId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
-        user.addPointBalance(refundAmount);
-        userRepository.save(user);
+        userFeignClient.increasePoint(memberId, refundAmount);
 
         // 4. 환불 기록
         PointTransaction transaction = new PointTransaction(

@@ -44,9 +44,7 @@ public class UserAuthCommandController {
         userAuthCommandService.verifyEmail(token);
         log.info("이메일 인증 성공");
         // 리다이렉트 주소를 헤더로 반환
-        return ResponseEntity.status(HttpStatus.FOUND) // 302
-                .header("Location", "http://localhost:8000/api/v1/user-service/register/success")
-                .build();
+        return ResponseEntity.ok(ApiResponse.success(null, "이메일 인증에 성공했습니다"));
     }
 
     /* 토큰 재발급 */

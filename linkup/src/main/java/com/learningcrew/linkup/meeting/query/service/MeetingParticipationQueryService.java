@@ -3,6 +3,7 @@ package com.learningcrew.linkup.meeting.query.service;
 import com.learningcrew.linkup.common.infrastructure.MemberQueryClient;
 import com.learningcrew.linkup.exception.BusinessException;
 import com.learningcrew.linkup.exception.ErrorCode;
+import com.learningcrew.linkup.meeting.command.domain.aggregate.MeetingParticipationHistory;
 import com.learningcrew.linkup.meeting.query.dto.response.MeetingParticipationDTO;
 import com.learningcrew.linkup.meeting.query.dto.response.MeetingParticipationResponse;
 import com.learningcrew.linkup.meeting.query.dto.response.MemberDTO;
@@ -83,5 +84,9 @@ public class MeetingParticipationQueryService {
         return MeetingParticipationResponse.builder()
                 .participationId(response.getParticipationId())
                 .build();
+    }
+
+    public List<MeetingParticipationHistory> getAcceptedParticipants(int meetingId) {
+        return null;
     }
 }

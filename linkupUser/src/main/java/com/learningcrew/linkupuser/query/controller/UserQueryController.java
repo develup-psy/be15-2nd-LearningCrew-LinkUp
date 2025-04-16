@@ -44,4 +44,9 @@ public class UserQueryController {
     Optional<String> getEmailByUserId(int userId){
         return userQueryService.getUserEmail(userId);
     }
+
+    @GetMapping("/users/me/{userId}/userName")
+    String getUserNameByUserId(int userId){
+        return null;
+    }
 }

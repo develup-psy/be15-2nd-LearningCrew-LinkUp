@@ -1,14 +1,12 @@
 package com.learningcrew.linkup.meeting.command.application.service;
 
+import com.learningcrew.linkup.common.infrastructure.UserFeignClient;
 import com.learningcrew.linkup.common.query.mapper.SportTypeMapper;
 import com.learningcrew.linkup.exception.BusinessException;
 import com.learningcrew.linkup.exception.ErrorCode;
-import com.learningcrew.linkup.linker.command.domain.aggregate.User;
-import com.learningcrew.linkup.linker.command.domain.repository.UserRepository;
 import com.learningcrew.linkup.meeting.command.application.dto.request.LeaderUpdateRequest;
 import com.learningcrew.linkup.meeting.command.application.dto.request.MeetingCreateRequest;
 import com.learningcrew.linkup.meeting.command.application.dto.request.MeetingParticipationCreateRequest;
-import com.learningcrew.linkup.meeting.command.application.dto.request.MeetingParticipationDeleteRequest;
 import com.learningcrew.linkup.meeting.command.domain.aggregate.Meeting;
 import com.learningcrew.linkup.meeting.command.domain.aggregate.MeetingParticipationHistory;
 import com.learningcrew.linkup.meeting.command.domain.repository.MeetingParticipationHistoryRepository;
@@ -59,10 +57,9 @@ public class MeetingCommandService {
     private final StatusQueryService statusQueryService;
     private final SportTypeMapper sportTypeMapper;
     private final PlaceQueryService placeQueryService;
-    private final UserRepository userRepository;
     private final PointRepository pointRepository;
-    private final MeetingQueryService meetingQueryService;
-    private final JpaMeetingParticipationHistoryRepository jpaMeetingParticipationHistoryRepository;
+
+    private final UserFeignClient userFeignClient;
 
     /* 모임 등록 */
     @Transactional
@@ -199,16 +196,14 @@ public class MeetingCommandService {
         // 장소 대여비 회수 로직 추가
         if (meeting.getPlaceId() != null) {
             Place place = placeQueryService.getPlaceById(meeting.getPlaceId());
-            User owner = userRepository.findById(place.getOwnerId())
-                    .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
+            int ownerId = place.getOwnerId();
             int rentalCost = place.getRentalCost();
-            owner.subtractPointBalance(rentalCost);
-            userRepository.save(owner);
+            userFeignClient.decreasePoint(ownerId,rentalCost);
 
             PointTransaction revokeTransaction = new PointTransaction(
                     null,
-                    owner.getUserId(),
+                    ownerId,
                     -rentalCost,
                     "REFUND",
                     null
@@ -225,15 +220,15 @@ public class MeetingCommandService {
         int rentalCost = place.getRentalCost();
         int costPerUser = rentalCost / minUser;
 
-        User user = userRepository.findById(creatorId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        int currentPointBalance = userFeignClient.getPointBalance(creatorId);
 
-        if (user.getPointBalance() < costPerUser) {
+        if (currentPointBalance< costPerUser) {
             throw new BusinessException(ErrorCode.INSUFFICIENT_BALANCE,
                     "개설자의 포인트가 부족합니다. 최소 필요 포인트: " + costPerUser);
         }
-        user.subtractPointBalance(costPerUser);
-        userRepository.save(user);
+
+        userFeignClient.decreasePoint(creatorId, costPerUser);
+
         PointTransaction transaction = new PointTransaction(
                 null,
                 creatorId,
@@ -242,13 +237,15 @@ public class MeetingCommandService {
                 null // createdAt은 DB default
         );
 
-//        /* 개설자 포인트 사용 알림 발송 */
-//        pointNotificationHelper.sendPaymentNotification(
-//                creatorId,
-//                place.getPlaceName(),
-//                costPerUser,
-//                user.getPointBalance()
-//        );
+        int afterPointBalance = userFeignClient.getPointBalance(creatorId);
+
+        /* 개설자 포인트 사용 알림 발송 */
+        pointNotificationHelper.sendPaymentNotification(
+                creatorId,
+                place.getPlaceName(),
+                costPerUser,
+                afterPointBalance
+        );
 
         pointRepository.save(transaction);
     }
@@ -289,15 +286,12 @@ public class MeetingCommandService {
         for (MeetingParticipationHistory p : participants) {
             if (prePaid > perPersonCost) {
                 int refundAmount = prePaid - perPersonCost;
-
-                User user = userRepository.findById(p.getMemberId())
-                        .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
-                user.addPointBalance(refundAmount);
-                userRepository.save(user);
+                int userId = p.getMemberId();
+                userFeignClient.increasePoint(userId, refundAmount);
 
                 pointRepository.save(new PointTransaction(
                         null,
-                        user.getUserId(),
+                        userId,
                         refundAmount,
                         "REFUND",
                         null
