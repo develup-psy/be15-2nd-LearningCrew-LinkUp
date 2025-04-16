@@ -69,7 +69,6 @@ public class PointCommandService {
                 .accountNumber(account.getAccountNumber())
                 .holderName(account.getHolderName())
                 .status_id(account.getStatus_id())
-                .balance(account.getBalance() + refundAmount)
                 .createdAt(account.getCreatedAt())
                 .build();
         accountRepository.save(account);
@@ -82,7 +81,6 @@ public class PointCommandService {
                 "WITHDRAW",
                 null
         ));
-
         return new PointTransactionResponse("전액 환불 완료", 0);
     }
 

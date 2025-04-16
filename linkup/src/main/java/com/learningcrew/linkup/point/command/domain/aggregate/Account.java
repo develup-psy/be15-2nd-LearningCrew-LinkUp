@@ -31,8 +31,6 @@ public class Account {
 
     private int status_id;
 
-    private int balance;
-
     @CreatedDate
     LocalDateTime createdAt;
 
