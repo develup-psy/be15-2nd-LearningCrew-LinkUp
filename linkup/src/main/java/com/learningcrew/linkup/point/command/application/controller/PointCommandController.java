@@ -1,6 +1,7 @@
 package com.learningcrew.linkup.point.command.application.controller;
 
 import com.learningcrew.linkup.point.command.application.dto.request.PointTransactionRequest;
+import com.learningcrew.linkup.point.command.application.dto.request.WithdrawRequest;
 import com.learningcrew.linkup.point.command.application.dto.response.PointTransactionResponse;
 import com.learningcrew.linkup.point.command.application.service.PointCommandService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,6 +29,14 @@ public class PointCommandController {
             @RequestBody PointTransactionRequest request
     ){
         PointTransactionResponse response = pointCommandService.createPointTransaction(request);
+        return ResponseEntity.ok(response);
+    }
+    @PostMapping("/refund")
+    public ResponseEntity<PointTransactionResponse> refundPointTransaction(
+            @RequestBody WithdrawRequest request
+    )
+    {
+        PointTransactionResponse response = pointCommandService.withdrawPoint(request);
         return ResponseEntity.ok(response);
     }
 }
