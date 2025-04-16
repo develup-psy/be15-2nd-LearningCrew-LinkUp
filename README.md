@@ -831,6 +831,48 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 
 ## 13. 🧪 테스트 케이스 상세
 
+- 예약 생성시 사업자 알림
+
+<img src="assets/test_cases/gif/place_reserve_owner.gif" alt="예약 생성시 사업자 알림" width="700"/>
+
+<br>
+
+- 모임 신청자 발생 시 개설자 알림
+
+<img src="assets/test_cases/gif/meeting_builder_notification.gif" alt="모임 신청자 발생 시 개설자 알림" width="700"/>
+
+<br>
+
+- 모임 참가 신청 승인 및 포인트 지불
+
+<img src="assets/test_cases/gif/meeting_participation_accept.gif" alt="모임 참가 신청 승인 및 포인트 지불" width="700"/>
+
+<br>
+
+- 포인트 부족 상황에서의 모임 개설
+
+<img src="assets/test_cases/gif/point_meeting_fail.gif" alt="포인트 부족 상황에서의 모임 개설" width="700"/>
+
+<br>
+
+- 모임 개설 및 장소 대여비 지불 
+
+<img src="assets/test_cases/gif/meeting_place_point.gif" alt="모임 개설 및 장소 대여비 지불" width="700"/>
+
+<br>
+
+- 모임 취소로 인한 참여자 장소 대여비 반환 및 사업자 장소 예약 대금 반환
+
+<img src="assets/test_cases/gif/meeting_delete_refund.gif" alt="모임 참가 신청 승인 및 포인트 지불" width="700"/>
+
+<br>
+
+- 최대 인원으로 인한 장소 대여비 차액 반환
+
+<img src="assets/test_cases/gif/max_people_point_refund.gif" alt="최대 인원으로 인한 장소 대여비 차액 반환" width="700"/>
+
+<br>
+
 <details>
 <summary>👤 사용자 관련</summary>
 
@@ -869,6 +911,26 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 <details>
 <summary>친구 관리</summary>
 - 설명
+
+</details>
+
+<br>
+
+<details>
+<summary>알림 관리</summary>
+
+- 알림 내역 조회
+
+<img src="assets/test_cases/notification/Test_102.png" alt="알림 관리"/>
+
+<br>
+
+- 알림 확인 표시
+
+<img src="assets/test_cases/notification/Test_103.png" alt="알림 관리"/>
+
+<br>
+
 
 </details>
 
