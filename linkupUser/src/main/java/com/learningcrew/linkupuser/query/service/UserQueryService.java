@@ -23,5 +23,9 @@ public interface UserQueryService {
 
     Boolean getExistsUser(int userId);
 
-    Optional<String> getUserEmail(int userId);
+    String getUserEmail(int userId);
+
+    String getUserNameByUserId(int userId);
+
+    int getPointBalance(int userId);
 }

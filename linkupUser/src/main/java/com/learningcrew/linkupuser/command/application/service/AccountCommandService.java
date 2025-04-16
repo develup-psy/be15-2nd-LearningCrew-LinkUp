@@ -16,6 +16,10 @@ public interface AccountCommandService {
 
     void updateProfile(int userId, ProfileUpdateRequest request);
 
+    void increaseUserPoint(int userId, int amount);
+
+    void decreaseUserPoint(int userId, int amount);
+
     // void verifyEmail(...);
     // void updateProfile(...);
     // void deleteUser(...);

@@ -29,9 +29,7 @@ public class GmailNotificationClientImpl implements GmailNotificationClient {
 
     @Override
     public void sendEmailNotification(String userId, String subject, String content) {
-        String to = userFeignClient.getEmailByUserId(Integer.parseInt(userId)).orElseThrow(
-                () -> new BusinessException(ErrorCode.USER_NOT_FOUND)
-        );
+        String to = userFeignClient.getEmailByUserId(Integer.parseInt(userId));
 
         try {
             MimeMessage message = mailSender.createMimeMessage();

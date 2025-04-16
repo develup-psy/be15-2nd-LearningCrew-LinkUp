@@ -72,4 +72,11 @@ image:
   image-url: ${IMAGE_URL}
   default-profile: ${DEFAULT_PROFILE_IMAGE}
 
+logging:
+  level:
+    com.learningcrew.linkup.common.infrastructure.UserFeignClient: DEBUG
+    feign.Logger: DEBUG
+    feign.Request: DEBUG
+    feign.Response: DEBUG
+
 

@@ -1,5 +1,6 @@
 package com.learningcrew.linkup.common.infrastructure;
 
+import com.learningcrew.linkup.common.dto.ApiResponse;
 import com.learningcrew.linkup.common.dto.query.UserInfoResponse;
 import com.learningcrew.linkup.exception.BusinessException;
 import com.learningcrew.linkup.exception.ErrorCode;
@@ -33,8 +34,9 @@ public class UserFeignFallback implements UserFeignClient {
     }
 
     @Override
-    public void increasePoint(int userId, int amount) {
+    public ApiResponse<Void> increasePoint(int userId, int amount) {
         handleError("increasePoint");
+        return ApiResponse.failure("포인트 증가 실패 (Fallback)");
     }
 
     @Override
@@ -44,8 +46,9 @@ public class UserFeignFallback implements UserFeignClient {
     }
 
     @Override
-    public void decreasePoint(int userId, int amount) {
+    public ApiResponse<Void>  decreasePoint(int userId, int amount) {
         handleError("decreasePoint");
+        return ApiResponse.failure("포인트 감소 실패 (Fallback)");
     }
 
     @Override
@@ -55,9 +58,9 @@ public class UserFeignFallback implements UserFeignClient {
     }
 
     @Override
-    public Optional<String> getEmailByUserId(int userId) {
+    public String getEmailByUserId(int userId) {
         handleError("getEmailByUserId");
-        return Optional.empty();
+        return null;
     }
 
     @Override

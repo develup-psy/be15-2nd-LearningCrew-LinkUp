@@ -31,4 +31,6 @@ public interface UserMapper {
     Boolean existsByUserId(int userId);
 
     Optional<String> findUserEmailByUserId(int userId);
+
+    Optional<String> findUserNameByUserId(int userId);
 }

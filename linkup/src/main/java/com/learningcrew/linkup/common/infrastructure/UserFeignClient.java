@@ -1,5 +1,6 @@
 package com.learningcrew.linkup.common.infrastructure;
 
+import com.learningcrew.linkup.common.dto.ApiResponse;
 import com.learningcrew.linkup.common.dto.query.UserInfoResponse;
 import com.learningcrew.linkup.config.FeignClientConfig;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -10,26 +11,26 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Optional;
 
-@FeignClient(name = "linkupuser", path = "/users", configuration = FeignClientConfig.class, fallbackFactory = UserFeignFallback.class)
+@FeignClient(name = "linkupuser", configuration = FeignClientConfig.class, fallbackFactory = UserFeignFallback.class)
 public interface UserFeignClient {
     @PostMapping("/users/{userId}/point/increase")
-    void increasePoint(@PathVariable("userId") int userId, @RequestParam int amount);
+    ApiResponse<Void> increasePoint(@PathVariable("userId") int userId, @RequestParam int amount);
 
     @GetMapping("/users/me/{userId}")
     UserInfoResponse getUserById(@PathVariable("userId") int userId);
 
     @GetMapping("/users/me/{userId}/email")
-    Optional<String> getEmailByUserId(int userId);
+    String getEmailByUserId(@PathVariable("userId") int userId);
 
     @GetMapping("/users/{userId}/exists")
     Boolean existsUser(@PathVariable("userId") int userId);
 
     @GetMapping("/users/me/{userId}/userName")
-    String getUserNameByUserId(int userId);
+    String getUserNameByUserId(@PathVariable("userId") int userId);
 
     @GetMapping("/me/{userId}/point")
     int getPointBalance(@PathVariable("userId") int userId);
 
     @PostMapping("/users/{userId}/point/decrease")
-    void decreasePoint(@PathVariable int userId, @RequestParam int amount);
+    ApiResponse<Void>  decreasePoint(@PathVariable int userId, @RequestParam int amount);
 }

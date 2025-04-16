@@ -72,13 +72,28 @@ public class UserQueryServiceImpl implements UserQueryService {
         );
     }
 
+
     @Override
     public Boolean getExistsUser(int userId) {
         return userMapper.existsByUserId(userId);
     }
 
     @Override
-    public Optional<String> getUserEmail(int userId) {
-        return userMapper.findUserEmailByUserId(userId);
+    public String getUserEmail(int userId) {
+        return userMapper.findUserEmailByUserId(userId).orElseThrow(() -> new BusinessException(ErrorCode.BAD_REQUEST));
+    }
+
+    @Override
+    public String getUserNameByUserId(int userId) {
+        return userMapper.findUserNameByUserId(userId).orElseThrow(
+                ()->new BusinessException(ErrorCode.BAD_REQUEST)
+        );
+    }
+
+    @Override
+    public int getPointBalance(int userId) {
+        return userMapper.findPointByUserId(userId).orElseThrow(
+                () -> new BusinessException(ErrorCode.BAD_REQUEST)
+        ).getTotalPoints();
     }
 }

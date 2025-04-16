@@ -1,7 +1,6 @@
 server:
   port: 0
 
-
 spring:
   application:
     name: LINKUPUSER
@@ -62,3 +61,10 @@ springdoc:
     path: /v3/api-docs
   swagger-ui:
     path: /swagger-ui.html
+
+logging:
+  level:
+    com.learningcrew.linkupuser.client.UserClient: DEBUG
+    feign.Logger: DEBUG
+    feign.Request: DEBUG
+    feign.Response: DEBUG

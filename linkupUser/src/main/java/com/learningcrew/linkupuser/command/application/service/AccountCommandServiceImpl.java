@@ -182,4 +182,31 @@ public class AccountCommandServiceImpl implements AccountCommandService {
         userRepository.save(user);
     }
 
+    /* 포인트 증가 */
+    @Override
+    @Transactional
+    public void increaseUserPoint(int userId, int amount) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+
+        int current = user.getPointBalance();
+        user.setPointBalance(current + amount);
+        userRepository.save(user);
+//        userRepository.save(user); 트랜잭션이 커밋될 때 자동으로 DB에 반영
+    }
+
+    /* 포인트 감소 */
+    @Override
+    @Transactional
+    public void decreaseUserPoint(int userId, int amount) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+
+        if (user.getPointBalance() < amount) {
+            throw new BusinessException(ErrorCode.INSUFFICIENT_POINT);
+        }
+
+        user.setPointBalance(user.getPointBalance() - amount);
+//        userRepository.save(user); 트랜잭션이 커밋될 때 자동으로 DB에 반영
+    }
 }

@@ -92,4 +92,10 @@
           FROM user
         where user_id = #{userId}
     </select>
+    <select id="findUserNameByUserId" resultType="String">
+        SELECT
+              user_name
+          FROM
+         WHERE user_id = #{ userId }
+    </select>
 </mapper>
