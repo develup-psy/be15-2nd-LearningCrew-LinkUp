@@ -46,9 +46,10 @@
 
 ## 2. 🏆 팀 소개
 
+<br>
+
 |                     곽진웅                     |                   김여진                   |                      박성용                      |                   박준서                   |                   장건희                   |                  최지혜                  |
 | :-----------------------------------------: | :-------------------------------------: | :-------------------------------------------: | :-------------------------------------: | :-------------------------------------: | :-----------------------------------: |
-|                     역할                      |                   역할                    |                      역할                       |                   역할                    |                   역할                    |                  역할                   |
 | [mijuckboon](https://github.com/mijuckboon) | [meowdule](https://github.com/meowdule) | [develop-psy](https://github.com/develup-psy) | [Joonspar](https://github.com/Joonspar) | [jang9465](https://github.com/jang9465) | [jihye25](https://github.com/jihye25) |
 
 
@@ -832,7 +833,47 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 
 <details>
 <summary>👤 사용자 관련</summary>
-- 회원가입, 로그인, 계정 찾기, 프로필 등
+
+<details>
+<summary>계정 관리</summary>
+- 설명
+
+</details>
+
+<br>
+
+<details>
+<summary>프로필</summary>
+- 설명
+
+</details>
+
+<br>
+
+<details>
+<summary>계좌 관리</summary>
+- 설명
+
+</details>
+
+<br>
+
+<details>
+<summary>활동 관리</summary>
+- 설명
+
+</details>
+
+<br>
+
+<details>
+<summary>친구 관리</summary>
+- 설명
+
+</details>
+
+<br>
+
 </details>
 
 <br>
@@ -841,8 +882,16 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 <summary>🎯 포인트 관련</summary>
 
 - 포인트 충전
-<img src="assets/test_cases/TEST-036.png" alt="TEST-036"/>
-</details>
+
+<img src="assets/test_cases/point/TEST-036.png" alt="포인트 충전"/>
+
+<br>
+
+- 잔여 포인트 환불
+
+<img src="assets/test_cases/point/TEST-042.png" alt="포인트 충전"/>
+
+<br>
 
 </details>
 
@@ -850,74 +899,191 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 
 <details>
 <summary>📅 모임</summary>
+
+<details>
+<summary>모임 조회</summary>
+
+- 관리자 모임 내역 조회
+
+<img src="assets/test_cases/meeting/Test_46.png" alt="모임 조회"/>
+
+<br>
+
+- 관리자 모임 내역 조회 (조건별)
+
+<img src="assets/test_cases/meeting/Test_46_1.png" alt="모임 조회"/>
+
+<br>
+
+- 개설 모임 목록 조회
+
+<img src="assets/test_cases/meeting/Test_47.png" alt="모임 조회"/>
+
+<br>
+
+- 개설 모임 조건 검색 조회
+
+<img src="assets/test_cases/meeting/Test_48.png" alt="모임 조회"/>
+
+<br>
+
+- 회원별 참가 모임 조회
+
+<img src="assets/test_cases/meeting/Test_49.png" alt="모임 조회"/>
+
+<br>
+
+- 회원별 모임 내역 조회
+
+<img src="assets/test_cases/meeting/Test_50.png" alt="모임 조회"/>
+
+<br>
+
+- 모임 상세 조회
+
+<img src="assets/test_cases/meeting/Test_51.png" alt="모임 조회"/>
+
+<br>
+
+
+</details>
+
+<br>
+
+<details>
+<summary>모임 개설</summary>
+
 - 모임 개설
 
-<img src="assets/test_cases/meeting/create_meeting_TEST-052.PNG" alt="create_meeting_TEST-052"/>
+<img src="assets/test_cases/meeting/create_meeting_TEST-052.PNG" alt="모임 개설"/>
+
+<br>
+
+- 참가 요청 목록 확인
+<img src="assets/test_cases/meeting/Test_53.png" alt="모임 개설"/>
 
 <br>
 
 - 참가 승인
 
-<img src="assets/test_cases/meeting/accept_participation_TEST-054.PNG" alt="accept_participation_TEST-054"/>
+<img src="assets/test_cases/meeting/accept_participation_TEST-054.PNG" alt="모임 개설"/>
 
 <br>
 
 - 참가 거절
 
-<img src="assets/test_cases/meeting/reject_participation_TEST-055.PNG" alt="reject_participation_TEST-055"/>
+<img src="assets/test_cases/meeting/reject_participation_TEST-055.PNG" alt="모임 개설"/>
 
 <br>
 
 - 개설자 참가 취소
 
-<img src="assets/test_cases/meeting/leader_update_TEST-056.PNG" alt="leader_update_TEST-056"/>
+<img src="assets/test_cases/meeting/leader_update_TEST-056.PNG" alt="모임 개설"/>
 
 <br>
 
 - 모임 취소
 
-<img src="assets/test_cases/meeting/cancel_meeting_TEST-057.PNG" alt="cancel_meeting_TEST-057"/>
+<img src="assets/test_cases/meeting/cancel_meeting_TEST-057.PNG" alt="모임 개설"/>
+
+<br>
+
+</details>
+
+<br>
+
+<details>
+<summary>모임 참가</summary>
+
+- 참가자 목록 조회
+
+<img src="assets/test_cases/meeting/Test_58.png" alt="모임 참가"/>
 
 <br>
 
 - 참가 신청 성공
 
-<img src="assets/test_cases/meeting/apply_participation_success_TEST-059.PNG" alt="apply_participation_success_TEST-059"/>
+<img src="assets/test_cases/meeting/apply_participaiton_success_TEST-059.PNG" alt="모임 참가"/>
 
 <br>
 
-- 참가 신청 실패 <!-- 이건 필요 없으면 생략 가능 -->
+- 참가 신청 실패
 
-<img src="assets/test_cases/meeting/apply_participation_fail_TEST-059.PNG" alt="apply_participation_fail_TEST-059"/>
+<img src="assets/test_cases/meeting/apply_participation_fail_TEST-059.PNG" alt="모임 참가"/>
 
 <br>
 
 - 모임 참가 취소
-<img src="assets/test_cases/meeting/cancle_participation_TEST-060.PNG" alt="cancle_participation_TEST-060"/>
+
+<img src="assets/test_cases/meeting/cancle_participation_TEST-060.PNG" alt="모임 참가"/>
+
+<br>
+
+</details>
+
+<br>
+
+<details>
+<summary>모임 찜</summary>
+
+- 모임 찜 목록 조회
+
+<img src="assets/test_cases/meeting/Test_61.png" alt="모임 찜"/>
 
 <br>
 
 - 모임 찜 등록
 
-<img src="assets/test_cases/meeting/create_interested_meeting_TEST-062.PNG" alt="create_interested_meeting_TEST-062"/>
+<img src="assets/test_cases/meeting/create_interested_meeting_TEST-062.PNG" alt="모임 찜"/>
 
 <br>
 
 - 모임 찜 취소
 
-<img src="assets/test_cases/meeting/delete_interested_meeting_TEST-063.PNG" alt="delete_interested_meeting_TEST-063"/>
+<img src="assets/test_cases/meeting/delete_interested_meeting_TEST-063.PNG" alt="모임 찜"/>
+
+<br>
+
+
+</details>
+
+<br>
+
+<details>
+<summary>후기 및 평가</summary>
+
+- 참가자 평가 내역 조회
+
+<img src="assets/test_cases/meeting/Test_64.png" alt="모임 조회"/>
+
+<br>
+
+- 평가자별 참가자 평가 내역 조회
+
+<img src="assets/test_cases/meeting/Test_65.png" alt="모임 조회"/>
+
+<br>
+
+- 대상자별 참가자 평가 내역 조회
+
+<img src="assets/test_cases/meeting/Test_66.png" alt="모임 조회"/>
 
 <br>
 
 - 참가자 평가 작성 성공
 
-<img src="assets/test_cases/meeting/participant_review_success_TEST-067.PNG" alt="participant_review_success_TEST-067"/>
+<img src="assets/test_cases/meeting/participant_review_success_TEST-067.PNG" alt="모임 조회"/>
 
 <br>
 
 - 참가자 평가 작성 실패
 
-<img src="assets/test_cases/meeting/participant_review_fail_TEST-067.PNG" alt="participant_review_fail_TEST-067"/>
+<img src="assets/test_cases/meeting/participant_review_fail_TEST-067.PNG" alt="모임 조회"/>
+
+</details>
+
+<br>
+
 </details>
 
 <br>
@@ -931,49 +1097,49 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 
 - 장소 전체 목록 조회
 
-<img src="assets/test_cases/place/TEST-069.png" alt="TEST-069"/>
+<img src="assets/test_cases/place/TEST-069.png" alt="장소 목록"/>
 
 <br>
 
 - 사업자 장소 목록 조회
 
-<img src="assets/test_cases/place/Test_70.png" alt="TEST-070"/>
+<img src="assets/test_cases/place/Test_70.png" alt="장소 목록"/>
 
 <br>
 
 - 예약 장소 목록 조회
 
-<img src="assets/test_cases/place/TEST-071.png" alt="TEST-071"/>
+<img src="assets/test_cases/place/TEST-071.png" alt="장소 목록"/>
 
 <br>
 
 - 장소 상세 조회
 
-<img src="assets/test_cases/place/TEST-072.png" alt="TEST-072"/>
+<img src="assets/test_cases/place/TEST-072.png" alt="장소 목록"/>
 
 <br>
 
 - 운동/지역 별 장소 조회
 
-<img src="assets/test_cases/place/TEST-073.png" alt="TEST-073"/>
+<img src="assets/test_cases/place/TEST-073.png" alt="장소 목록"/>
 
 <br>
 
 - 장소 즐겨찾기 조회
 
-<img src="assets/test_cases/place/TEST-074.png" alt="TEST-074"/>
+<img src="assets/test_cases/place/TEST-074.png" alt="장소 목록"/>
 
 <br>
 
 - 장소 즐겨찾기 등록
 
-<img src="assets/test_cases/place/TEST-075.png" alt="TEST-075"/>
+<img src="assets/test_cases/place/TEST-075.png" alt="장소 목록"/>
 
 <br>
 
 - 장소 즐겨찾기 해제
 
-<img src="assets/test_cases/place/TEST-076.png" alt="TEST-076"/>
+<img src="assets/test_cases/place/TEST-076.png" alt="장소 목록"/>
 
 </details>
 
@@ -984,25 +1150,25 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 
 - 장소 등록 
 
-<img src="assets/test_cases/place/TEST-077.png" alt="TEST-077"/>
+<img src="assets/test_cases/place/TEST-077.png" alt="장소 관리"/>
 
 <br>
 
 - 장소 수정
 
-<img src="assets/test_cases/place/TEST-078.png" alt="TEST-078"/>
+<img src="assets/test_cases/place/TEST-078.png" alt="장소 관리"/>
 
 <br>
 
 - 운영시간 수정
 
-<img src="assets/test_cases/place/TEST-079.png" alt="TEST-079"/>
+<img src="assets/test_cases/place/TEST-079.png" alt="장소 관리"/>
 
 <br>
 
 - 장소 사진 수정
 
-<img src="assets/test_cases/place/TEST-080.png" alt="TEST-080"/>
+<img src="assets/test_cases/place/TEST-080.png" alt="장소 관리"/>
 
 </details>
 
@@ -1013,13 +1179,13 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 
 - 사업자별 예약 전체 조회
 
-<img src="assets/test_cases/place/TEST-081.png" alt="TEST-081"/>
+<img src="assets/test_cases/place/TEST-081.png" alt="예약"/>
 
 <br>
 
 - 사업자/상태별 예약 조회
 
-<img src="assets/test_cases/place/TEST-082.png" alt="TEST-082"/>
+<img src="assets/test_cases/place/TEST-082.png" alt="예약"/>
 
 </details>
 
@@ -1036,30 +1202,119 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 <details>
 <summary>게시글 기능 </summary>
 
-- 게시글 삭제
+- 게시글 전체 내역 조회
 
-<img src="assets/test_cases/community/TEST-093.jpg" alt="커뮤니티"/>
+<img src="assets/test_cases/community/Test_83.png" alt="게시글"/>
 
 <br>
 
+- 회원별 게시글 내역 조회
+
+<img src="assets/test_cases/community/Test_84.png" alt="게시글"/>
+
+<br>
+
+- 게시글 목록 조회
+
+<img src="assets/test_cases/community/Test_85.png" alt="게시글"/>
+
+<br>
+
+- 게시글 검색
+
+<img src="assets/test_cases/community/Test_86.png" alt="게시글"/>
+
+<br>
+
+- 게시글 상세 조회
+
+<img src="assets/test_cases/community/Test_87.png" alt="게시글"/>
+
+<br>
+
+- 공지사항 등록
+
+<img src="assets/test_cases/community/Test_88.png" alt="게시글"/>
+
+<br>
+
+
+- 게시글 작성
+
+<img src="assets/test_cases/community/TEST-089.png" alt="게시글"/>
+
+<br>
+
+
 - 게시글 수정
 
-<img src="assets/test_cases/community/TEST-091.jpg" alt="커뮤니티"/>
+<img src="assets/test_cases/community/TEST-091.jpg" alt="게시글"/>
+
+<br>
+
+- 게시글 삭제
+
+<img src="assets/test_cases/community/TEST-093.jpg" alt="게시글"/>
+
+<br>
 
 </details>
+
+<br>
 
 <details>
 <summary>댓글 기능</summary>
 
+- 댓글 전체 내역 조회
+
+<img src="assets/test_cases/community/TEST-094.png" alt="댓글"/>
+
+<br>
+
+- 회원 별 댓글 내역 조회
+
+<img src="assets/test_cases/community/TEST-095.png" alt="댓글"/>
+
+<br>
+
 - 댓글 작성
 
-<img src="assets/test_cases/community/TEST-096.jpg" alt="커뮤니티"/>
+<img src="assets/test_cases/community/TEST-096.jpg" alt="댓글"/>
 
 <br>
 
 - 댓글 삭제
 
-<img src="assets/test_cases/community/TEST-097.jpg" alt="커뮤니티"/>
+<img src="assets/test_cases/community/TEST-097.jpg" alt="댓글"/>
+
+</details>
+
+<br>
+
+<details>
+<summary>좋아요 기능</summary>
+
+- 게시글 좋아요
+
+<img src="assets/test_cases/community/TEST-098.png" alt="좋아요"/>
+
+<br>
+
+- 게시글 좋아요 취소
+
+<img src="assets/test_cases/community/TEST-099.png" alt="좋아요"/>
+
+<br>
+
+- 댓글 좋아요
+
+<img src="assets/test_cases/community/TEST-100.png" alt="좋아요"/>
+
+<br>
+
+- 댓글 좋아요 취소
+
+<img src="assets/test_cases/community/TEST-101.png" alt="좋아요"/>
 
 </details>
 
@@ -1198,6 +1453,8 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 
 </details>
 
+<br>
+
 
 <details>
 <summary>이의 제기 기능 </summary>
@@ -1249,6 +1506,8 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 <img src="assets/test_cases/report/Test_151.png" alt="관리자"/>
 
 </details>
+
+<br>
 
 
 <details>
