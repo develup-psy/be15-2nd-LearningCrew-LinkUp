@@ -1,7 +1,6 @@
 package com.learningcrew.linkup.meeting.command.application.controller;
 
 import com.learningcrew.linkup.common.dto.ApiResponse;
-import com.learningcrew.linkup.common.query.mapper.StatusMapper;
 import com.learningcrew.linkup.exception.BusinessException;
 import com.learningcrew.linkup.exception.ErrorCode;
 import com.learningcrew.linkup.meeting.command.application.dto.request.MeetingParticipationCreateRequest;
@@ -26,10 +25,11 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "모임 참가 관리", description = "모임 참가 신청 및 취소 API")
 public class MeetingParticipationController {
 
+    private static final int STATUS_ACCEPTED = 2;
+
     private final MeetingParticipationCommandService participationService;
     private final MeetingRepository meetingRepository;
     private final MeetingParticipationHistoryRepository participationRepository;
-    private final StatusMapper statusMapper;
 
     @Operation(summary = "모임 참가 신청 가능 여부 확인", description = "포인트 기준 참가 가능 여부 확인")
     @GetMapping("/{meetingId}/participation/check")
@@ -75,10 +75,7 @@ public class MeetingParticipationController {
             @PathVariable int memberId
     ) {
         // 참여 이력 조회 (ACCEPTED일 때만 참가 중인 경우에 해당)
-        int acceptedStatusId = statusMapper.statusByStatusType("ACCEPTED")
-                .orElseThrow(IllegalArgumentException::new)
-                .getStatusId();
-        MeetingParticipationHistory participation = participationRepository.findByMeetingIdAndMemberIdAndStatusId(meetingId, memberId, acceptedStatusId)
+        MeetingParticipationHistory participation = participationRepository.findByMeetingIdAndMemberIdAndStatusId(meetingId, memberId, STATUS_ACCEPTED)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "참여 정보를 찾을 수 없습니다."));
 
         // soft delete 수행

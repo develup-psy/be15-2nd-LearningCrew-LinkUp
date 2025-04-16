@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -36,7 +37,7 @@ public class ParticipantReviewCommandService {
         Meeting meeting = meetingRepository.findById(meetingId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEETING_NOT_FOUND));
 
-        // 2. 참가 완료된 사람들만 리뷰 가능 (STATUS_DONE = 5) // TODO: 모임 진행 완료 처리할 때 참가자들도 모두 참가 완료 처리
+        // 2. 참가 완료된 사람들만 리뷰 가능 (STATUS_DONE = 5)
         List<MeetingParticipationHistory> doneParticipants =
                 participationRepository.findByMeetingIdAndStatusId(meetingId, STATUS_DONE);
 
@@ -88,4 +89,5 @@ public class ParticipantReviewCommandService {
 
         return reviewRepository.save(review).getReviewId();
     }
+
 }
