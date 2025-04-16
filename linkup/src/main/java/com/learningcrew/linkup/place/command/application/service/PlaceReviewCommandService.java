@@ -22,7 +22,7 @@ public class PlaceReviewCommandService {
 
     public PlaceReviewResponse createReview(PlaceReviewCreateRequest request) {
         MeetingParticipationHistory history = meetingParticipationHistoryRepository
-                .findByMemberIdAndMeetingIdAndStatusId(request.getMemberId(), request.getMeetingId(), 2)
+                .findByMemberIdAndMeetingIdAndStatusId(request.getMemberId(), request.getMeetingId(), 5)
                 .orElseThrow(() -> new BusinessException(ErrorCode.REVIEW_NOT_ALLOWED));
 
         Meeting meeting = meetingRepository.findById(request.getMeetingId())

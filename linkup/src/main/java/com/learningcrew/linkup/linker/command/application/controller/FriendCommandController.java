@@ -4,6 +4,7 @@ import com.learningcrew.linkup.common.dto.ApiResponse;
 import com.learningcrew.linkup.linker.command.application.service.FriendCommandService;
 import com.learningcrew.linkup.security.jwt.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/friends")
+@Tag(name="친구 관리",description = "친구 요청 수락 및 삭제 API")
 public class FriendCommandController {
 
     private final FriendCommandService friendCommandService;

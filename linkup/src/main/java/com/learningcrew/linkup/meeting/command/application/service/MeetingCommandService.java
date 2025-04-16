@@ -242,13 +242,13 @@ public class MeetingCommandService {
                 null // createdAt은 DB default
         );
 
-        /* 개설자 포인트 사용 알림 발송 */
-        pointNotificationHelper.sendPaymentNotification(
-                creatorId,
-                place.getPlaceName(),
-                costPerUser,
-                user.getPointBalance()
-        );
+//        /* 개설자 포인트 사용 알림 발송 */
+//        pointNotificationHelper.sendPaymentNotification(
+//                creatorId,
+//                place.getPlaceName(),
+//                costPerUser,
+//                user.getPointBalance()
+//        );
 
         pointRepository.save(transaction);
     }

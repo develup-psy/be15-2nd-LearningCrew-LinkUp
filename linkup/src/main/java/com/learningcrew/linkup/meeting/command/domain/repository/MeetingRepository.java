@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,7 +17,7 @@ public interface MeetingRepository {
     void flush();
 
 //    @Query("SELECT m FROM Meeting m WHERE m.startTime <= :now AND m.statusId NOT IN :excludedStatusIds")
-//    List<Meeting> findMeetingsToSettle(@Param("now") LocalDateTime now, @Param("excludedStatusIds") List<Integer> excludedStatusIds);
-
+//    List<Meeting> findMeetingsToSettle(@Param("now") LocalTime now, @Param("statusId") List<Integer> excludedStatusIds);
+//
 
 }

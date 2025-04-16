@@ -112,8 +112,7 @@
         SELECT a.participation_id, b.status_type, a.meeting_id, a.member_id, a.participated_at
         FROM meeting_participation_history a
         JOIN status b ON a.status_id = b.status_id
-        WHERE a.meeting_id = #{meetingId}
-        AND a.member_id = #{memberId}
+        WHERE a.member_id = #{memberId}
     </select>
 
 </mapper>

@@ -39,11 +39,12 @@
 //    @Scheduled(fixedRate = 5 * 60 * 1000) // 매 분마다 실행 (테스트 용)
 //    @Transactional
 //    public void settleMeetings() {
+//        int statusId = statusQueryService.getStatusId("ACCEPTED");
 //        LocalTime now = LocalDateTime.now().toLocalTime();
-//        meetingRepository.findMeetingsToSettle(now, statusId);
+//        meetingRepository.findMeetingsToSettle(now, List.of(statusId));
 //
 //        // 1. 시작 시간이 지난 모임 중 DONE/DELETED 처리 안된 모임 조회
-//        List<Meeting> meetings = meetingRepository.findMeetingsToSettle(now);
+//        List<Meeting> meetings = meetingRepository.findMeetingsToSettle(now,List.of(statusId));
 //
 //        for (Meeting meeting : meetings) {
 //            int meetingId = meeting.getMeetingId();

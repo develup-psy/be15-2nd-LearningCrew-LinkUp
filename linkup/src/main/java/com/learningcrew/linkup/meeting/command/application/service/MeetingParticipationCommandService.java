@@ -47,7 +47,7 @@ public class MeetingParticipationCommandService {
     private final ModelMapper modelMapper;
     private final MeetingParticipationQueryService meetingParticipationQueryService;
     private final StatusQueryService statusQueryService;
-    private final NotificationHelper notificationHelper;
+//    private final NotificationHelper notificationHelper;
     private final MeetingNotificationHelper meetingNotificationHelper;
     private final PointNotificationHelper pointNotificationHelper;
     private final JpaMeetingParticipationHistoryRepository jpaRepository;
@@ -229,13 +229,13 @@ public class MeetingParticipationCommandService {
         );
         pointRepository.save(transaction);
 
-        /* 모임 신청자 포인트 사용 알림 발송 */
-        pointNotificationHelper.sendPaymentNotification(
-                memberId,
-                meeting.getMeetingTitle(),
-                amountPerPerson,
-                user.getPointBalance()
-        );
+//        /* 모임 신청자 포인트 사용 알림 발송 */
+//        pointNotificationHelper.sendPaymentNotification(
+//                memberId,
+//                meeting.getMeetingTitle(),
+//                amountPerPerson,
+//                user.getPointBalance()
+//        );
 
         return new PointTransactionResponse("결제가 완료되었습니다.", user.getPointBalance());
     }

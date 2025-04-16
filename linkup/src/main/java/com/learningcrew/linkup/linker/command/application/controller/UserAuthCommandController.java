@@ -8,6 +8,7 @@ import com.learningcrew.linkup.linker.command.application.dto.request.RefreshTok
 import com.learningcrew.linkup.linker.command.application.dto.response.TokenResponse;
 import com.learningcrew.linkup.linker.command.application.service.AuthCommandService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,10 +20,15 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/auth")
+@Tag(name="계정 관리",description = "계정 관리 API")
 public class UserAuthCommandController {
     private final AuthCommandService userAuthCommandService;
 
     /* 자체 로그인 */
+    @Operation(
+            summary = "자체 회원 로그인",
+            description = "회원의 아이디, 비밀번호를 검색하여 데이터 조회 성공 시에 로그인 된다."
+    )
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<TokenResponse>> login(@Valid @RequestBody LoginRequest request){
         log.info("로그인 요청: email={}", request.getEmail());
@@ -32,6 +38,10 @@ public class UserAuthCommandController {
     }
 
     /* 이메일 인증 */
+    @Operation(
+            summary = "토큰 재발급",
+            description = "사용자는 토큰을 재발급 받을 수 있다."
+    )
     @GetMapping("/verify-email")
     public ResponseEntity<ApiResponse<Void>> verifyEmail(@RequestParam("token") String token) {
         log.info("이메일 인증 요청: token={}", token);
@@ -44,6 +54,10 @@ public class UserAuthCommandController {
     }
 
     /* 토큰 재발급 */
+    @Operation(
+            summary = "이메일 인증",
+            description = "사용자는 자신의 이메일을 사용하여 인증을 한다."
+    )
     @PostMapping("/refresh")
     public ResponseEntity<ApiResponse<TokenResponse>> getAccessTokenByRefreshToken(@Valid @RequestBody RefreshTokenRequest request){
         log.info("토큰 재발급 요청: refreshToken={}", request.getRefreshToken());
@@ -53,6 +67,10 @@ public class UserAuthCommandController {
     }
 
     /* 로그아웃 */
+    @Operation(
+            summary = "로그아웃",
+            description = "사용자는 로그아웃 한다."
+    )
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<Void>> logout(@Valid @RequestBody RefreshTokenRequest request){
         log.info("로그아웃 요청: refreshToken={}", request.getRefreshToken());
@@ -63,7 +81,7 @@ public class UserAuthCommandController {
 
     /* 비밀번호 찾기 - 비밀번호 재설정 url 발송 */
     @PostMapping("/password/reset-link")
-    @Operation(summary = "비밀번호 재설정 URL 발송", description = "이메일 조회 후 재설정 url을 이메일로 발송")
+    @Operation(summary = "비밀번호 재설정 URL 발송", description = "이메일 조회 후 재설정 url을 이메일로 발송한다.")
     public ResponseEntity<ApiResponse<Void>> sendPasswordResetUrl(@Valid @RequestBody FindPasswordRequest request) {
         userAuthCommandService.sendPasswordResetLink(request);
         return ResponseEntity.ok(ApiResponse.success(null, "비밀번호 재설정 메일을 전송했습니다."));
