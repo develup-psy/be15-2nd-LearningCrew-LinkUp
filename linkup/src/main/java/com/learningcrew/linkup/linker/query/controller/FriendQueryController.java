@@ -7,6 +7,7 @@ import com.learningcrew.linkup.linker.query.dto.response.FriendInfoResponse;
 import com.learningcrew.linkup.linker.query.service.FriendQueryService;
 import com.learningcrew.linkup.security.jwt.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/friends")
+@Tag(name="친구 관리",description = "친구 조회 API")
 public class FriendQueryController {
     private final FriendQueryService friendQueryService;
 
