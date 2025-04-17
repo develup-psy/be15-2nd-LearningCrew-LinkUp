@@ -4,6 +4,7 @@ package com.learningcrew.linkupuser.query.mapper;
 import com.learningcrew.linkupuser.command.domain.aggregate.User;
 import com.learningcrew.linkupuser.common.dto.ApiResponse;
 import com.learningcrew.linkupuser.query.dto.query.*;
+import com.learningcrew.linkupuser.query.dto.response.UserStatusResponse;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.http.ResponseEntity;
 
@@ -33,4 +34,6 @@ public interface UserMapper {
     Optional<String> findUserEmailByUserId(int userId);
 
     Optional<String> findUserNameByUserId(int userId);
+
+    Optional<UserStatusResponse> findStatusByUserId(int userId);
 }

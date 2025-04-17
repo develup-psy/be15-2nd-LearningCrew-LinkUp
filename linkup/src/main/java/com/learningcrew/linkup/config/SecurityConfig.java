@@ -60,6 +60,91 @@ public class SecurityConfig {
         return new HeaderAuthenticationFilter();
     }
 
+    /* 관리자 api */
+    private void adminEndpoints(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auths) {
+        auths.requestMatchers(
+                "/report",
+                "/report/reportType/{reportTypeId}",
+                "/report/reporter-user",
+                "/report/reportee-user",
+                "/report/reporter-user/{reportedId}",
+                "/report/reportee-user/{reporteeId}",
+                "/report/{reportId}/rejected",
+                "/report/{reportId}/accepted",
+                "/penalty",
+                "/penalty/{penaltyType}",
+                "/penalty/user/{memberId}",
+                "/penalty/user/{memberId}/{penaltyType}",
+                "/penalty/post/{postId}",
+                "/penalty/comment/{commentId}",
+                "/penalty/placeReview/{reviewId}",
+                "/penalty/placerRview/{reviewId}/done",
+                "/penalty/{penaltyId}",
+                "/objections",
+                "/objections/status/{statusId}",
+                "/objections/user/{memberId}",
+                "/objections/{objectionId}/accept",
+                "/objections/{objectionId}/reject",
+                "/blacklist",
+                "/blacklist/{memberId}",
+                "/blacklist/{memberId}/clear",
+                "/posts/list",
+                "/post/user/{userId}",
+                "/admin/users",
+                "/meetings/list",
+                "/meetings/review",
+                "/meetings/review/reviewer/{memberId}",
+                "/meetings/review/reviewee/{memberId}",
+                "/admin/places"
+        ).hasAuthority("ADMIN");
+
+        auths.requestMatchers(
+                HttpMethod.GET, "/admin/businesses/pending"
+        ).hasAuthority("ADMIN");
+
+        auths.requestMatchers(HttpMethod.PUT,
+                "/admin/businesses/{targetId}/approve",
+                "/admin/businesses/{targetId}/reject"
+        ).hasAuthority("ADMIN");
+    }
+
+    /* 사업자 api */
+    private void businessEndpoints(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auths) {
+        auths.requestMatchers(
+                HttpMethod.PUT, "/businesses"
+        ).hasAuthority("BUSINESS");
+
+        auths.requestMatchers(
+                "/place",
+                "/place/:id",
+                "/place/:id/times",
+                "/place/:id/images",
+                "/owner/{ownerId}/places"
+        ).hasAuthority("BUSINESS");
+    }
+
+
+    /* 다중 권한 api */
+    private void sharedAuthEndpoints(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auths) {
+        //회원 OR 관리자
+        auths.requestMatchers(
+                "/meetings/user/{userId}",
+                "/meetings/user/{userId}/done",
+                "/meetings/{meetingId}/participation",
+                "/posts",
+                "/posts/{postId}",
+                "/posts/{postId}/delete",
+                "/postComment",
+                "/postComment/{postCommentId}"
+        ).hasAnyAuthority("ADMIN", "USER");
+
+        //사업자 OR 관리자
+        auths.requestMatchers(
+                "/owner/{ownerId}/reserve"
+        ).hasAnyAuthority("ADMIN", "BUSINESS");
+
+    }
+
     /* 공통 api */
     private void permitAllEndpoints(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auths) {
         auths.requestMatchers(
@@ -78,19 +163,9 @@ public class SecurityConfig {
     /* 사용자 접근 api */
     private void userEndpoints(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auths) {
         auths.requestMatchers(
-                "/users/me",
-                "/users/me/profile",
-                "/users/me/manner-temperature",
-                "/users/me/posts",
-                "/users/me/comments",
-                "/users/me/meetings/participated",
-                "/users/me/point",
+                "/users/**",
                 "/accounts/**",
-                "/auth/logout",
-                "/users/withdraw"
-        ).hasAuthority("USER");
-
-        auths.requestMatchers(
+                "/auth/**",
                 "/friends/**",
                 "/posts/**",
                 "/comments/**",
@@ -98,112 +173,11 @@ public class SecurityConfig {
                 "/payments/**",
                 "/place/**",
                 "/places/**",
-                "/owner/**",
-                "/owner/**",
+                "/owners/**",
                 "/members/**",
                 "/user/**",
-                "/businesses/me",
-                "/objections/review/{reivewId}",
-                "/objections/post/{postId}",
-                "/objections/comment/{commentId}"
+                "/businesses/**",
+                "/objections/**"
         ).hasAuthority("USER");
-
-        auths.requestMatchers(HttpMethod.POST, "/businesses").hasAuthority("USER");
     }
-
-    /* 사업자 api */
-    private void businessEndpoints(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auths) {
-        auths.requestMatchers(
-                HttpMethod.PUT, "/businesses"
-        ).hasAuthority("BUSINESS");
-
-        auths.requestMatchers(
-            "/settlements/**",
-            "/place",
-            "/place/:id",
-            "/place/:id/times",
-            "/place/:id/images",
-                "/owner/{ownerId}/places"
-        ).hasAuthority("BUSINESS");
-    }
-
-    /* 관리자 api */
-    private void adminEndpoints(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auths) {
-        auths.requestMatchers(
-            "/report",
-            "/report/reportType/{reportTypeId}",
-            "/report/reporter-user",
-            "/report/reportee-user",
-            "/report/reporter-user/{reportedId}",
-            "/report/reportee-user/{reporteeId}",
-            "/report/{reportId}/rejected",
-            "/report/{reportId}/accepted",
-            "/penalty",
-            "/penalty/{penaltyType}",
-            "/penalty/user/{memberId}",
-            "/penalty/user/{memberId}/{penaltyType}",
-            "/penalty/post/{postId}",
-            "/penalty/comment/{commentId}",
-            "/penalty/placeReview/{reviewId}",
-            "/penalty/placerRview/{reviewId}/done",
-            "/penalty/{penaltyId}",
-            "/objections",
-            "/objections/status/{statusId}",
-            "/objections/user/{memberId}",
-            "/objections/{objectionId}/accept",
-            "/objections/{objectionId}/reject",
-            "/blacklist",
-            "/blacklist/{memberId}",
-            "/blacklist/{memberId}/clear",
-            "/posts/list",
-            "/post/user/{userId}",
-            "/admin/users",
-            "/admin/businesses/pending",
-            "/admin/businesses/{businessId}/approve",
-            "/admin/businesses/{businessId}/reject",
-            "/meetings/list",
-            "/meetings/review",
-            "/meetings/review/reviewer/{memberId}",
-            "/meetings/review/reviewee/{memberId}",
-            "/admin/places"
-        ).hasAuthority("ADMIN");
-
-        auths.requestMatchers(
-                "/admin/**"
-        ).hasAuthority("ADMIN");
-
-    }
-
-    /* 다중 권한 api */
-    private void sharedAuthEndpoints(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auths) {
-        //회원 OR 관리자
-        auths.requestMatchers(
-                "/meetings",
-                "/meetings",
-                "/meetings/user/{userId}",
-                "/meetings/user/{userId}/done",
-                "/meetings/{meetingId}/participation",
-                "/posts",
-                "/posts/{postId}",
-                "/posts/{postId}/delete",
-                "/postComment",
-                "/postComment/{postCommentId}"
-        ).hasAuthority("ADMIN");
-
-        //사업자 OR 관리자
-        auths.requestMatchers(
-                "/owner/{ownerId}/reserve",
-                "/owner/{ownerId}/reserve"
-        ).hasAuthority("ADMIN");
-
-        //사업자 OR ADMIN
-
-    }
-
-
-
-
-
-
-
 }

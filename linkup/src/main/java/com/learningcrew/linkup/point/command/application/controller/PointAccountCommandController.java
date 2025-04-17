@@ -23,7 +23,7 @@ public class PointAccountCommandController {
     @Operation(summary = "계좌 등록")
     public ResponseEntity<ApiResponse<Void>> registerAccount(
             @RequestBody @Valid AccountRequest request,
-            String userId
+            @AuthenticationPrincipal String userId
     ) {
         accountService.register(Integer.parseInt(userId), request);
         return ResponseEntity.ok(ApiResponse.success(null, "계좌 등록 성공"));
@@ -33,7 +33,7 @@ public class PointAccountCommandController {
     @Operation(summary = "계좌 수정")
     public ResponseEntity<ApiResponse<Void>> updateAccount(
             @RequestBody @Valid AccountRequest request,
-            String userId
+            @AuthenticationPrincipal String userId
     ) {
         accountService.update(Integer.parseInt(userId), request);
         return ResponseEntity.ok(ApiResponse.success(null,"계좌 수정 성공"));

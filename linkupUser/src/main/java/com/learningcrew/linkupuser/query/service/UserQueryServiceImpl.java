@@ -8,6 +8,7 @@ import com.learningcrew.linkupuser.exception.ErrorCode;
 import com.learningcrew.linkupuser.query.dto.query.*;
 import com.learningcrew.linkupuser.query.dto.response.UserListResponse;
 import com.learningcrew.linkupuser.query.dto.response.UserProfileResponse;
+import com.learningcrew.linkupuser.query.dto.response.UserStatusResponse;
 import com.learningcrew.linkupuser.query.mapper.MemberMapper;
 import com.learningcrew.linkupuser.query.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
@@ -96,4 +97,13 @@ public class UserQueryServiceImpl implements UserQueryService {
                 () -> new BusinessException(ErrorCode.BAD_REQUEST)
         ).getTotalPoints();
     }
+
+    @Override
+    public UserStatusResponse getUserStatus(int userId) {
+        return userMapper.findStatusByUserId(userId).orElseThrow(
+                () -> new BusinessException(ErrorCode.BAD_REQUEST)
+        );
+    }
+
+
 }

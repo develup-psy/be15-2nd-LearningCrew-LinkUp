@@ -146,7 +146,11 @@ public enum ErrorCode {
     REMOTE_CALL_FAILED(HttpStatus.INTERNAL_SERVER_ERROR,  "외부 서비스 호출에 실패했습니다."),
 
     USER_SERVICE_UNAVAILABLE(HttpStatus.SERVICE_UNAVAILABLE, "User 서비스와의 연결이 불안정합니다."),
-    FEIGN_CLIENT_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "User 서비스 통신 오류가 발생했습니다.");
+    FEIGN_CLIENT_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "User 서비스 통신 오류가 발생했습니다."),
+
+    // 사업자
+    OWNER_NOT_FOUND(HttpStatus.BAD_REQUEST,"사업자가 존재하지 않습니다"),
+    DUPLICATE_OWNER_REGISTRATION(HttpStatus.BAD_REQUEST,"이미 사업자 등록이 완료되어 있습니다");
 
 
 

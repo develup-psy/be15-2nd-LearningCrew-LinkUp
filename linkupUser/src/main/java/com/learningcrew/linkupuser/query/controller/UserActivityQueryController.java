@@ -81,7 +81,7 @@ public class UserActivityQueryController {
 
 
     /* 매너 온도 조회 */
-    @GetMapping("/manner")
+    @GetMapping("/ manner")
     @Operation(summary = "매너온도 조회", description = "사용자의 매너온도를 조회합니다.")
     public ResponseEntity<ApiResponse<UserMannerTemperatureDto>> getMannerTemperature(@AuthenticationPrincipal String userId) {
         UserMannerTemperatureDto manner = userQueryService.getMannerTemperature(Integer.parseInt(userId));

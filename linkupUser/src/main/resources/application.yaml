@@ -64,7 +64,7 @@ springdoc:
 
 logging:
   level:
-    com.learningcrew.linkupuser.client.UserClient: DEBUG
+    com.learningcrew.linkupuser.client.com.learningcrew.linkupuser.client.CommunityClient: DEBUG
     feign.Logger: DEBUG
     feign.Request: DEBUG
     feign.Response: DEBUG

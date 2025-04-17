@@ -4,7 +4,9 @@ package com.learningcrew.linkupuser.query.controller;
 import com.learningcrew.linkupuser.common.dto.ApiResponse;
 import com.learningcrew.linkupuser.query.dto.query.MeetingMemberDto;
 import com.learningcrew.linkupuser.query.dto.query.UserInfoResponse;
+import com.learningcrew.linkupuser.query.dto.response.UserStatusResponse;
 import com.learningcrew.linkupuser.query.service.UserQueryService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +38,7 @@ public class UserQueryController {
         return userQueryService.getExistsUser(userId);
     }
 
+
     @GetMapping("/me/{userId}/email")
     public String getEmailByUserId(@PathVariable int userId, HttpServletRequest request) {
         log.info("요청 URI: {}", request.getRequestURI());
@@ -51,5 +54,12 @@ public class UserQueryController {
     @GetMapping("/me/{userId}/point")
     public int getPointBalance(@PathVariable int userId) {
         return userQueryService.getPointBalance(userId);
+    }
+
+    @GetMapping("/me/{userId}/status")
+    @Operation(summary = "유저 상태 조회", description = "유저의 현재 상태 (ACTIVE, INACTIVE, BLACKLISTED)를 조회합니다.")
+    public ResponseEntity<ApiResponse<UserStatusResponse>> getUserStatus(@PathVariable int userId) {
+        UserStatusResponse response = userQueryService.getUserStatus(userId);
+        return ResponseEntity.ok(ApiResponse.success(response, "유저 상태 조회 성공"));
     }
 }
