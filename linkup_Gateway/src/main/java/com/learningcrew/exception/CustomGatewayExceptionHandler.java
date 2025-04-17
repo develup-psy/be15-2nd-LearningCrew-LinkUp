@@ -33,8 +33,6 @@ public class CustomGatewayExceptionHandler implements ErrorWebExceptionHandler {
     @Override
     public Mono<Void> handle(ServerWebExchange exchange, Throwable ex) {
         ServerHttpResponse response = exchange.getResponse();
-        ServerHttpRequest request = exchange.getRequest();
-
         // 이미 커밋된 응답은 건드릴 수 없습니다.
         if (response.isCommitted()) {
             return Mono.error(ex);

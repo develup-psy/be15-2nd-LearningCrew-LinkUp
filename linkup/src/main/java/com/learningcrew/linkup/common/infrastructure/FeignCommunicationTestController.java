@@ -3,6 +3,7 @@ package com.learningcrew.linkup.common.infrastructure;
 import com.learningcrew.linkup.common.dto.ApiResponse;
 import com.learningcrew.linkup.common.dto.query.MeetingMemberDto;
 import com.learningcrew.linkup.common.dto.query.UserInfoResponse;
+import com.learningcrew.linkup.place.command.application.dto.response.UserStatusResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -55,6 +56,11 @@ public class FeignCommunicationTestController {
     @GetMapping("/user/{userId}/point")
     public ApiResponse<Integer> testGetPoint(@PathVariable int userId) {
         return ApiResponse.success(userFeignClient.getPointBalance(userId));
+    }
+
+    @GetMapping("/user/{userId}/status")
+    public ApiResponse<UserStatusResponse> testGetStatus(@PathVariable int userId) {
+        return ApiResponse.success(userFeignClient.getUserStatus(userId).getData());
     }
 
     // ===== MemberQueryClient =====

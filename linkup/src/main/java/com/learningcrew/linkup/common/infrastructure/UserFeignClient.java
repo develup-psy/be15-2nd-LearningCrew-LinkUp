@@ -3,6 +3,7 @@ package com.learningcrew.linkup.common.infrastructure;
 import com.learningcrew.linkup.common.dto.ApiResponse;
 import com.learningcrew.linkup.common.dto.query.UserInfoResponse;
 import com.learningcrew.linkup.config.FeignClientConfig;
+import com.learningcrew.linkup.place.command.application.dto.response.UserStatusResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,9 +29,12 @@ public interface UserFeignClient {
     @GetMapping("/users/me/{userId}/userName")
     String getUserNameByUserId(@PathVariable("userId") int userId);
 
-    @GetMapping("/me/{userId}/point")
+    @GetMapping("/users/me/{userId}/point")
     int getPointBalance(@PathVariable("userId") int userId);
 
     @PostMapping("/users/{userId}/point/decrease")
     ApiResponse<Void>  decreasePoint(@PathVariable int userId, @RequestParam int amount);
+
+    @GetMapping("/users/me/{userId}/status")
+    ApiResponse<UserStatusResponse> getUserStatus(@PathVariable int userId);
 }
