@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,7 +23,7 @@ public class PointAccountQueryController {
     @GetMapping
     @Operation(summary = "계좌 조회")
     public ResponseEntity<ApiResponse<AccountResponse>> getAccount(
-           String userId
+            @AuthenticationPrincipal String userId
     ) {
         AccountResponse response = pointAccountQueryService.getAccount(Integer.parseInt(userId));
         return ResponseEntity.ok(ApiResponse.success(response, "계좌 조회 성공"));
