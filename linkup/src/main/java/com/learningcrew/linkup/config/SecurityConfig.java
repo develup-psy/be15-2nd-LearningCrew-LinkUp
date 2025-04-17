@@ -128,7 +128,6 @@ public class SecurityConfig {
     private void sharedAuthEndpoints(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auths) {
         //회원 OR 관리자
         auths.requestMatchers(
-                "/meetings",
                 "/meetings/user/{userId}",
                 "/meetings/user/{userId}/done",
                 "/meetings/{meetingId}/participation",
@@ -137,14 +136,13 @@ public class SecurityConfig {
                 "/posts/{postId}/delete",
                 "/postComment",
                 "/postComment/{postCommentId}"
-        ).hasAnyAuthority("ADMIN", "BUSINESS");
+        ).hasAnyAuthority("ADMIN", "USER");
 
         //사업자 OR 관리자
         auths.requestMatchers(
                 "/owner/{ownerId}/reserve"
         ).hasAnyAuthority("ADMIN", "BUSINESS");
 
-        //사업자 OR ADMIN
     }
 
     /* 공통 api */
