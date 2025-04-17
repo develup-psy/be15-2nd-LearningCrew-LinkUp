@@ -1174,6 +1174,8 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 
 </details>
 
+<br>
+
 <details>
 <summary>정산</summary>
 
@@ -1547,7 +1549,7 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 
 - 게시글 작성
 
-<img src="assets/test_cases/community/TEST-089.png" alt="게시글"/>
+<img src="assets/test_cases/community/TEST-089.jpg" alt="게시글"/>
 
 <br>
 
