@@ -36,6 +36,7 @@ public class UserQueryController {
         return userQueryService.getExistsUser(userId);
     }
 
+
     @GetMapping("/me/{userId}/email")
     public String getEmailByUserId(@PathVariable int userId, HttpServletRequest request) {
         log.info("요청 URI: {}", request.getRequestURI());
