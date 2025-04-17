@@ -26,6 +26,8 @@ public class OperationTimeCommandService {
     public OperationTimeUpdateResponse updateOperationTimes(int placeId, List<OperationTimeRequest> operationTimeRequests) {
         Place place = placeRepository.findById(placeId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.PLACE_NOT_FOUND));
+        System.out.println("📍 [place 정보] ownerId = " + place.getOwnerId());
+
 
         for (OperationTimeRequest req : operationTimeRequests) {
             if (req.getStartTime().equals(req.getEndTime())) {

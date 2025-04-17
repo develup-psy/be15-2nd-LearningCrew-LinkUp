@@ -17,7 +17,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1")
+@RequestMapping("/place")
 @Tag(name="장소 리뷰 관리", description="장소 리뷰 등록 API")
 public class PlaceReviewCommandController {
 
@@ -27,7 +27,7 @@ public class PlaceReviewCommandController {
             summary = "장소리뷰 등록",
             description = "회원은 자신이 참여한 모임의 장소에 대한 리뷰를 수정한다."
     )
-    @PostMapping("/place/{placeId}/review")
+    @PostMapping("/{placeId}/review")
     public ResponseEntity<ApiResponse<PlaceReviewResponse>> createPlaceReview(
             @PathVariable int placeId,
             @RequestBody PlaceReviewCreateRequest placeReviewCreateRequest) {
