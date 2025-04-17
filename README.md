@@ -389,7 +389,7 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 ```
 📦 root
 ├── 📁 assets                       # 프로젝트 부속 자료
-│   ├── 📁 api-docs                 # 외부 API 명세 관련 문서
+│   ├── 📁 api-docs                 # API 명세 관련 문서
 │   ├── 📁 ddl                      # DDL 스크립트 (테이블 생성 등)
 │   │   └── 📄 linkup_ddL.sql
 │   ├── 📁 images                   # 이미지 자료 모음
@@ -464,7 +464,7 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 ## 6. 📊 WBS (작업 분배 및 일정)
 
 
-🔗 [WBS 명세서 링크](#6--wbs-작업-분배-및-일정)
+🔗 [WBS 명세서 링크](https://docs.google.com/spreadsheets/d/e/2PACX-1vS5z7lnFVoKhrHU0zT55KpMlmla72tCCbzkwDi_7PyI23dByzC5GMS2v7jT-7YjDzr9LlZDPXG-xev4/pubhtml?gid=403982901&single=true)
 
 
 <img src="assets/images/wbs.jpg" alt="wbs" width="550"/>
@@ -819,11 +819,27 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 
 ---
 
-## 12. 📒 테스트 케이스 정의서
+## 12. 📒 REST API 설계 문서(Swagger 등)
+
+<br>
+
+>REST API 설계 문서
+
+[swagger_api.pdf](assets/api-docs/Swagger_API.pdf)
+
+<br>
+
+<img src="assets/api-docs/swagger_api.jpg" alt="rest_api" width="700"/>
+
+<br>
+
+<br>
 
 🔗 [테스트 케이스 정의서 링크](# )
 
 <img src="assets/images/test_case_definition.jpg" alt="test_case_definition"/>
+
+<br>
 
 <br>
 
@@ -878,7 +894,60 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 
 <details>
 <summary>계정 관리</summary>
-- 설명
+
+- 자체 회원가입
+
+<img src="assets/test_cases/user/Test_001.png" alt="계정 관리"/>
+
+<br>
+
+- 자체 회원 로그인
+
+<img src="assets/test_cases/user/Test_002.png" alt="계정 관리"/>
+
+<br>
+
+- 비밀번호 찾기
+
+<img src="assets/test_cases/user/Test_005.png" alt="계정 관리"/>
+
+<br>
+
+- 이메일 인증
+
+<img src="assets/test_cases/user/Test_006.png" alt="계정 관리"/>
+
+<br>
+
+- 비밀번호 재설정
+
+<img src="assets/test_cases/user/Test_007.png" alt="계정 관리"/>
+
+<br>
+
+- 계정 복구 신청
+
+<img src="assets/test_cases/user/Test_008.png" alt="계정 관리"/>
+
+<br>
+
+- 토큰 재발급
+
+<img src="assets/test_cases/user/Test_009.png" alt="계정 관리"/>
+
+<br>
+
+- 로그아웃
+
+<img src="assets/test_cases/user/Test_010.png" alt="계정 관리"/>
+
+<br>
+
+- 회원 탈퇴
+
+<img src="assets/test_cases/user/Test_011.png" alt="계정 관리"/>
+
+<br>
 
 </details>
 
@@ -886,7 +955,18 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 
 <details>
 <summary>프로필</summary>
-- 설명
+
+- 프로필 조회
+
+<img src="assets/test_cases/user/Test_012.png" alt="프로필 관리"/>
+
+<br>
+
+- 프로필 수정
+
+<img src="assets/test_cases/user/Test_013.png" alt="프로필 관리"/>
+
+<br>
 
 </details>
 
@@ -894,7 +974,31 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 
 <details>
 <summary>계좌 관리</summary>
-- 설명
+
+- 계좌 등록
+
+<img src="assets/test_cases/user/Test_015.png" alt="계좌 관리"/>
+
+<br>
+
+- 게좌 수정
+
+<img src="assets/test_cases/user/Test_016.png" alt="계좌 관리"/>
+
+<br>
+
+- 계좌 조회
+
+<img src="assets/test_cases/user/Test_017.png" alt="계좌 관리"/>
+
+<br>
+
+- 사업자 등록
+
+<img src="assets/test_cases/user/Test_018.png" alt="계좌 관리"/>
+
+<br>
+
 
 </details>
 
@@ -902,7 +1006,38 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 
 <details>
 <summary>활동 관리</summary>
-- 설명
+
+- 매너 온도 조회
+
+<img src="assets/test_cases/user/Test_021.png" alt="활동 관리"/>
+
+<br>
+
+- 작성 게시글 조회
+
+<img src="assets/test_cases/user/Test_022.png" alt="활동 관리"/>
+
+<br>
+
+- 작성 댓글 조회
+
+<img src="assets/test_cases/user/Test_023.png" alt="활동 관리"/>
+
+<br>
+
+- 참가 모임 이력 조회
+
+<img src="assets/test_cases/user/Test_024.png" alt="활동 관리"/>
+
+<br>
+
+- 포인트 조회
+
+<img src="assets/test_cases/user/Test_025.png" alt="활동 관리"/>
+
+<br>
+
+
 
 </details>
 
@@ -910,7 +1045,73 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 
 <details>
 <summary>친구 관리</summary>
-- 설명
+
+- 친구 목록 조회
+
+<img src="assets/test_cases/user/Test_026.png" alt="친구 관리"/>
+
+<br>
+
+- 친구 요청 신청
+
+<img src="assets/test_cases/user/Test_027.png" alt="친구 관리"/>
+
+<br>
+
+- 친구 요청 수락
+
+<img src="assets/test_cases/user/Test_028.png" alt="친구 관리"/>
+
+<br>
+
+- 친구 요청 거절 및 삭제
+
+<img src="assets/test_cases/user/Test_029.png" alt="친구 관리"/>
+
+<br>
+
+- 친구 신청 목록 조회
+
+<img src="assets/test_cases/user/Test_030.png" alt="친구 관리"/>
+
+<br>
+
+- 친구 개설 모임 조회
+
+<img src="assets/test_cases/user/Test_031.png" alt="친구 관리"/>
+
+<br>
+
+</details>
+
+<br>
+
+<details>
+<summary>회원 관리</summary>
+
+- 회원 전체 목록 조회
+
+<img src="assets/test_cases/user/Test_032.png" alt="회원 관리"/>
+
+<br>
+
+- 사업자 권한 신청 조회
+
+<img src="assets/test_cases/user/Test_033.png" alt="회원 관리"/>
+
+<br>
+
+- 사업자 권한 승인
+
+<img src="assets/test_cases/user/Test_034.png" alt="회원 관리"/>
+
+<br>
+
+- 사업자 권한 승인 거절
+
+<img src="assets/test_cases/user/Test_035.png" alt="회원 관리"/>
+
+<br>
 
 </details>
 
@@ -943,15 +1144,54 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 <details>
 <summary>🎯 포인트 관련</summary>
 
+<details>
+<summary>결제</summary>
+
 - 포인트 충전
 
 <img src="assets/test_cases/point/TEST-036.png" alt="포인트 충전"/>
 
 <br>
 
+</details>
+
+<br>
+
+<details>
+<summary>포인트 관리</summary>
+
+- 포인트 내역 조회
+
+<img src="assets/test_cases/point/TEST-041.png" alt="포인트 관리"/>
+
+<br>
+
 - 잔여 포인트 환불
 
-<img src="assets/test_cases/point/TEST-042.png" alt="포인트 충전"/>
+<img src="assets/test_cases/point/TEST-042.png" alt="포인트 관리"/>
+
+<br>
+
+</details>
+
+<details>
+<summary>정산</summary>
+
+- 월별 정산 대금 조회
+
+<img src="assets/test_cases/point/TEST-043.png" alt="포인트 정산"/>
+
+<br>
+
+- 정산 내역 조회
+
+<img src="assets/test_cases/point/TEST-044.png" alt="포인트 정산"/>
+
+<br>
+
+</details>
+
+<br>
 
 <br>
 
