@@ -4,6 +4,7 @@ import com.learningcrew.linkup.common.dto.ApiResponse;
 import com.learningcrew.linkup.common.dto.query.UserInfoResponse;
 import com.learningcrew.linkup.exception.BusinessException;
 import com.learningcrew.linkup.exception.ErrorCode;
+import com.learningcrew.linkup.place.command.application.dto.response.UserStatusResponse;
 import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -49,6 +50,12 @@ public class UserFeignFallback implements UserFeignClient {
     public ApiResponse<Void>  decreasePoint(int userId, int amount) {
         handleError("decreasePoint");
         return ApiResponse.failure("포인트 감소 실패 (Fallback)");
+    }
+
+    @Override
+    public ApiResponse<UserStatusResponse> getUserStatus(int ownerId) {
+        handleError("User 상태 확인 오류");
+        return null;
     }
 
     @Override

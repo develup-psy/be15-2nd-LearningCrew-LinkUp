@@ -7,6 +7,7 @@ import com.learningcrew.linkupuser.query.dto.query.UserInfoResponse;
 import com.learningcrew.linkupuser.query.dto.query.UserMannerTemperatureDto;
 import com.learningcrew.linkupuser.query.dto.response.UserListResponse;
 import com.learningcrew.linkupuser.query.dto.response.UserProfileResponse;
+import com.learningcrew.linkupuser.query.dto.response.UserStatusResponse;
 import org.springframework.http.ResponseEntity;
 
 import java.util.Optional;
@@ -28,4 +29,6 @@ public interface UserQueryService {
     String getUserNameByUserId(int userId);
 
     int getPointBalance(int userId);
+
+    UserStatusResponse getUserStatus(int userId);
 }
