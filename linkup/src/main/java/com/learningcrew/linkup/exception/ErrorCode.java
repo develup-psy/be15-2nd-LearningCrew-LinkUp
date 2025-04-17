@@ -131,6 +131,8 @@ public enum ErrorCode {
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "댓글을 찾을 수 없습니다."),
     UNAUTHORIZED_POST_EDIT(HttpStatus.FORBIDDEN, "해당 게시글 수정 권한이 없습니다."),
     UNAUTHORIZED_COMMENT_DELETE(HttpStatus.FORBIDDEN, "해당 댓글 삭제 권한이 없습니다."),
+    NOT_ADMIN(HttpStatus.BAD_REQUEST,"공지사항은 관리자만 작성할 수 있습니다."),
+    ALREADY_LIKED(HttpStatus.BAD_REQUEST,"이미 좋아요를 눌렀습니다."),
 
     // 후기
     REVIEW_NOT_FOUND(HttpStatus.NOT_FOUND, "후기를 찾을 수 없습니다."),

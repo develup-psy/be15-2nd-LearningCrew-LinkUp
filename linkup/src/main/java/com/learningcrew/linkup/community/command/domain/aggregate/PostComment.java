@@ -1,15 +1,14 @@
 package com.learningcrew.linkup.community.command.domain.aggregate;
 
-import com.learningcrew.linkup.community.command.application.dto.PostCommentUpdateRequestDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
-
 @Entity
 @Table(name = "community_comment")
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -17,7 +16,8 @@ public class PostComment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private BigInteger postCommentId;
+    @Column(name = "comment_id")
+    private BigInteger commentId;
 
     @ManyToOne
     @JoinColumn(name = "post_id")
@@ -25,34 +25,33 @@ public class PostComment {
 
     private int userId;
 
-    private String postCommentContent;
+    @Column(name = "content")
+    private String commentContent;
 
-    private String postCommentIsDeleted;
+    @Column(name = "is_deleted")
+    private String commentIsDeleted = "N";
 
+    @Column(name = "created_at")
     private LocalDateTime postCommentCreatedAt;
 
-    private LocalDateTime postCommentDeletedAt;
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
 
-    @PrePersist
-    protected void onCreate() {
-        this.postCommentCreatedAt = LocalDateTime.now();
+    public PostComment(Post post, int userId, String commentContent) {
+        this.post = post;
+        this.userId = userId;
+        this.commentContent = commentContent;
     }
 
-    @PreUpdate
-    protected void onUpdate() {
-        if ("Y".equals(postCommentIsDeleted)) {
-            this.postCommentDeletedAt = LocalDateTime.now();
-        }
+    public void softDelete() {
+        this.commentIsDeleted = "Y";
+        this.deletedAt = LocalDateTime.now();
     }
 
-    public void updatePostComment(PostCommentUpdateRequestDTO postCommentUpdateRequestDTO) {
-        if (postCommentUpdateRequestDTO.getCommentContent() == null || postCommentUpdateRequestDTO.getCommentContent().trim().isEmpty()) {
-            throw new IllegalArgumentException("Comment content cannot be empty");
-        }
-        this.postCommentContent = postCommentUpdateRequestDTO.getCommentContent();
+//    public void softDeleteComment(int postId, BigInteger commentId, int userId) {
+//    }
+
+    public void setCommentDeletedAt(LocalDateTime now) {
+        this.deletedAt = now;
     }
-
-
-
-
 }
