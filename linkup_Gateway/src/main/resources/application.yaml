@@ -1,0 +1,33 @@
+server:
+  port: 8000
+
+spring:
+  application:
+    name: gateway-server
+  cloud:
+    gateway:
+      routes:
+        - id: LINKUPUSER
+          uri: lb://LINKUPUSER
+          predicates:
+            - Path=/api/v1/user-service/**
+          filters:
+            - RewritePath=/api/v1/user-service/(?<segment>.*), /${segment}
+        - id: LINKUPCOMMON
+          uri: lb://LINKUPCOMMON
+          predicates:
+            - Path=/api/v1/common-service/**
+          filters:
+            - RewritePath=/api/v1/common-service/(?<segment>.*), /${segment}
+
+eureka:
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: ${JWT_ACCESS_EXPIRATION}
+  refresh-expiration: ${JWT_REFRESH_EXPIRATION}

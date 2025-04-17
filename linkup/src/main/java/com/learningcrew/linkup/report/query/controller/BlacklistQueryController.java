@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/blacklist")
+@RequestMapping("/blacklist")
 @RequiredArgsConstructor
 @Tag(name = "블랙리스트 조회", description = "관리자 전용 블랙리스트 사용자 목록 조회 API")
 public class BlacklistQueryController {

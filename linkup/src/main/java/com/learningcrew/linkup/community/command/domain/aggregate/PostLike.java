@@ -1,6 +1,5 @@
 package com.learningcrew.linkup.community.command.domain.aggregate;
 
-import com.learningcrew.linkup.linker.command.domain.aggregate.User;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -21,8 +20,5 @@ public class PostLike {
     @JoinColumn(name = "post_id")
     private Post post;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
-
+    private int userId;
 }

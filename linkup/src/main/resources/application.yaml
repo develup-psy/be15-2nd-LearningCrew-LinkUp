@@ -1,4 +1,9 @@
+server:
+  port: 0
+
 spring:
+  application:
+    name: LINKUPCOMMON
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
     url: jdbc:mariadb://${DB_HOST}:${DB_PORT}/${DB_NAME}
@@ -25,16 +30,16 @@ spring:
           starttls:
             enable: true        # starttls 활성화 여부
 
-
   main:
     allow-bean-definition-overriding: true
+
 mybatis:
   configuration:
     map-underscore-to-camel-case: true
     mybatis.configuration.auto-mapping-behavior: NONE
   mapper-locations: classpath:/mappers/**/*.xml
   type-aliases-package: >
-    com.learningcrew.linkup.linker.query.dto,
+    com.learningcrew.linkup.common.dto.query,
     com.learningcrew.linkup.community.query.dto,
     com.learningcrew.linkup.meeting.query.dto,
     com.learningcrew.linkup.notification.query.dto,
@@ -43,11 +48,19 @@ mybatis:
     com.learningcrew.linkup.report.query.dto,
     com.learningcrew.linkup.security
 
-
 jwt:
   secret: ${JWT_SECRET}
   expiration: ${JWT_ACCESS_EXPIRATION}
   refresh-expiration: ${JWT_REFRESH_EXPIRATION}
+
+eureka:
+  instance:
+    instance-id: ${spring.application.name}:${spring.instance.instance-id:${random.value}}
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
 
 springdoc:
   packages-to-scan: com.learningcrew.linkup
@@ -58,5 +71,12 @@ image:
   image-dir: ${IMAGE_DIR}
   image-url: ${IMAGE_URL}
   default-profile: ${DEFAULT_PROFILE_IMAGE}
+
+logging:
+  level:
+    com.learningcrew.linkup.common.infrastructure.UserFeignClient: DEBUG
+    feign.Logger: DEBUG
+    feign.Request: DEBUG
+    feign.Response: DEBUG
 
 

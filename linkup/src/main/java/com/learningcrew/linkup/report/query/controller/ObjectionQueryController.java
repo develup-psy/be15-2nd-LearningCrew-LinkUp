@@ -12,7 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/objections")
+@RequestMapping("/objections")
 @RequiredArgsConstructor
 @Tag(name = "이의 제기 조회", description = "이의 제기 내역 조회 API")
 public class ObjectionQueryController {

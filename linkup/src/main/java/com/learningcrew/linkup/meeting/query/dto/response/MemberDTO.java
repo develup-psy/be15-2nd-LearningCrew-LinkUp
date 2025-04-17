@@ -18,7 +18,4 @@ public class MemberDTO {
     private String introduction;
     private BigDecimal mannerTemperature;
     private String profileImageUrl;
-//    private int statusId;
-
-
 }

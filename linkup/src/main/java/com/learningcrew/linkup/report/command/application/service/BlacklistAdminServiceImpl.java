@@ -1,9 +1,8 @@
 package com.learningcrew.linkup.report.command.application.service;
 
+import com.learningcrew.linkup.common.infrastructure.UserFeignClient;
 import com.learningcrew.linkup.exception.BusinessException;
 import com.learningcrew.linkup.exception.ErrorCode;
-import com.learningcrew.linkup.linker.command.domain.aggregate.User;
-import com.learningcrew.linkup.linker.command.domain.repository.UserRepository;
 import com.learningcrew.linkup.report.command.application.dto.request.BlacklistRegisterRequest;
 import com.learningcrew.linkup.report.command.application.dto.response.BlacklistRegisterResponse;
 import com.learningcrew.linkup.report.command.application.dto.response.BlacklistRemoveResponse;
@@ -22,14 +21,15 @@ import java.time.LocalDateTime;
 public class BlacklistAdminServiceImpl implements BlacklistAdminService {
 
     private final BlacklistRepository blacklistRepository;
-    private final UserRepository userRepository;
     private final ReportHistoryRepository reportRepository;
+    private final UserFeignClient userFeignClient;
 
     @Override
     public BlacklistRegisterResponse registerBlacklist(BlacklistRegisterRequest request) {
         // 사용자 존재 확인
-        User user = userRepository.findById(request.getMemberId())
-                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        if(!userFeignClient.existsUser(request.getMemberId())){
+            throw new BusinessException(ErrorCode.USER_NOT_FOUND);
+        }
 
         // 이미 등록 여부 확인
         if (blacklistRepository.existsByMemberId(request.getMemberId())) {

@@ -1,6 +1,6 @@
 package com.learningcrew.linkup.notification.command.application.helper;
 
-import com.learningcrew.linkup.linker.query.service.UserQueryServiceImpl;
+import com.learningcrew.linkup.common.infrastructure.UserFeignClient;
 import com.learningcrew.linkup.notification.command.application.dto.EventNotificationRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,8 +13,7 @@ import java.util.Map;
 @Component
 @RequiredArgsConstructor
 public class FriendNotificationHelper {
-
-    private final UserQueryServiceImpl userQueryService;
+    private final UserFeignClient userFeignClient;
     private final NotificationHelper notificationHelper;
 
     /**
@@ -22,8 +21,7 @@ public class FriendNotificationHelper {
      */
     public void sendFriendRequestNotification(int requesterId, int addresseeId) {
         /* 친구 신청 알림 발송 - jgh */
-        String userName = String.valueOf(userQueryService.getUserName(requesterId)
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다.")));
+        String userName = userFeignClient.getUserNameByUserId(requesterId);
 
         Map<String, String> variables = new HashMap<>();
         variables.put("userName", userName);
@@ -47,8 +45,7 @@ public class FriendNotificationHelper {
 
     // 친구 수락 알림
     public void sendFriendAcceptNotification(int accepterId, int requesterId) {
-        String userName = String.valueOf(userQueryService.getUserName(accepterId)
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다.")));
+        String userName = userFeignClient.getUserNameByUserId(requesterId);
 
         Map<String, String> variables = new HashMap<>();
         variables.put("userName", userName);

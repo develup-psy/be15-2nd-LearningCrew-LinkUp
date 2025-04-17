@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learningcrew.linkupuser.query.mapper.UserMapper">
+    <select id="findAllUsers" resultType="UserProfileDTO">
+        SELECT
+                user_id
+              , user_name
+              , contact_number
+              , email
+              , point_balance
+          FROM user
+         WHERE role_id = #{ roleId }
+    </select>
+    <select id="findByUserEmail" resultType="UserDeleteDTO">
+        SELECT
+                 user_id
+               , email
+               , status_id
+               , password
+         FROM user
+        WHERE email = #{ email }
+    </select>
+    <select id="findByUserUserId" resultType="UserDeleteDTO">
+        SELECT
+              user_id
+            , email
+            , status_id
+            , password
+        FROM user
+        WHERE user_id = #{ userId }
+    </select>
+    <select id="findUserMeetings" resultType="UserMeetingDTO">
+        SELECT
+              m.meeting_id AS meetingId
+            , m.meeting_title AS meetingTitle
+            , u.nickname AS leaderNickName
+            , m.date AS meetingDate
+            , p.place_name AS meetingPlace
+            , m.custom_place_address AS customPlaceAddress
+            , m.latitude
+            , m.longitude
+        FROM member u
+        JOIN meeting_participation_history mph ON mph.member_id = u.member_id
+        JOIN meeting m ON m.meeting_id = mph.meeting_id
+        JOIN place p ON p.place_id = m.place_id
+        WHERE u.member_id = #{userId}
+        ORDER BY m.date DESC
+    </select>
+    <select id="findPointByUserId" resultType="UserPointDto">
+        SELECT
+                user_id
+              , point_balance AS totalPoints
+          FROM user
+         WHERE user_id = #{ userId }
+    </select>
+    <select id="findUserInfoById" resultType="UserInfoResponse">
+        SELECT
+                    u.user_id       AS userId,
+                    u.email         AS email,
+                    m.nickname      AS nickname,
+                    r.role_type     AS role,
+                    s.status_type   AS status,
+                    m.profile_image_url AS profileImageUrl
+         FROM user u
+         JOIN member m ON m.user_id = u.user_id
+         JOIN role r ON u.role_id = r.role_id
+         JOIN status s ON u.status_id = s.status_id
+        WHERE u.user_id = #{userId}
+    </select>
+    <select id="findMeetingMemberById" resultType="MeetingMemberDto">
+        SELECT
+                m.member_id AS memberId,
+                m.nickname,
+                m.gender,
+                m.birth_date AS birthDate,
+                m.introduction,
+                m.manner_temperature AS mannerTemperature,
+                m.profile_image_url AS profileImageUrl
+         FROM member m
+        WHERE m.member_id = #{memberId}
+    </select>
+    <select id="existsByUserId" resultType="boolean">
+        SELECT EXISTS (
+        SELECT 1
+        FROM member
+        WHERE member_id = #{userId}
+        )
+    </select>
+    <select id="findUserEmailByUserId" resultType="String">
+        SELECT
+              email
+          FROM user
+        where user_id = #{userId}
+    </select>
+    <select id="findUserNameByUserId" resultType="String">
+        SELECT
+              user_name
+          FROM
+         WHERE user_id = #{ userId }
+    </select>
+</mapper>

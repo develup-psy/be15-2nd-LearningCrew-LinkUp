@@ -1,7 +1,6 @@
 package com.learningcrew.linkup.point.command.application.service;
 
-import com.learningcrew.linkup.linker.command.domain.aggregate.User;
-import com.learningcrew.linkup.linker.command.domain.repository.UserRepository;
+import com.learningcrew.linkup.common.infrastructure.UserFeignClient;
 import com.learningcrew.linkup.point.command.application.dto.request.PointTransactionRequest;
 import com.learningcrew.linkup.point.command.application.dto.request.WithdrawRequest;
 import com.learningcrew.linkup.point.command.application.dto.response.PointTransactionResponse;
@@ -10,16 +9,17 @@ import com.learningcrew.linkup.point.command.domain.aggregate.PointTransaction;
 import com.learningcrew.linkup.point.command.domain.repository.AccountRepository;
 import com.learningcrew.linkup.point.command.domain.repository.PointRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PointCommandService {
     private final PointRepository pointRepository;
-    private final UserRepository userRepository;
+    private final UserFeignClient userFeignClient;
     private final AccountRepository accountRepository;
 
     @Transactional
@@ -27,9 +27,10 @@ public class PointCommandService {
 
         String transactionType = request.getTransactionType();
 
-        User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException("유저 없음"));
+        // 먼저 User 서비스에 포인트 증가 요청
+        userFeignClient.increasePoint(request.getUserId(), request.getAmount());
 
+        // 테이블에 거래 이력 저장
         if ("CHARGE".equals(transactionType)) {
             PointTransaction pointTransaction = new PointTransaction(
                     null,
@@ -39,27 +40,26 @@ public class PointCommandService {
                     null
             );
             pointRepository.save(pointTransaction);
-
-            user.addPointBalance(request.getAmount());
-            userRepository.save(user);
         }
 
-        return new PointTransactionResponse("포인트가 적립되었습니다.", user.getPointBalance());
+        // 최신 포인터 정보 조회
+        int latestPointBalance = userFeignClient.getPointBalance(request.getUserId());
+
+        return new PointTransactionResponse("포인트가 적립되었습니다.", latestPointBalance);
     }
+
     @Transactional
     public PointTransactionResponse withdrawPoint(WithdrawRequest request) {
 
-        User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException("유저 없음"));
 
         Account account = accountRepository.findByUserId(request.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("계좌 정보 없음"));
 
-        int refundAmount = user.getPointBalance(); // 전액 환불
+        int userId = request.getUserId();
+        int refundAmount = userFeignClient.getPointBalance(request.getUserId());
 
         // 포인트를 0으로 만들고
-        user.subtractPointBalance(refundAmount);
-        userRepository.save(user);
+        userFeignClient.decreasePoint(userId, refundAmount);
 
         // 계좌 잔액에 추가
         account = Account.builder()
@@ -76,14 +76,11 @@ public class PointCommandService {
         // 포인트 트랜잭션 기록
         pointRepository.save(new PointTransaction(
                 null,
-                user.getUserId(),
+                userId,
                 -refundAmount,
                 "WITHDRAW",
                 null
         ));
         return new PointTransactionResponse("전액 환불 완료", 0);
     }
-
-
-
 }

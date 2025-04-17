@@ -19,7 +19,7 @@ import java.util.Map;
 @Tag(name = "Notification 테스트 API", description = "테스트 알림 전송용 컨트롤러")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/test")
+@RequestMapping("/test")
 public class NotificationTestController {
 
     private final NotificationCommandService notificationCommandService;

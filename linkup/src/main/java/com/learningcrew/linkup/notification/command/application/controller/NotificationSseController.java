@@ -14,7 +14,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @Tag(name = "SSE 연결 API", description = "실시간 알림 수신을 위한 SSE 엔드포인트")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/sse")
+@RequestMapping("/sse")
 public class NotificationSseController {
 
     private final NotificationSseService notificationSseService;
