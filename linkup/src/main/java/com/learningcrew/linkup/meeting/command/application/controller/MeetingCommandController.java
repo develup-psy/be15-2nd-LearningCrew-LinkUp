@@ -10,10 +10,7 @@ import com.learningcrew.linkup.meeting.command.application.dto.response.MeetingC
 import com.learningcrew.linkup.meeting.command.application.service.MeetingCommandService;
 import com.learningcrew.linkup.meeting.command.application.service.MeetingParticipationCommandService;
 import com.learningcrew.linkup.meeting.query.dto.response.MeetingDTO;
-import com.learningcrew.linkup.meeting.query.dto.response.MeetingParticipationDTO;
-import com.learningcrew.linkup.meeting.query.service.MeetingParticipationQueryService;
 import com.learningcrew.linkup.meeting.query.service.MeetingQueryService;
-import com.learningcrew.linkup.meeting.query.service.StatusQueryService;
 import com.learningcrew.linkup.place.command.application.dto.request.ReservationCreateRequest;
 import com.learningcrew.linkup.place.command.application.dto.response.ReservationCommandResponse;
 import com.learningcrew.linkup.place.command.application.service.ReservationCommandService;
@@ -24,18 +21,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
+@RequestMapping("/api/v1")
 @RequiredArgsConstructor
 public class MeetingCommandController {
 
     private final MeetingCommandService meetingCommandService;
     private final MeetingParticipationCommandService service;
-    private final MeetingParticipationQueryService participationQueryService;
     private final MeetingQueryService meetingQueryService;
     private final ReservationCommandService reservationCommandService;
-    private final StatusQueryService statusQueryService;
 
     @Operation(
             summary = "모임 생성",
