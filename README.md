@@ -1540,6 +1540,10 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 
 <br>
 
+<img src="assets/test_cases/community/Test_88_1.png" alt="게시글"/>
+
+<br>
+
 
 - 게시글 작성
 
