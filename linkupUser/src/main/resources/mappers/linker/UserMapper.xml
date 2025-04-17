@@ -98,4 +98,20 @@
           FROM
          WHERE user_id = #{ userId }
     </select>
+
+    <resultMap id="UserStatusResultMap" type="UserStatusResponse">
+        <association property="status" javaType="com.learningcrew.linkupuser.common.domain.Status">
+            <result property="statusId" column="status_id"/>
+            <result property="statusType" column="status_type"/>
+        </association>
+    </resultMap>
+
+    <select id="findStatusByUserId" resultMap="UserStatusResultMap">
+        SELECT
+                s.status_id
+              , s.status_type
+          FROM user u
+          JOIN status s ON s.status_id = u.status_id
+         WHERE user_id = #{userId}
+    </select>
 </mapper>

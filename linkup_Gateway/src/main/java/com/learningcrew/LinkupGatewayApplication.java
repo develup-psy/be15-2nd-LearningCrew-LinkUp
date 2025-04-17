@@ -1,4 +1,4 @@
-package com.learningcrew.gateway;
+package com.learningcrew;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
