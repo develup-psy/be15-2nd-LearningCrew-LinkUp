@@ -40,17 +40,19 @@ public class MeetingCommandController {
     ) {
         int meetingId = meetingCommandService.createMeeting(meetingCreateRequest);
         // 2. 예약 생성
-        ReservationCreateRequest reservationCreateRequest = new ReservationCreateRequest(
-                meetingId,
-                meetingCreateRequest.getPlaceId(),
-                java.sql.Date.valueOf(meetingCreateRequest.getDate()),
-                meetingCreateRequest.getStartTime(),
-                meetingCreateRequest.getEndTime()
-        );
-        ReservationCommandResponse reservationResponse = reservationCommandService.createReservation(reservationCreateRequest);
-        System.out.println(reservationResponse.getMessage());
+        Integer placeId = meetingCreateRequest.getPlaceId();
+        if (placeId != null) {
+            ReservationCreateRequest reservationCreateRequest = new ReservationCreateRequest(
+                    meetingId,
+                    meetingCreateRequest.getPlaceId(),
+                    java.sql.Date.valueOf(meetingCreateRequest.getDate()),
+                    meetingCreateRequest.getStartTime(),
+                    meetingCreateRequest.getEndTime()
+            );
+            ReservationCommandResponse reservationResponse = reservationCommandService.createReservation(reservationCreateRequest);
+        }
 
-        MeetingCommandResponse response = new MeetingCommandResponse(meetingId);
+            MeetingCommandResponse response = new MeetingCommandResponse(meetingId);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success(response));
