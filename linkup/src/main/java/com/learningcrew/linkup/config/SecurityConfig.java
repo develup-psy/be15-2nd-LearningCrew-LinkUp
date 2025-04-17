@@ -128,7 +128,7 @@ public class SecurityConfig {
     private void sharedAuthEndpoints(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auths) {
         //회원 OR 관리자
         auths.requestMatchers(
-                "/meetings/**",
+                "/meetings",
                 "/meetings/user/{userId}",
                 "/meetings/user/{userId}/done",
                 "/meetings/{meetingId}/participation",
@@ -164,7 +164,6 @@ public class SecurityConfig {
     /* 사용자 접근 api */
     private void userEndpoints(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auths) {
         auths.requestMatchers(
-                "/meetings/**",
                 "/users/**",
                 "/accounts/**",
                 "/auth/**",
