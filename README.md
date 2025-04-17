@@ -1120,6 +1120,16 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 <details>
 <summary>알림 관리</summary>
 
+- 알림 설정
+
+<img src="assets/test_cases/notification/Test_102_set.png" alt="알림 관리"/>
+
+<br>
+
+<img src="assets/test_cases/notification/Test_103_set.png" alt="알림 관리"/>
+
+<br>
+
 - 알림 내역 조회
 
 <img src="assets/test_cases/notification/Test_102.png" alt="알림 관리"/>
