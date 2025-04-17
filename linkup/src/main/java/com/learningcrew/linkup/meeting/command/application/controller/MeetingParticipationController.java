@@ -20,7 +20,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/meetings")
 @RequiredArgsConstructor
 @Tag(name = "모임 참가 관리", description = "모임 참가 신청 및 취소 API")
 public class MeetingParticipationController {
@@ -32,7 +31,7 @@ public class MeetingParticipationController {
     private final MeetingParticipationHistoryRepository participationRepository;
 
     @Operation(summary = "모임 참가 신청 가능 여부 확인", description = "포인트 기준 참가 가능 여부 확인")
-    @GetMapping("/{meetingId}/participation/check")
+    @GetMapping("/meetings/{meetingId}/participation/check")
     public ResponseEntity<ApiResponse<MeetingPaymentResponse>> checkEligibility(
             @PathVariable int meetingId,
             @RequestParam("userId") int userId
@@ -48,7 +47,7 @@ public class MeetingParticipationController {
     }
 
     @Operation(summary = "모임 참가 신청", description = "회원이 모임에 참가 신청")
-    @PostMapping("/{meetingId}/participation")
+    @PostMapping("/meetings/{meetingId}/participation")
     public ResponseEntity<ApiResponse<MeetingParticipationCommandResponse>> createMeetingParticipation(
             @RequestBody @Validated MeetingParticipationCreateRequest request,
             @PathVariable int meetingId
@@ -69,7 +68,7 @@ public class MeetingParticipationController {
     }
 
     @Operation(summary = "모임 참가 취소", description = "회원이 모임 참가 취소")
-    @DeleteMapping("/{meetingId}/participation/{memberId}")
+    @DeleteMapping("/meetings/{meetingId}/participation/{memberId}")
     public ResponseEntity<ApiResponse<MeetingParticipationCommandResponse>> deleteMeetingParticipation(
             @PathVariable int meetingId,
             @PathVariable int memberId

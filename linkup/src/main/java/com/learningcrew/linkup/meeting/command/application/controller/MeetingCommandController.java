@@ -14,6 +14,7 @@ import com.learningcrew.linkup.meeting.command.application.service.MeetingPartic
 import com.learningcrew.linkup.meeting.command.domain.aggregate.Meeting;
 import com.learningcrew.linkup.meeting.command.domain.repository.MeetingRepository;
 import com.learningcrew.linkup.place.command.application.dto.request.ReservationCreateRequest;
+import com.learningcrew.linkup.place.command.application.dto.response.ReservationCommandResponse;
 import com.learningcrew.linkup.place.command.application.service.ReservationCommandService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,7 +25,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/meetings")
 @RequiredArgsConstructor
 @Tag(name = "모임 관리", description = "모임 개설자 기능 API")
 public class MeetingCommandController {
@@ -35,22 +35,24 @@ public class MeetingCommandController {
     private final MeetingRepository meetingRepository;
 
     @Operation(summary = "모임 생성", description = "회원이 운동 종목, 날짜(2주 이내), 시간, 장소, 인원을 입력해 모임을 개설한다.")
-    @PostMapping
+    @PostMapping("/meetings")
     public ResponseEntity<ApiResponse<MeetingCommandResponse>> createMeeting(
-            @RequestBody @Validated MeetingCreateRequest request
+            @RequestBody @Validated MeetingCreateRequest meetingCreateRequest
     ) {
-        int meetingId = meetingCommandService.createMeeting(request);
+        int meetingId = meetingCommandService.createMeeting(meetingCreateRequest);
 
         // 장소가 있을 경우 예약도 함께 생성
-        if (request.getPlaceId() != null) {
-            ReservationCreateRequest reservationRequest = new ReservationCreateRequest(
+        Integer placeId = meetingCreateRequest.getPlaceId();
+        if (placeId != null) {
+            ReservationCreateRequest reservationCreateRequest = new ReservationCreateRequest(
                     meetingId,
-                    request.getPlaceId(),
-                    java.sql.Date.valueOf(request.getDate()),
-                    request.getStartTime(),
-                    request.getEndTime()
+                    placeId,
+                    java.sql.Date.valueOf(meetingCreateRequest.getDate()),
+                    meetingCreateRequest.getStartTime(),
+                    meetingCreateRequest.getEndTime()
             );
-            reservationCommandService.createReservation(reservationRequest);
+            ReservationCommandResponse reservationResponse = reservationCommandService.createReservation(reservationCreateRequest);
+            System.out.println(reservationResponse.getMessage());
         }
 
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -58,7 +60,7 @@ public class MeetingCommandController {
     }
 
     @Operation(summary = "참가 승인", description = "개설자가 참가 신청을 승인한다.")
-    @PutMapping("/{meetingId}/participation/{memberId}/accept")
+    @PutMapping("/meetings/{meetingId}/participation/{memberId}/accept")
     public ResponseEntity<ApiResponse<ManageParticipationResponse>> acceptParticipation(
             @PathVariable int meetingId,
             @PathVariable int memberId,
@@ -82,7 +84,7 @@ public class MeetingCommandController {
     }
 
     @Operation(summary = "참가 거절", description = "개설자가 참가 신청을 거절한다.")
-    @PutMapping("/{meetingId}/participation/{memberId}/reject")
+    @PutMapping("/meetings/{meetingId}/participation/{memberId}/reject")
     public ResponseEntity<ApiResponse<ManageParticipationResponse>> rejectParticipation(
             @PathVariable int meetingId,
             @PathVariable int memberId,
@@ -106,7 +108,7 @@ public class MeetingCommandController {
     }
 
     @Operation(summary = "개설자 변경", description = "개설자가 권한을 다른 참여자에게 넘긴다.")
-    @PutMapping("/{meetingId}/change-leader/{memberId}")
+    @PutMapping("/meetings/{meetingId}/change-leader/{memberId}")
     public ResponseEntity<ApiResponse<LeaderUpdateResponse>> updateLeader(
             @PathVariable int meetingId,
             @PathVariable int memberId,
@@ -117,7 +119,7 @@ public class MeetingCommandController {
     }
 
     @Operation(summary = "모집 취소", description = "개설자가 모임을 취소한다.")
-    @DeleteMapping("/{meetingId}/cancel")
+    @DeleteMapping("/meetings/{meetingId}/cancel")
     public ResponseEntity<ApiResponse<MeetingCommandResponse>> deleteMeeting(
             @PathVariable int meetingId,
             @RequestParam int memberId
