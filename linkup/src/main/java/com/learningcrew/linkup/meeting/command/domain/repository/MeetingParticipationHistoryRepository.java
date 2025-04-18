@@ -23,4 +23,6 @@ public interface MeetingParticipationHistoryRepository {
     boolean existsByMeetingIdAndMemberIdAndStatusId(int meetingId, int memberId, int statusAccepted);
 
     List<MeetingParticipationHistory> findAllByMeetingId(int meetingId);
+
+    List<MeetingParticipationHistory> findByMemberIdAndMeetingIdAndStatusId(Integer memberId, Integer meetingId, int statusReviewWritten);
 }
