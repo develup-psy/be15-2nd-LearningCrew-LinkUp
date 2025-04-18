@@ -809,7 +809,7 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 
 > 전체 시스템 구성 다이어그램  
 
-<img src="assets/images/sysetem_architecture.jpg" alt="sysetem_architecture"/>
+<img src="assets/images/sysetem_architecture.jpg" alt="sysetem_architecture" width="700"/>
 
 <br>
 
@@ -837,11 +837,9 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 
 🔗 [테스트 케이스 정의서 링크](https://docs.google.com/spreadsheets/d/e/2PACX-1vS5z7lnFVoKhrHU0zT55KpMlmla72tCCbzkwDi_7PyI23dByzC5GMS2v7jT-7YjDzr9LlZDPXG-xev4/pubhtml?gid=1875790254&single=true)
 
-<img src="assets/images/test_case_definition_1.jpg" alt="test_case_definition"/>
+<img src="assets/images/test_case_definition_1.jpg" alt="test_case_definition" width="550"/>
 
-<br>
-
-<img src="assets/images/test_case_definition_2.jpg" alt="test_case_definition"/>
+<img src="assets/images/test_case_definition_2.jpg" alt="test_case_definition" width="550"/>
 
 <br>
 
