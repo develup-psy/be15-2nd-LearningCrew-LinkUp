@@ -1,47 +1,45 @@
 package com.learningcrew.linkup.meeting.command.application.service;
 
+import com.learningcrew.linkup.common.infrastructure.UserFeignClient;
+import com.learningcrew.linkup.common.query.mapper.SportTypeMapper;
 import com.learningcrew.linkup.exception.BusinessException;
 import com.learningcrew.linkup.exception.ErrorCode;
-import com.learningcrew.linkup.linker.command.domain.aggregate.Member;
-import com.learningcrew.linkup.linker.command.domain.repository.MemberRepository;
 import com.learningcrew.linkup.meeting.command.application.dto.request.LeaderUpdateRequest;
 import com.learningcrew.linkup.meeting.command.application.dto.request.MeetingCreateRequest;
 import com.learningcrew.linkup.meeting.command.application.dto.request.MeetingParticipationCreateRequest;
-import com.learningcrew.linkup.meeting.command.domain.aggregate.*;
+import com.learningcrew.linkup.meeting.command.domain.aggregate.Meeting;
+import com.learningcrew.linkup.meeting.command.domain.aggregate.MeetingParticipationHistory;
 import com.learningcrew.linkup.meeting.command.domain.repository.BestPlayerRepository;
 import com.learningcrew.linkup.meeting.command.domain.repository.MeetingParticipationHistoryRepository;
 import com.learningcrew.linkup.meeting.command.domain.repository.MeetingRepository;
-import com.learningcrew.linkup.meeting.command.domain.repository.ParticipantReviewRepository;
+import com.learningcrew.linkup.meeting.query.mapper.MeetingMapper;
+import com.learningcrew.linkup.meeting.query.service.MeetingParticipationQueryService;
+import com.learningcrew.linkup.notification.command.application.helper.MeetingNotificationHelper;
+import com.learningcrew.linkup.notification.command.application.helper.PointNotificationHelper;
+import com.learningcrew.linkup.place.query.service.PlaceQueryService;
+import com.learningcrew.linkup.point.command.domain.repository.PointRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class MeetingCommandService {
-    static final int MANNER_TEMPERATURE_SUBTRACT = 2;
-    static final int MANNER_TEMPERATURE_MULTIPLIER_FOR_LEADER = 2;
+    private static final int MIN_USER = 1;
+    private static final int MAX_USER = 30;
 
-    private List<Meeting> cachedTodaysMeetings;
-    private List<Meeting> cachedYesterdaysMeetings;
-
-    private final BestPlayerRepository bestPlayerRepository;
-    private final MemberRepository memberRepository;
-    private final MeetingRepository meetingRepository;
-    private final MeetingParticipationHistoryRepository meetingParticipationHistoryRepository;
-    private final MeetingParticipationCommandService meetingParticipationCommandService;
-    private final MeetingStatusService meetingStatusService;
-    private final ParticipantReviewRepository participantReviewRepository;
-
+    private static final int MANNER_TEMPERATURE_SUBTRACT = 2;
+    private static final int MANNER_TEMPERATURE_MULTIPLIER_FOR_LEADER = 2;
 
     private static final int STATUS_PENDING = 1;
     private static final int STATUS_ACCEPTED = 2;
@@ -49,16 +47,36 @@ public class MeetingCommandService {
     private static final int STATUS_DELETED = 4;
     private static final int STATUS_DONE = 5;
 
-    private static final int MIN_USER = 1;
-    private static final int MAX_USER = 30;
+    private List<Meeting> cachedTodaysMeetings;
+//    private List<Meeting> cachedYesterdaysMeetings;
+
+    private final BestPlayerRepository bestPlayerRepository;
+    private final MeetingRepository meetingRepository;
+    private final MeetingStatusService meetingStatusService;
+    private final MeetingParticipationHistoryRepository meetingParticipationHistoryRepository;
+    private final MeetingNotificationHelper meetingNotificationHelper;
+    private final PointNotificationHelper pointNotificationHelper;
+
+    private final MeetingParticipationCommandService meetingParticipationCommandService;
+    private final MeetingParticipationCommandService participationCommandService;
+    private final MeetingParticipationQueryService participationQueryService;
+    private final SportTypeMapper sportTypeMapper;
+    private final PlaceQueryService placeQueryService;
+    private final PointRepository pointRepository;
+
+    private final UserFeignClient userFeignClient;
+
+
 
     /**
      * 1. 모임 생성
      */
     @Transactional
     public int createMeeting(MeetingCreateRequest request) {
+        /* 1. 검증 로직 */
         validateMeetingCreateRequest(request);
 
+        /* 2. 모임 저장 */
         Meeting meeting = Meeting.builder()
                 .leaderId(request.getLeaderId())
                 .placeId(request.getPlaceId())
@@ -79,17 +97,17 @@ public class MeetingCommandService {
                 .longitude(request.getLongitude())
                 .build();
 
-        Meeting saved = meetingRepository.save(meeting);
-        meetingStatusService.changeStatusByMemberCount(saved); // 혹시 minUser 1이면 status 바로 변경
+        Meeting savedMeeting = meetingRepository.save(meeting);
+        meetingStatusService.changeStatusByMemberCount(savedMeeting); // 혹시 minUser 1이면 status 바로 변경
 
-        // 개설자 자동 참가 처리
+        /* 3. 개설자를 모임 참가자에 등록 */
         MeetingParticipationCreateRequest participationRequest = MeetingParticipationCreateRequest.builder()
-                .memberId(saved.getLeaderId())
+                .memberId(savedMeeting.getLeaderId())
                 .build();
 
-        meetingParticipationCommandService.createMeetingParticipation(participationRequest, saved);
+        meetingParticipationCommandService.createMeetingParticipation(participationRequest, savedMeeting);
 
-        return saved.getMeetingId();
+        return savedMeeting.getMeetingId();
     }
 
     /**
@@ -97,13 +115,16 @@ public class MeetingCommandService {
      */
     @Transactional
     public int updateLeader(int meetingId, int newLeaderId, LeaderUpdateRequest request) {
+        // 1. 모임 정보 조회
         Meeting meeting = meetingRepository.findById(meetingId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEETING_NOT_FOUND));
 
+        // 2. 권한 체크 (현재 리더가 요청한 사람인지 확인)
         if (meeting.getLeaderId() != request.getMemberId()) {
             throw new BusinessException(ErrorCode.FORBIDDEN, "개설자만 개설자 변경 권한이 있습니다.");
         }
 
+        // 3. 새로운 개설자가 모임 참여자인지 확인
         List<MeetingParticipationHistory> acceptedParticipants =
                 meetingParticipationHistoryRepository.findByMeetingIdAndStatusId(meetingId, STATUS_ACCEPTED);
 
@@ -114,15 +135,24 @@ public class MeetingCommandService {
             throw new BusinessException(ErrorCode.USER_NOT_FOUND, "해당 회원은 모임 참여자가 아닙니다.");
         }
 
+        // 4. 기존 개설자의 참여 내역 soft delete
         meetingParticipationHistoryRepository.findByMeetingIdAndMemberId(meetingId, request.getMemberId())
                 .ifPresent(oldLeaderHistory -> {
                     oldLeaderHistory.setStatusId(STATUS_DELETED);
                     meetingParticipationHistoryRepository.save(oldLeaderHistory);
                 });
+        // 5. 환불 처리
+
+        // 6. 모임 리더 변경
 
         meeting.setLeaderId(newLeaderId);
         Meeting saved = meetingRepository.save(meeting);
+
+        // 모임 status 변경
         meetingStatusService.changeStatusByMemberCount(saved);
+
+        /* 개설자 변경 알림 발송 */
+
 
         return meetingId;
     }
@@ -146,8 +176,22 @@ public class MeetingCommandService {
             }
         }
 
+        /* 모임의 status를 deleted로 변경하고 update */
         meeting.setStatusId(STATUS_DELETED);
+
+        // 장소 대여비 회수 로직 추가
         meetingRepository.save(meeting);
+    }
+
+    public void validateCreatorBalance(int creatorId, Integer placeId, int minUser) {
+    }
+
+    public void cancelMeetingByLeader(int meetingId) {
+
+    }
+
+    public void forceCompleteMeeting(int meetingId) {
+
     }
 
     /**
@@ -175,15 +219,15 @@ public class MeetingCommandService {
 
 
     @Scheduled(cron = "0 0 0 * * *") // 자정에 한 번 오늘 모임 목록 캐싱
-    public void cacheTodaysMeetings() {
+    public void cacheMeetings() {
         LocalDate today = LocalDate.now();
         LocalDate yesterday = today.minusDays(1);
 
         cachedTodaysMeetings = meetingRepository.findAllByDate(today);
-        cachedYesterdaysMeetings = meetingRepository.findAllByDate(yesterday);
+//        cachedYesterdaysMeetings = meetingRepository.findAllByDate(yesterday);
 
         log.info("오늘 모임 {}건 캐싱 완료", cachedTodaysMeetings.size());
-        log.info("어제 모임 {}건 캐싱 완료", cachedYesterdaysMeetings.size());
+//        log.info("어제 모임 {}건 캐싱 완료", cachedYesterdaysMeetings.size());
     }
 
     @Transactional
@@ -256,104 +300,103 @@ public class MeetingCommandService {
         }
     }
 
-
-    @Transactional
-    @Scheduled(cron = "0 0,30 * * * *")
-        // 매 30분마다 반영 시도
-        /* 매너온도 반영 */
-    void updateMannerTemperatures() {
-        if (cachedYesterdaysMeetings == null) {
-            log.warn("어제 모임 목록이 캐싱되지 않았습니다.");
-            return;
-        }
-
-        /* 어제 모임 중 현재 시각과 종료 시각이 일치하는 종료된(STATUS 5) 모임의 ID만 필터링 */
-        List<Meeting> meetings = cachedYesterdaysMeetings.stream()
-                .filter(meeting
-                        -> Math.abs(Duration.between(LocalTime.now(), meeting.getEndTime()).toMinutes()) <= 1)
-                .filter(meeting -> meeting.getStatusId() == STATUS_DONE)
-                .toList();
-
-        meetings.forEach(
-                meeting -> {
-                    Map<Member, Double> changesOfMannerTemperatures
-                            = getChangesOfMannerTemperatures(meeting);
-
-                    Double maxAvg = changesOfMannerTemperatures.values()
-                            .stream().max(Comparator.naturalOrder())
-                            .orElse(null);
-
-                    if (maxAvg != null) {
-                        List<Member> bestPlayers = changesOfMannerTemperatures.entrySet()
-                                .stream()
-                                .filter(kv -> kv.getValue().equals(maxAvg))
-                                .map(Map.Entry::getKey)
-                                .toList();
-
-                        /* 베스트 플레이어 등록 */
-                        bestPlayers.forEach(
-                                member -> {
-                                    BestPlayerId id = new BestPlayerId(meeting.getMeetingId(), member.getMemberId());
-                                    BestPlayer bestPlayer = new BestPlayer(id);
-
-                                    bestPlayerRepository.save(bestPlayer);
-                                }
-                        );
-
-                        /* 리더의 변화량은 2배 */
-                        int leaderId = meeting.getLeaderId();
-                        Member leader = changesOfMannerTemperatures
-                                .keySet().stream()
-                                .filter(member -> member.getMemberId() == leaderId)
-                                .findFirst().orElse(null);
-
-                        changesOfMannerTemperatures.put(leader,
-                                MANNER_TEMPERATURE_MULTIPLIER_FOR_LEADER * changesOfMannerTemperatures.get(leader)
-                        );
-
-                        changesOfMannerTemperatures.keySet()
-                                .forEach(
-                                        member -> {
-                                            BigDecimal updatedMannerTemperature
-                                                    = member.getMannerTemperature().add(BigDecimal.valueOf(changesOfMannerTemperatures.get(member)
-                                            ));
-
-                                            member.setMannerTemperature(updatedMannerTemperature);
-
-                                            memberRepository.save(member);
-                                        }
-                                );
-                    }
-                }
-        );
-    }
-
-    /* 매너온도 계산 */
-    private Map<Member, Double> getChangesOfMannerTemperatures(Meeting meeting) {
-        List<ParticipantReview> reviews = participantReviewRepository.findAllByMeetingId(meeting.getMeetingId());
-
-        /* avg 편하게 계산할 수 있게 double로 */
-        Map<Member, Double> changesOfMannerTemperatures = new HashMap<>();
-
-        List<Member> reviewees = reviews.stream().map(ParticipantReview::getRevieweeId)
-                .distinct()
-                .map(id -> memberRepository.findById(id)
-                        .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND))
-                )
-                .toList();
-
-        reviewees.forEach(reviewee -> {
-            double changeOfMannerTemperature =
-                    reviews.stream()
-                            .filter(review -> review.getRevieweeId() == reviewee.getMemberId())
-                            .map(ParticipantReview::getScore)
-                            .mapToDouble(score -> score)
-                            .average()
-                            .orElse(MANNER_TEMPERATURE_SUBTRACT) - MANNER_TEMPERATURE_SUBTRACT;
-
-            changesOfMannerTemperatures.put(reviewee, changeOfMannerTemperature);
-        });
-
-        return changesOfMannerTemperatures;
-    }
+//    @Transactional
+//    @Scheduled(cron = "0 0,30 * * * *")
+//        // 매 30분마다 반영 시도
+//        /* 매너온도 반영 */
+//    void updateMannerTemperatures() {
+//        if (cachedYesterdaysMeetings == null) {
+//            log.warn("어제 모임 목록이 캐싱되지 않았습니다.");
+//            return;
+//        }
+//
+//        /* 어제 모임 중 현재 시각과 종료 시각이 일치하는 종료된(STATUS 5) 모임의 ID만 필터링 */
+//        List<Meeting> meetings = cachedYesterdaysMeetings.stream()
+//                .filter(meeting
+//                        -> Math.abs(Duration.between(LocalTime.now(), meeting.getEndTime()).toMinutes()) <= 1)
+//                .filter(meeting -> meeting.getStatusId() == STATUS_DONE)
+//                .toList();
+//
+//        meetings.forEach(
+//                meeting -> {
+//                    Map<Member, Double> changesOfMannerTemperatures
+//                            = getChangesOfMannerTemperatures(meeting);
+//
+//                    Double maxAvg = changesOfMannerTemperatures.values()
+//                            .stream().max(Comparator.naturalOrder())
+//                            .orElse(null);
+//
+//                    if (maxAvg != null) {
+//                        List<Member> bestPlayers = changesOfMannerTemperatures.entrySet()
+//                                .stream()
+//                                .filter(kv -> kv.getValue().equals(maxAvg))
+//                                .map(Map.Entry::getKey)
+//                                .toList();
+//
+//                        /* 베스트 플레이어 등록 */
+//                        bestPlayers.forEach(
+//                                member -> {
+//                                    BestPlayerId id = new BestPlayerId(meeting.getMeetingId(), member.getMemberId());
+//                                    BestPlayer bestPlayer = new BestPlayer(id);
+//
+//                                    bestPlayerRepository.save(bestPlayer);
+//                                }
+//                        );
+//
+//                        /* 리더의 변화량은 2배 */
+//                        int leaderId = meeting.getLeaderId();
+//                        Member leader = changesOfMannerTemperatures
+//                                .keySet().stream()
+//                                .filter(member -> member.getMemberId() == leaderId)
+//                                .findFirst().orElse(null);
+//
+//                        changesOfMannerTemperatures.put(leader,
+//                                MANNER_TEMPERATURE_MULTIPLIER_FOR_LEADER * changesOfMannerTemperatures.get(leader)
+//                        );
+//
+//                        changesOfMannerTemperatures.keySet()
+//                                .forEach(
+//                                        member -> {
+//                                            BigDecimal updatedMannerTemperature
+//                                                    = member.getMannerTemperature().add(BigDecimal.valueOf(changesOfMannerTemperatures.get(member)
+//                                            ));
+//
+//                                            member.setMannerTemperature(updatedMannerTemperature);
+//
+//                                            memberRepository.save(member);
+//                                        }
+//                                );
+//                    }
+//                }
+//        );
+//    }
+//
+//    /* 매너온도 계산 */
+//    private Map<Member, Double> getChangesOfMannerTemperatures(Meeting meeting) {
+//        List<ParticipantReview> reviews = participantReviewRepository.findAllByMeetingId(meeting.getMeetingId());
+//
+//        /* avg 편하게 계산할 수 있게 double로 */
+//        Map<Member, Double> changesOfMannerTemperatures = new HashMap<>();
+//
+//        List<Member> reviewees = reviews.stream().map(ParticipantReview::getRevieweeId)
+//                .distinct()
+//                .map(id -> memberRepository.findById(id)
+//                        .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND))
+//                )
+//                .toList();
+//
+//        reviewees.forEach(reviewee -> {
+//            double changeOfMannerTemperature =
+//                    reviews.stream()
+//                            .filter(review -> review.getRevieweeId() == reviewee.getMemberId())
+//                            .map(ParticipantReview::getScore)
+//                            .mapToDouble(score -> score)
+//                            .average()
+//                            .orElse(MANNER_TEMPERATURE_SUBTRACT) - MANNER_TEMPERATURE_SUBTRACT;
+//
+//            changesOfMannerTemperatures.put(reviewee, changeOfMannerTemperature);
+//        });
+//
+//        return changesOfMannerTemperatures;
+//    }
 }

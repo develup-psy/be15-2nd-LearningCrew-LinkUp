@@ -90,6 +90,7 @@ public class MeetingCommandController {
             @PathVariable int memberId,
             @RequestBody ManageParticipationRequest request
     ) {
+        // 1. 요청된 모임의 주최자가 맞는지 확인
         Meeting meeting = meetingRepository.findById(meetingId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEETING_NOT_FOUND));
 
@@ -97,6 +98,7 @@ public class MeetingCommandController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
+        // 2. 참가 거절
         long participationId = participationService.rejectParticipation(meeting, memberId);
 
         return ResponseEntity.ok(ApiResponse.success(
