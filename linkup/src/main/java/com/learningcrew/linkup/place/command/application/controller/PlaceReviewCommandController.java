@@ -17,7 +17,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1")
+@RequestMapping("")
 @Tag(name="장소 리뷰 관리", description="장소 리뷰 등록 API")
 public class PlaceReviewCommandController {
 

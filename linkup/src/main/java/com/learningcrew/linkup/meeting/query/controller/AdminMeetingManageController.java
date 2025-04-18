@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/meetings/list")
+@RequestMapping("/meetings/list")
 @RequiredArgsConstructor
 @Tag(name = "관리자 - 모임 관리", description = "관리자의 모임 이력/회원별 조회 기능")
 public class AdminMeetingManageController {
