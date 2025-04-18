@@ -157,7 +157,8 @@ public class SecurityConfig {
                 "/auth/password/reset",
                 "/users/recover",
                 "/auth/refresh",
-                "/auth/verify-email"
+                "/auth/verify-email",
+                "/payments/me/history"
         ).permitAll();
     }
 
