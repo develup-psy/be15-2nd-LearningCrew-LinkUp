@@ -31,7 +31,7 @@ public class PostQueryService {
                     dto.setPostId(post.getPostId());
                     dto.setTitle(post.getTitle());
                     dto.setContent(post.getContent());
-//                    dto.setIsNotice(post.getPostIsNotice().name());
+                    dto.setIsNotice(post.getPostIsNotice().name());
                     dto.setCreatedAt(post.getPostCreatedAt().toString());
                     dto.setUpdatedAt(post.getPostUpdatedAt().toString());
                     return dto;

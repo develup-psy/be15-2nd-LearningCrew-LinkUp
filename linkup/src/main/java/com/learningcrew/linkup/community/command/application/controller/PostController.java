@@ -20,27 +20,27 @@ public class PostController {
 
     private final PostService postService;
 
-//    @PostMapping
-//    public ResponseEntity<ApiResponse<PostResponse>> createPost(
-//            @RequestPart("postCreateRequest") PostCreateRequest postCreateRequest,   // @RequestBody -> @RequestPart
-//            @RequestPart(required = false) List<MultipartFile> postImgs) {  // 파일 업로드를 위한 MultipartFile
-//        PostResponse response = postService.createPost(postCreateRequest, postImgs);
-//        return ResponseEntity.status(HttpStatus.CREATED)
-//                .body(ApiResponse.success(response));
-//    }
-//
-//    @PutMapping("/{postId}")
-//    public ResponseEntity<ApiResponse<PostResponse>> updatePost(
-//            @PathVariable int postId,
-//            @RequestPart PostUpdateRequest postUpdateRequest,  // @RequestBody -> @RequestPart
-//            @RequestPart(required = false) List<MultipartFile> postImgs) {  // 파일 업로드를 위한 MultipartFile
-//        PostResponse response = postService.updatePost(postId, postUpdateRequest, postImgs);
-//        return ResponseEntity.ok(ApiResponse.success(response));
-//    }
-//
-//    @PutMapping("/{postId}/delete")
-//    public ResponseEntity<ApiResponse<Void>> deletePost(@PathVariable int postId) {
-//        postService.deletePost(postId);
-//        return ResponseEntity.ok(ApiResponse.success(null));
-//    }
+    @PostMapping
+    public ResponseEntity<ApiResponse<PostResponse>> createPost(
+            @RequestPart("postCreateRequest") PostCreateRequest postCreateRequest,   // @RequestBody -> @RequestPart
+            @RequestPart(required = false) List<MultipartFile> postImgs) {  // 파일 업로드를 위한 MultipartFile
+        PostResponse response = postService.createPost(postCreateRequest, postImgs);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success(response));
+    }
+
+    @PutMapping("/{postId}")
+    public ResponseEntity<ApiResponse<PostResponse>> updatePost(
+            @PathVariable int postId,
+            @RequestPart PostUpdateRequest postUpdateRequest,  // @RequestBody -> @RequestPart
+            @RequestPart(required = false) List<MultipartFile> postImgs) {  // 파일 업로드를 위한 MultipartFile
+        PostResponse response = postService.updatePost(postId, postUpdateRequest, postImgs);
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+    @PutMapping("/{postId}/delete")
+    public ResponseEntity<ApiResponse<Void>> deletePost(@PathVariable int postId) {
+        postService.deletePost(postId);
+        return ResponseEntity.ok(ApiResponse.success(null));
+    }
 }

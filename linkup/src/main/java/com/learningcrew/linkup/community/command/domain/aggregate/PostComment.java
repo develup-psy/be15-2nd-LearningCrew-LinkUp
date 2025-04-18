@@ -48,8 +48,8 @@ public class PostComment {
         this.deletedAt = LocalDateTime.now();
     }
 
-//    public void softDeleteComment(int postId, BigInteger commentId, int userId) {
-//    }
+    public void softDeleteComment(int postId, BigInteger commentId, int userId) {
+    }
 
     public void setCommentDeletedAt(LocalDateTime now) {
         this.deletedAt = now;

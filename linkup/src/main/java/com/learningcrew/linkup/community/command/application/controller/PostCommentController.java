@@ -18,21 +18,21 @@ public class PostCommentController {
 
     private final PostCommentService postCommentService;
 
-//    @PostMapping("/{userId}")
-//    public ResponseEntity<ApiResponse<PostCommentResponse>> createComment
-//            (@PathVariable int postId,
-//            @RequestBody PostCommentCreateRequest commentRequest) {
-//        PostCommentResponse response = postCommentService.createComment(postId, commentRequest);
-//        return ResponseEntity.status(HttpStatus.CREATED)
-//                .body(ApiResponse.success(response));
-//    }
+    @PostMapping("/{userId}")
+    public ResponseEntity<ApiResponse<PostCommentResponse>> createComment
+            (@PathVariable int postId,
+            @RequestBody PostCommentCreateRequest commentRequest) {
+        PostCommentResponse response = postCommentService.createComment(postId, commentRequest);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success(response));
+    }
 
     @PutMapping("/{commentId}/delete")
         public ResponseEntity<ApiResponse<PostCommentResponse>> deleteComment(
         @PathVariable int postId,
         @PathVariable BigInteger commentId,
         @RequestParam  int userId) {
-//        postCommentService.softDeleteComment(postId, commentId, userId);
+        postCommentService.softDeleteComment(postId, commentId, userId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
                 .body(ApiResponse.success(null));
         }

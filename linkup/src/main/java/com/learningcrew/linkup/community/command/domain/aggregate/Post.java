@@ -2,6 +2,7 @@ package com.learningcrew.linkup.community.command.domain.aggregate;
 
 //import com.learningcrew.linkup.common.Image;
 //import com.learningcrew.linkup.community.command.domain.constants.PostIsNotice;
+import com.learningcrew.linkup.community.command.domain.PostIsNotice;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -33,9 +34,9 @@ public class Post {
     @Column(name = "is_deleted")
     private String isDeleted = "N";
 
-//    @Enumerated(EnumType.STRING)
-//    @Column(name = "is_notice")
-//    private PostIsNotice postIsNotice = PostIsNotice.N;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "is_notice")
+    private PostIsNotice postIsNotice = PostIsNotice.N;
 
     @Column(name = "created_at")
     private LocalDateTime postCreatedAt;
@@ -43,11 +44,11 @@ public class Post {
     @Column(name = "updated_at")
     private LocalDateTime postUpdatedAt;
 
-//    public void updatePostDetails(String title, String content, String isNotice) {
-//        this.title = title;
-//        this.content = content;
-//        this.postIsNotice = PostIsNotice.valueOf(isNotice.toUpperCase());
-//    }
+    public void updatePostDetails(String title, String content, String isNotice) {
+        this.title = title;
+        this.content = content;
+        this.postIsNotice = PostIsNotice.valueOf(isNotice.toUpperCase());
+    }
 
     public void setIsDelete(String isDelete) {
         this.isDeleted = isDelete;
