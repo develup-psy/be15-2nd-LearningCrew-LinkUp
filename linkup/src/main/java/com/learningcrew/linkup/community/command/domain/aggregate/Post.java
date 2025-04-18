@@ -1,11 +1,14 @@
 package com.learningcrew.linkup.community.command.domain.aggregate;
 
 //import com.learningcrew.linkup.common.Image;
+//import com.learningcrew.linkup.community.command.domain.constants.PostIsNotice;
+import com.learningcrew.linkup.community.command.domain.PostIsNotice;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 @Entity
@@ -24,44 +27,33 @@ public class Post {
 
     private int userId;
 
-    private String postTitle;
+    private String title;
 
-    private String postContent;
+    private String content;
 
-    private String postIsDeleted = "N";
+    @Column(name = "is_deleted")
+    private String isDeleted = "N";
 
-    private String postIsNotice = "N";
+    @Enumerated(EnumType.STRING)
+    @Column(name = "is_notice")
+    private PostIsNotice postIsNotice = PostIsNotice.N;
 
+    @Column(name = "created_at")
     private LocalDateTime postCreatedAt;
 
+    @Column(name = "updated_at")
     private LocalDateTime postUpdatedAt;
 
-    private LocalDateTime postDeletedAt;
-
-    @PrePersist
-    protected void onCreate() {
-        this.postCreatedAt = LocalDateTime.now();
-        this.postUpdatedAt = LocalDateTime.now();
+    public void updatePostDetails(String title, String content, String isNotice) {
+        this.title = title;
+        this.content = content;
+        this.postIsNotice = PostIsNotice.valueOf(isNotice.toUpperCase());
     }
 
-    @PreUpdate
-    protected void onUpdate() {
-        this.postUpdatedAt = LocalDateTime.now();
+    public void setIsDelete(String isDelete) {
+        this.isDeleted = isDelete;
     }
 
-
-    public void updatePostDetails(int postId, int userId, String postTitle, String postContent) {
-        this.postId = postId;
-        this.userId = userId;
-        this.postTitle = postTitle;
-        this.postContent = postContent;
-    }
-
-
-    // 게시글과 이미지를 연결하는 관계
-//    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-//    private List<Image> images;
-
-
+    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<PostImage> postImages;
 }
-

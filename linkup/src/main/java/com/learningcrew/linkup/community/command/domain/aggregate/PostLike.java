@@ -21,4 +21,11 @@ public class PostLike {
     private Post post;
 
     private int userId;
+
+    public static PostLike create(Post post, int userId) {
+        return PostLike.builder()
+                .post(post)
+                .userId(userId)
+                .build();
+    }
 }
