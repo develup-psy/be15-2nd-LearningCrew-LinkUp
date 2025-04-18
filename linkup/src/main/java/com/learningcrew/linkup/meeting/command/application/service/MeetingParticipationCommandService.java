@@ -1,7 +1,6 @@
 package com.learningcrew.linkup.meeting.command.application.service;
 
 import com.learningcrew.linkup.common.infrastructure.UserFeignClient;
-import com.learningcrew.linkup.common.query.mapper.StatusMapper;
 import com.learningcrew.linkup.exception.BusinessException;
 import com.learningcrew.linkup.exception.ErrorCode;
 import com.learningcrew.linkup.meeting.command.application.dto.request.MeetingParticipationCreateRequest;
@@ -9,7 +8,6 @@ import com.learningcrew.linkup.meeting.command.domain.aggregate.Meeting;
 import com.learningcrew.linkup.meeting.command.domain.aggregate.MeetingParticipationHistory;
 import com.learningcrew.linkup.meeting.command.domain.repository.MeetingParticipationHistoryRepository;
 import com.learningcrew.linkup.meeting.command.domain.repository.MeetingRepository;
-import com.learningcrew.linkup.meeting.query.dto.response.MeetingDTO;
 import com.learningcrew.linkup.notification.command.application.helper.MeetingNotificationHelper;
 import com.learningcrew.linkup.notification.command.application.helper.PointNotificationHelper;
 import com.learningcrew.linkup.place.command.domain.aggregate.entity.Place;
@@ -37,7 +35,6 @@ public class MeetingParticipationCommandService {
     private final MeetingStatusService meetingStatusService;
     private final MeetingNotificationHelper meetingNotificationHelper;
     private final PointNotificationHelper pointNotificationHelper;
-    private final StatusMapper statusMapper;
 
     private static final int STATUS_PENDING = 1;
     private static final int STATUS_ACCEPTED = 2;
