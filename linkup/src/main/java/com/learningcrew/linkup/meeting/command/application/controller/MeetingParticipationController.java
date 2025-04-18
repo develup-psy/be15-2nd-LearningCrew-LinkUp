@@ -26,7 +26,7 @@ public class MeetingParticipationController {
 
     private static final int STATUS_ACCEPTED = 2;
 
-    private final MeetingParticipationCommandService participationService;
+    private final MeetingParticipationCommandService meetingParticipationCommandService;
     private final MeetingRepository meetingRepository;
     private final MeetingParticipationHistoryRepository participationRepository;
 
@@ -37,7 +37,7 @@ public class MeetingParticipationController {
             @RequestParam("userId") int userId
     ) {
         // 포인트 잔액 확인
-        participationService.validateBalance(meetingId, userId);
+        meetingParticipationCommandService.validateBalance(meetingId, userId);
 
         MeetingPaymentResponse response = MeetingPaymentResponse.builder()
                 .message("참가 가능합니다.")
@@ -56,10 +56,10 @@ public class MeetingParticipationController {
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEETING_NOT_FOUND));
 
         // 포인트 잔액 확인
-        participationService.validateBalance(meetingId, request.getMemberId());
+        meetingParticipationCommandService.validateBalance(meetingId, request.getMemberId());
 
         // 참가 신청
-        long participationId = participationService.createMeetingParticipation(request, meeting);
+        long participationId = meetingParticipationCommandService.createMeetingParticipation(request, meeting);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success(MeetingParticipationCommandResponse.builder()
@@ -78,7 +78,7 @@ public class MeetingParticipationController {
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "참여 정보를 찾을 수 없습니다."));
 
         // soft delete 수행
-        long participationId = participationService.deleteMeetingParticipation(participation);
+        long participationId = meetingParticipationCommandService.deleteMeetingParticipation(participation);
 
         return ResponseEntity.ok(ApiResponse.success(MeetingParticipationCommandResponse.builder()
                 .participationId(participationId)
