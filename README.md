@@ -387,7 +387,7 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 
 
 ```
-📦 root
+📦 LearningCrew_LinkUp
 ├── 📁 assets                       # 프로젝트 부속 자료
 │   ├── 📁 api-docs                 # API 명세 관련 문서
 │   ├── 📁 ddl                      # DDL 스크립트 (테이블 생성 등)
@@ -397,7 +397,16 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 │   └── 📁 test_cases               # 테스트 케이스 카테고리별 정리
 │       └── 📁 ...
 │
-├── 📁 LinkUP                       # Java 백엔드 프로젝트
+├── 📁 linkup
+│   ├── 📁 ...
+│
+├── 📁 linkup_EurekaServer
+│   ├── 📁 ...
+│
+├── 📁 linkup_Gateway
+│   ├── 📁 ...
+│
+├── 📁 linkupUser
 │   ├── 📁 ...
 │
 └── 📄 README.md                     # 프로젝트 소개 및 사용법
@@ -406,7 +415,7 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 
 
 <details>
-<summary>📂 세부 파일 구조</summary>
+<summary>📂 linkup </summary>
 
 ```
 📦 LinkUp.src.main
@@ -458,6 +467,106 @@ LinkUp은 모임이라는 소속에 구애받지 않고 언제든 원할 때 신
 
 
 <br>
+
+<details>
+<summary>📂 linkup_EurekaServer </summary>
+
+```
+📁 linkup_EurekaServer
+├── 📄 build.gradle
+├── 📄 settings.gradle
+├── 📁 src
+│   └── 📁 main
+│       ├── 📁 java
+│       │   └── 📁 com.learningcrew.linkup
+│       │       └── 📄 LinkupEurekaServerApplication.java
+│       └── 📁 resources
+│           └── 📄 application.yaml
+
+
+
+```
+
+
+</details>
+
+
+<br>
+
+<details>
+<summary>📂 linkup_Gateway </summary>
+
+```
+📁 linkup_Gateway
+├── 📄 build.gradle
+├── 📄 settings.gradle
+├── 📁 src
+│   └── 📁 main
+│       ├── 📁 java
+│       │   └── 📁 com.learningcrew.linkup
+│       │       ├── 📄 LinkupGatewayApplication.java
+│       │       ├── 📁 exception
+│       │       └── 📁 gateway
+│       │           ├── 📁 filter
+│       │           └── 📁 jwt
+│       └── 📁 resources
+│           └── 📄 application.yaml
+
+
+
+```
+
+
+</details>
+
+
+<br>
+
+<details>
+<summary>📂 linkupUser </summary>
+
+```
+📁 linkupUser
+├── 📄 build.gradle
+├── 📄 settings.gradle
+├── 📁 src
+│   └── 📁 main
+│       ├── 📁 java
+│       │   └── 📁 com.learningcrew.linkupuser
+│       │       ├── 📄 LinkupUserApplication.java
+│       │       ├── 📁 client
+│       │       ├── 📁 command
+│       │       │   └── 📁 application
+│       │       │       ├── 📁 controller
+│       │       │       ├── 📁 dto
+│       │       │       └── 📁 service
+│       │       ├── 📁 domain
+│       │       │   ├── 📁 aggregate
+│       │       │   └── 📁 repository
+│       │       ├── 📁 infrastructure
+│       │       │   └── 📁 repository
+│       │       └── 📁 query
+│       │           ├── 📁 controller
+│       │           ├── 📁 dto
+│       │           │   ├── 📁 request
+│       │           │   └── 📁 response
+│       │           ├── 📁 mapper
+│       │           └── 📁 service
+│       └── 📁 resources
+│           ├── 📄 application.yml
+│           └── 📁 mappers
+│               └── 📄 사용자_Mapper.xml
+
+
+```
+
+
+</details>
+
+
+<br>
+
+
 
 ---
 
