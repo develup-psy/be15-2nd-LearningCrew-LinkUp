@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.learningcrew.linkup.community.query.mapper.CommunityMapper">
+<mapper namespace="com.learningcrew.linkup.community.query.mapper.PostMapper">
     <select id="findPostsByUserId" resultType="UserPostDto">
         SELECT
                 p.post_id AS postId
@@ -22,6 +22,7 @@
         WHERE p.user_id = #{ userId }
         ORDER BY p.created_at DESC
     </select>
+
     <!-- 게시글 전체 조회 (관리자용: 키워드 + userId 조건 가능) -->
     <select id="selectAllPosts" resultType="com.learningcrew.linkup.community.query.dto.response.PostDTO">
         SELECT
@@ -35,18 +36,20 @@
         updated_at AS postUpdatedAt
         FROM community_post
         WHERE is_deleted = 'N'
-        <if test="request.keyword != null and request.keyword != ''">
-            AND (title LIKE CONCAT('%', #{request.keyword}, '%') OR content LIKE CONCAT('%', #{request.keyword}, '%'))
+        <if test="keyword != null and keyword != ''">
+            AND (title LIKE CONCAT('%', #{keyword}, '%') OR content LIKE CONCAT('%', #{keyword}, '%'))
         </if>
-        <if test="request.userId != null">
-            AND user_id = #{request.userId}
+        <if test="userId != null">
+            AND user_id = #{userId}
         </if>
         ORDER BY created_at DESC
-        LIMIT #{request.limit} OFFSET #{request.offset}
+        LIMIT #{limit} OFFSET #{offset}
     </select>
 
+
     <!-- 게시글 상세 조회 -->
-    <select id="selectPostById" resultType="com.learningcrew.linkup.community.query.dto.response.PostDetailResponse">
+<!--    <select id="selectPostById" resultType="com.learningcrew.linkup.community.query.dto.response.PostDetailResponse">-->
+    <select id="selectPostDetail" resultType="com.learningcrew.linkup.community.query.dto.response.PostDetailResponse">
         SELECT
         post_id AS postId,
         user_id AS userId,
@@ -95,4 +98,12 @@
         SELECT COUNT(*) FROM community_post
         WHERE is_deleted = 'N' AND user_id = #{userId}
     </select>
+
+    <!-- 게시글 이미지 조회 쿼리 -->
+    <select id="selectPostImageUrlsByPostId" parameterType="int" resultType="string">
+        SELECT image_url
+        FROM post_image
+        WHERE post_id = #{postId}
+    </select>
+
 </mapper>
