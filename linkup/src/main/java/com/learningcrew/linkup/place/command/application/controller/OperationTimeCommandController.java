@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("")
 @RequiredArgsConstructor
 @Tag(name = "장소 운영시간 관리", description = "운영시간 수정 API")
 public class OperationTimeCommandController
@@ -25,7 +24,7 @@ public class OperationTimeCommandController
             summary = "장소 운영시간 수정",
             description = "사업자가 자신의 장소 운영시간을 수정한다."
     )
-    @PatchMapping("place/{placeId}/times")
+    @PatchMapping("/place/{placeId}/times")
     public ResponseEntity<ApiResponse<OperationTimeUpdateResponse>> updateOperationTimes(
             @PathVariable int placeId,
             @RequestBody @Validated List<OperationTimeRequest> operationTimeRequests) {

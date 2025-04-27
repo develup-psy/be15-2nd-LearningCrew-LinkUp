@@ -23,6 +23,15 @@ public class PlaceCreateRequest {
 
     private final String description;
     private final String equipment;
+
+    @NotNull
+    @Min(value = 1)
+    private final int minUser;
+
+    @NotNull
+    @Min(value = 1)
+    private final int maxUser;
+
     private char isActive = 'Y';
     @Min(value = 0)
     private final int rentalCost;

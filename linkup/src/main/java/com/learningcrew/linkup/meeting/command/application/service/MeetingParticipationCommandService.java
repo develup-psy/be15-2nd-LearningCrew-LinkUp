@@ -1,5 +1,6 @@
 package com.learningcrew.linkup.meeting.command.application.service;
 
+import com.learningcrew.linkup.common.dto.ApiResponse;
 import com.learningcrew.linkup.common.infrastructure.UserFeignClient;
 import com.learningcrew.linkup.exception.BusinessException;
 import com.learningcrew.linkup.exception.ErrorCode;
@@ -19,6 +20,7 @@ import com.learningcrew.linkup.place.command.domain.aggregate.entity.Place;
 import com.learningcrew.linkup.place.query.service.PlaceQueryService;
 import com.learningcrew.linkup.point.command.application.dto.response.MeetingPaymentResponse;
 import com.learningcrew.linkup.point.command.application.dto.response.PointTransactionResponse;
+import com.learningcrew.linkup.point.command.application.service.PointCommandService;
 import com.learningcrew.linkup.point.command.domain.aggregate.PointTransaction;
 import com.learningcrew.linkup.point.command.domain.repository.PointRepository;
 import lombok.RequiredArgsConstructor;
@@ -46,6 +48,7 @@ public class MeetingParticipationCommandService {
     private final PlaceQueryService placeQueryService;
     private final PointRepository pointRepository;
     private final UserFeignClient userFeignClient;
+    private final PointCommandService pointCommandService;
 
     @Transactional(readOnly = true)
     public MeetingPaymentResponse checkBalance(int meetingId, int userId) {
@@ -69,46 +72,57 @@ public class MeetingParticipationCommandService {
         return new MeetingPaymentResponse(message, pointBalance);
     }
 
-    /* 모임 참가 신청 */
     @Transactional
     public long createMeetingParticipation(MeetingParticipationCreateRequest request, Meeting meeting) {
-        MeetingParticipationHistory history
-                = modelMapper.map(request, MeetingParticipationHistory.class);
-
+        MeetingParticipationHistory history = modelMapper.map(request, MeetingParticipationHistory.class);
         LocalDateTime now = LocalDateTime.now();
 
-        /* 회원이 모임에 속해 있는지 확인 */
-        List<Integer> participantsIds = jpaRepository.findByMeetingIdAndStatusId(
-                meeting.getMeetingId(), statusQueryService.getStatusId("ACCEPTED")
+        /* 1. 중복 참가자(ACCEPTED, PENDING 모두) 검사 */
+        List<Integer> participantsIds = jpaRepository.findByMeetingIdAndStatusIdIn(
+                meeting.getMeetingId(),
+                List.of(
+                        statusQueryService.getStatusId("ACCEPTED"),
+                        statusQueryService.getStatusId("PENDING")
+                )
         ).stream().map(MeetingParticipationHistory::getMemberId).toList();
 
         if (participantsIds.contains(request.getMemberId())) {
-            throw new BusinessException(ErrorCode.MEETING_ALREADY_JOINED);
+            throw new BusinessException(ErrorCode.MEETING_ALREADY_JOINED, "이미 참가 신청한 사용자입니다.");
         }
 
-        /* 참가 신청 요청자가 개설자이면 ACCEPTED, 아니면 PENDING 처리 */
-        int statusId;
-        if (meeting.getLeaderId() != request.getMemberId()) {
-            statusId = statusQueryService.getStatusId("PENDING");
-        } else {
-            statusId = statusQueryService.getStatusId("ACCEPTED");
-        }
-
-        /* 모임이 참가 가능한 상태인지 확인 -> pending accepted rejected deleted done 중 pending 뿐 */
+        /* 2. 모임 상태 검사 */
         int meetingStatusId = meeting.getStatusId();
         if (meetingStatusId == statusQueryService.getStatusId("REJECTED")) {
-            throw new BusinessException(ErrorCode.MEETING_PARTICIPATION_LIMIT_EXCEEDED);
+            throw new BusinessException(ErrorCode.MEETING_PARTICIPATION_LIMIT_EXCEEDED, "참가할 수 없는 모임입니다.");
         }
         if (meetingStatusId == statusQueryService.getStatusId("DELETED") || meetingStatusId == statusQueryService.getStatusId("DONE")) {
             throw new BusinessException(ErrorCode.BAD_REQUEST, "참가 신청할 수 없는 모임입니다.");
-        } // 모임 취소 혹은 진행 완료
-
-        /* 시간과도 비교 (모임이 종료되어야 진행 완료 처리되므로, 모임 진행 중에 신청이 가능할 수 있음) */
-        LocalDateTime allowedUntil = meeting.getDate().atTime(meeting.getStartTime());
-        if (allowedUntil.isBefore(now)) {
-            throw new BusinessException(ErrorCode.BAD_REQUEST, "참가 신청할 수 없는 모임입니다.");
         }
 
+        /* 3. 모임 시작 시간 지나지 않았는지 확인 */
+        LocalDateTime allowedUntil = meeting.getDate().atTime(meeting.getStartTime());
+        if (allowedUntil.isBefore(now)) {
+            throw new BusinessException(ErrorCode.BAD_REQUEST, "이미 시작된 모임입니다.");
+        }
+
+        /* 4. 참가자 포인트 잔액 검사 */
+        Place place = placeQueryService.getPlaceById(meeting.getPlaceId());
+        int rentalCost = place.getRentalCost();
+        int minUser = meeting.getMinUser();
+        int costPerUser = rentalCost / minUser;
+
+        int pointBalance = userFeignClient.getPointBalance(request.getMemberId());
+
+        if (pointBalance < costPerUser) {
+            throw new BusinessException(ErrorCode.INSUFFICIENT_BALANCE, "참가에 필요한 포인트가 부족합니다. 최소 필요 포인트: " + costPerUser + "P");
+        }
+
+        /* 5. 참가자 상태 결정 */
+        int statusId = (meeting.getLeaderId() != request.getMemberId())
+                ? statusQueryService.getStatusId("PENDING")
+                : statusQueryService.getStatusId("ACCEPTED");
+
+        /* 6. 참가 기록 저장 */
         history.setMeetingId(meeting.getMeetingId());
         history.setParticipatedAt(now);
         history.setStatusId(statusId);
@@ -116,71 +130,65 @@ public class MeetingParticipationCommandService {
         repository.save(history);
         repository.flush();
 
-        /* 참가 신청 알림 발송 */
-        if(meeting.getLeaderId() != request.getMemberId()){
-        meetingNotificationHelper.sendParticipationRequestNotification(
-                meeting.getLeaderId(),       // 알림 받을 사람 (모임 개설자)
-                meeting.getMeetingTitle()           // 모임 제목 (바인딩될 {meetingTitle})
-        );
+        /* 7. 참가 신청 알림 발송 (Leader는 제외) */
+        if (meeting.getLeaderId() != request.getMemberId()) {
+            meetingNotificationHelper.sendParticipationRequestNotification(
+                    meeting.getLeaderId(),
+                    meeting.getMeetingTitle()
+            );
         }
-
 
         return history.getParticipationId();
     }
 
+
     @Transactional
     public long acceptParticipation(MeetingDTO meeting, int memberId) {
-        // 1. 참가 내역 조회
         int meetingId = meeting.getMeetingId();
+
+        // 1. 참가 내역 조회
         MeetingParticipationHistory participation = jpaRepository.findByMeetingIdAndMemberId(meetingId, memberId);
 
-        if (participation == null || participation.getStatusId() != statusQueryService.getStatusId("PENDING") ) {
+        if (participation == null || participation.getStatusId() != statusQueryService.getStatusId("PENDING")) {
             throw new BusinessException(ErrorCode.BAD_REQUEST, "승인 가능한 참가 신청 내역이 없습니다.");
         }
 
-        // 2. 모임이 참가 신청 승인 가능한 상태인지 확인
+        // 2. 모임 상태 및 인원 확인
         int participantsCount = meetingParticipationQueryService.getParticipantsByMeetingId(meetingId).size();
-
-        // 정원 확인
         if (participantsCount >= meeting.getMaxUser()) {
             throw new BusinessException(ErrorCode.MEETING_PARTICIPATION_LIMIT_EXCEEDED);
         }
-
-        // status 확인
         if (meeting.getStatusType().equals("모집 완료")) {
             throw new BusinessException(ErrorCode.MEETING_PARTICIPATION_LIMIT_EXCEEDED);
         }
-
         if (meeting.getStatusType().equals("모임 취소") || meeting.getStatusType().equals("모임 진행 완료")) {
             throw new BusinessException(ErrorCode.BAD_REQUEST, "참가 신청 내역을 승인할 수 없는 모임입니다.");
         }
-
-        // 모임 시작 시간 확인
         if (meeting.getDate().atTime(meeting.getStartTime()).isBefore(LocalDateTime.now())) {
-            throw new BusinessException(ErrorCode.BAD_REQUEST, "참가 신청 내역을 승인할 수 없는 모임입니다.");
-        }
-        try {
-            payParticipation(meetingId, memberId);
-        } catch (BusinessException e) {
-            throw new BusinessException(ErrorCode.INSUFFICIENT_BALANCE, "포인트 부족으로 참가 승인을 할 수 없습니다.");
+            throw new BusinessException(ErrorCode.BAD_REQUEST, "참가 신청할 수 없는 모임입니다.");
         }
 
-        // 3. 참가 승인 처리
+        // 3. 포인트 차감 및 트랜잭션 기록
+        Place place = placeQueryService.getPlaceById(meeting.getPlaceId());
+        int rentalCost = place.getRentalCost();
+        int minUser = meeting.getMinUser();
+        int costPerUser = rentalCost / minUser;
+
+        int pointBalance = userFeignClient.getPointBalance(memberId);
+
+        // 포인트 트랜잭션(PAYMENT) 기록
+        pointCommandService.paymentTransaction(memberId, costPerUser);
+
+        // 4. 참가 승인 처리
         participation.setStatusId(statusQueryService.getStatusId("ACCEPTED"));
-        MeetingParticipationDTO dto = modelMapper.map(participation, MeetingParticipationDTO.class);
-        dto.setStatusId(2);
-
         repository.save(participation);
         repository.flush();
 
-
-        /* 참가 승인 알림 발송 */
+        // 5. 참가 승인 알림 발송
         meetingNotificationHelper.sendParticipationAcceptNotification(
-                memberId,       // 알림 받을 사람 (모임 개설자)
-                meeting.getMeetingTitle()           // 모임 제목 (바인딩될 {meetingTitle})
+                memberId,
+                meeting.getMeetingTitle()
         );
-
-
 
         return participation.getParticipationId();
     }
@@ -203,7 +211,6 @@ public class MeetingParticipationCommandService {
         int minUser = meeting.getMinUser();
         int amountPerPerson = rentalCost / minUser;
 
-        // 4. 사용자 포인트 조회 (Feign)
         if (pointBalance < amountPerPerson) {
             throw new BusinessException(ErrorCode.INSUFFICIENT_BALANCE, "포인트가 부족합니다.");
         }
@@ -279,8 +286,8 @@ public class MeetingParticipationCommandService {
 
         // JPA를 통해 참여 기록 재조회하여 상태 확인
         MeetingParticipationHistory participation = jpaRepository.findByMeetingIdAndMemberId(history.getMeetingId(), history.getMemberId());
-        System.out.println("✅ 현재 상태 ID: " + participation.getStatusId());
-        System.out.println("✅ ACCEPTED ID: " + acceptedStatusId);
+        System.out.println("현재 상태 ID: " + participation.getStatusId());
+        System.out.println("ACCEPTED ID: " + acceptedStatusId);
 
         if (participation.getStatusId() != acceptedStatusId) {
             throw new BusinessException(ErrorCode.BAD_REQUEST, "환불 가능한 참가 정보가 아닙니다.");

@@ -151,6 +151,13 @@ public class MeetingCommandController {
         return ResponseEntity.ok().body(ApiResponse.success(response));
     }
 
+    @PutMapping("/meetings/{meetingId}/complete")
+    public ResponseEntity<ApiResponse<MeetingCommandResponse>> completeMeeting(@PathVariable int meetingId) {
+        meetingCommandService.forceCompleteMeeting(meetingId);
 
+        MeetingCommandResponse response = new MeetingCommandResponse(meetingId);
+
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
 
 }
