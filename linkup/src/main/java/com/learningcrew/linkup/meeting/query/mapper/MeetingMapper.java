@@ -30,4 +30,7 @@ public interface MeetingMapper {
 
     List<MemberDTO> getPendingParticipantsByMeetingId(int meetingId);
 
+    List<MeetingSummaryDTO> selectPendingMeetingsByUserId(int userId);
+
+    List<MeetingSummaryDTO> selectCreatedMeetingsByUserId(int userId);
 }

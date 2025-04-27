@@ -325,12 +325,12 @@ public class MeetingParticipationCommandServiceImpl implements MeetingParticipat
         }
 
         // 사용자 확인 및 포인트 체크
-//        User user = userRepository.findById(userId)
-//                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
-//
-//        if (user.getPointBalance() < costPerUser) {
-//            throw new BusinessException(ErrorCode.INSUFFICIENT_BALANCE,
-//                    "포인트 잔액이 부족합니다. 최소 필요 포인트: " + costPerUser);
+//        UserInfoResponse user = userFeignClient.getUserById(userId);
+
+        if (userFeignClient.getPointBalance(userId) < costPerUser) {
+            throw new BusinessException(ErrorCode.INSUFFICIENT_BALANCE,
+                    "포인트 잔액이 부족합니다. 최소 필요 포인트: " + costPerUser);
+        }
     }
 
 

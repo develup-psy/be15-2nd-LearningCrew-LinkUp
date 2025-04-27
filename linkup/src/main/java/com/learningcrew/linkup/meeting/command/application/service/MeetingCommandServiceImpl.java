@@ -34,7 +34,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Transactional
 public class MeetingCommandServiceImpl implements MeetingCommandService {
-    private static final int MIN_USER = 1;
+    private static final int MIN_USER = 2;
     private static final int MAX_USER = 30;
 
     private static final int MANNER_TEMPERATURE_SUBTRACT = 2;
@@ -45,6 +45,8 @@ public class MeetingCommandServiceImpl implements MeetingCommandService {
     private static final int STATUS_REJECTED = 3;
     private static final int STATUS_DELETED = 4;
     private static final int STATUS_DONE = 5;
+
+    private static final int MEETING_TIME_UNIT = 10;
 
     private List<Meeting> cachedTodaysMeetings;
 //    private List<Meeting> cachedYesterdaysMeetings;
@@ -57,7 +59,6 @@ public class MeetingCommandServiceImpl implements MeetingCommandService {
     private final PointNotificationHelper pointNotificationHelper;
 
     private final MeetingParticipationCommandService meetingParticipationCommandService;
-    private final MeetingParticipationCommandService participationCommandService;
     private final PlaceQueryService placeQueryService;
     private final PointRepository pointRepository;
 
@@ -131,23 +132,26 @@ public class MeetingCommandServiceImpl implements MeetingCommandService {
         }
 
         // 4. 기존 개설자의 참여 내역 soft delete
-        meetingParticipationHistoryRepository.findByMeetingIdAndMemberId(meetingId, request.getMemberId())
-                .ifPresent(oldLeaderHistory -> {
-                    oldLeaderHistory.setStatusId(STATUS_DELETED);
-                    meetingParticipationHistoryRepository.save(oldLeaderHistory);
-                });
-        // 5. 환불 처리
+//        meetingParticipationHistoryRepository.findByMeetingIdAndMemberId(meetingId, request.getMemberId())
+//                .ifPresent(oldLeaderHistory -> {
+//                    oldLeaderHistory.setStatusId(STATUS_DELETED);
+//                    meetingParticipationHistoryRepository.save(oldLeaderHistory);
+//                });
+        // 5. 환불 처리 -> 인원이 감소해야 필요한 로직
 
         // 6. 모임 리더 변경
 
         meeting.setLeaderId(newLeaderId);
         Meeting saved = meetingRepository.save(meeting);
 
-        // 모임 status 변경
-        meetingStatusService.changeStatusByMemberCount(saved);
+        // 모임 status 변경 -> 인원이 감소해야 필요한 로직
+//        meetingStatusService.changeStatusByMemberCount(saved);
 
         /* 개설자 변경 알림 발송 */
-
+        meetingNotificationHelper.sendLeaderChangeNotification(
+                newLeaderId,       // 알림 받을 사람 (모임 개설자)
+                meeting.getMeetingTitle()           // 모임 제목 (바인딩될 {meetingTitle})
+        );
 
         return meetingId;
     }
@@ -283,7 +287,7 @@ public class MeetingCommandServiceImpl implements MeetingCommandService {
             throw new BusinessException(ErrorCode.INVALID_MEETING_DATE_FILTER);
         }
 
-        if (request.getStartTime().getMinute() % 30 != 0 || request.getEndTime().getMinute() % 30 != 0) {
+        if (request.getStartTime().getMinute() % MEETING_TIME_UNIT != 0 || request.getEndTime().getMinute() % MEETING_TIME_UNIT != 0) {
             throw new BusinessException(ErrorCode.BAD_REQUEST, "시작/종료 시간은 30분 단위여야 합니다.");
         }
 
@@ -309,7 +313,7 @@ public class MeetingCommandServiceImpl implements MeetingCommandService {
     }
 
     @Transactional
-    @Scheduled(cron = "0 0,30 * * * *") // 매 30분마다 상태 갱신 시도
+    @Scheduled(cron = "0 */10 * * * *") // 매 10분마다 상태 갱신 시도
     public void updateMeetingStatuses() {
         if (cachedTodaysMeetings == null) {
             log.warn("오늘 모임 목록이 캐싱되지 않았습니다.");
@@ -379,8 +383,8 @@ public class MeetingCommandServiceImpl implements MeetingCommandService {
     }
 
 //    @Transactional
-//    @Scheduled(cron = "0 0,30 * * * *")
-//        // 매 30분마다 반영 시도
+//    @Scheduled(cron = "0 */10 * * * *")
+//        // 매 10분마다 반영 시도
 //        /* 매너온도 반영 */
 //    void updateMannerTemperatures() {
 //        if (cachedYesterdaysMeetings == null) {

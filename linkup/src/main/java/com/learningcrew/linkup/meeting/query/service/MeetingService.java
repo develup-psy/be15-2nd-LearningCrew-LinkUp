@@ -124,5 +124,31 @@ public class MeetingService {
     }
 
 
+    public MeetingListResponse getPendingMeetingsByUser(int userId) {
+        List<MeetingSummaryDTO> meetings = meetingMapper.selectPendingMeetingsByUserId(userId);
 
+        meetings.forEach(m -> {
+            MeetingStatus status = MeetingStatus.fromId(m.getStatusId());
+            m.setStatusName(status.getLabel());
+        });
+
+        return MeetingListResponse.builder()
+                .meetings(meetings)
+                .pagination(null)
+                .build();
+    }
+
+    public MeetingListResponse getCreatedMeetingsByUser(int userId) {
+        List<MeetingSummaryDTO> meetings = meetingMapper.selectCreatedMeetingsByUserId(userId);
+
+        meetings.forEach(m -> {
+            MeetingStatus status = MeetingStatus.fromId(m.getStatusId());
+            m.setStatusName(status.getLabel());
+        });
+
+        return MeetingListResponse.builder()
+                .meetings(meetings)
+                .pagination(null)
+                .build();
+    }
 }

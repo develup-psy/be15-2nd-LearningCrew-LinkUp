@@ -42,6 +42,18 @@ public class MeetingController {
         return ResponseEntity.ok(ApiResponse.success(meetingService.getAcceptedMeetingsByUser(userId)));
     }
 
+    @GetMapping("/meetings/user/{userId}/pending")
+    @Operation(summary = "회원별 참가 신청된 모임 목록 조회", description = "회원이 참가 신청 후 수락 대기중인 모임 목록을 조회합니다.")
+    public ResponseEntity<ApiResponse<MeetingListResponse>> getPendingMeetingsByUser(@PathVariable int userId) {
+        return ResponseEntity.ok(ApiResponse.success(meetingService.getPendingMeetingsByUser(userId)));
+    }
+
+    @GetMapping("/meetings/user/{userId}/created")
+    @Operation(summary = "회원별 개설된 모임 목록 조회", description = "회원이 개설자 권한을 가진 모임 목록을 조회합니다.")
+    public ResponseEntity<ApiResponse<MeetingListResponse>> getCreatedMeetingsByUser(@PathVariable int userId) {
+        return ResponseEntity.ok(ApiResponse.success(meetingService.getCreatedMeetingsByUser(userId)));
+    }
+
     @GetMapping("/meetings/user/{userId}/done")
     @Operation(summary = "회원별 과거 모임 이력 조회", description = "해당 회원이 참가했던 과거 모임 목록을 조회합니다. (모임 날짜가 오늘 이전인 경우)")
     public ResponseEntity<ApiResponse<MeetingListResponse>> getPastMeetingsByUser(@PathVariable int userId) {

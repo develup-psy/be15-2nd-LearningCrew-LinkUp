@@ -259,4 +259,56 @@
         AND c.status_id != 4
     </select>
 
+    <select id="selectPendingMeetingsByUserId" resultType="com.learningcrew.linkup.meeting.query.dto.response.MeetingSummaryDTO">
+        SELECT
+        m.meeting_id AS meetingId,
+        u.nickname AS leaderNickname,
+        p.place_name AS placeName,
+        p.address AS placeAddress,
+        s.sport_name AS sportName,
+        m.status_id AS statusId,
+        m.meeting_title AS meetingTitle,
+        m.date,
+        m.start_time AS startTime,
+        m.end_time AS endTime,
+        m.min_user AS minUser,
+        m.max_user AS maxUser,
+        m.gender,
+        m.age_group AS ageGroup,
+        m.level,
+        m.custom_place_address AS customPlaceAddress
+        FROM meeting m
+        JOIN meeting_participation_history ph ON m.meeting_id = ph.meeting_id
+        JOIN member u ON m.leader_id = u.member_id
+        LEFT JOIN place p ON m.place_id = p.place_id
+        JOIN sport_type s ON m.sport_id = s.sport_id
+        WHERE ph.member_id = #{userId}
+        AND ph.status_id = 1
+    </select>
+
+    <select id="selectCreatedMeetingsByUserId" resultType="com.learningcrew.linkup.meeting.query.dto.response.MeetingSummaryDTO">
+        SELECT
+        m.meeting_id AS meetingId,
+        u.nickname AS leaderNickname,
+        p.place_name AS placeName,
+        p.address AS placeAddress,
+        s.sport_name AS sportName,
+        m.status_id AS statusId,
+        m.meeting_title AS meetingTitle,
+        m.date,
+        m.start_time AS startTime,
+        m.end_time AS endTime,
+        m.min_user AS minUser,
+        m.max_user AS maxUser,
+        m.gender,
+        m.age_group AS ageGroup,
+        m.level,
+        m.custom_place_address AS customPlaceAddress
+        FROM meeting m
+        JOIN member u ON m.leader_id = u.member_id
+        LEFT JOIN place p ON m.place_id = p.place_id
+        JOIN sport_type s ON m.sport_id = s.sport_id
+        WHERE m.leader_id = #{userId}
+    </select>
+
 </mapper>
