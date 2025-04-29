@@ -1,23 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.learningcrew.linkup.community.query.mapper.CommentMapper">
+
+    <!-- 특정 회원의 댓글 + 게시글 제목 조회 -->
     <select id="findCommentsByUserId" resultType="com.learningcrew.linkup.common.dto.query.UserCommentDto">
         SELECT
-                comment_id
-              , p.title AS postTitle
-              , c.content
-              , c.created_at
-          FROM community_comment c
-          JOIN community_post p ON p.post_id = c.post_id
-         WHERE c.user_id = #{ userId }
+        comment_id,
+        p.title AS postTitle,
+        c.content,
+        c.created_at
+        FROM community_comment c
+        JOIN community_post p ON p.post_id = c.post_id
+        WHERE c.user_id = #{ userId }
     </select>
+
     <!-- 게시글 상세용 댓글 조회 -->
     <resultMap id="CommentWithLikeResultMap" type="com.learningcrew.linkup.community.query.dto.response.PostCommentDTO">
         <id property="commentId" column="comment_id"/>
         <result property="postId" column="post_id"/>
         <result property="userId" column="user_id"/>
         <result property="commentContent" column="content"/>
-        <result property="postCommentCreatedAt" column="created_at"/>
+        <result property="createdAt" column="created_at"/>
         <result property="likeCount" column="like_count"/>
     </resultMap>
 
@@ -43,7 +46,7 @@
         comment_id AS commentId,
         post_id AS postId,
         user_id AS userId,
-        content AS postCommentCreatedAt,
+        content AS commentContent,
         created_at AS createdAt
         FROM community_comment
         WHERE is_deleted = 'N' AND user_id = #{userId}
@@ -63,7 +66,7 @@
         post_id AS postId,
         user_id AS userId,
         content AS commentContent,
-        created_at AS postCommentCreatedAt
+        created_at AS createdAt
         FROM community_comment
         WHERE is_deleted = 'N'
         <if test="keyword != null and keyword != ''">
@@ -86,4 +89,5 @@
             AND user_id = #{userId}
         </if>
     </select>
+
 </mapper>
