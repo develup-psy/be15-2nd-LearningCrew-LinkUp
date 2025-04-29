@@ -10,7 +10,6 @@ import java.util.Optional;
 
 @Primary
 public interface JpaMeetingParticipationHistoryRepository extends MeetingParticipationHistoryRepository, JpaRepository<MeetingParticipationHistory, Long> {
-    Optional<MeetingParticipationHistory> findByMemberIdAndMeetingIdAndStatusId(int memberId, int meetingId, int statusId);
 
     List<MeetingParticipationHistory> findByMeetingIdAndStatusIdIn(int meetingId, List<Integer> statusIds);
 }
