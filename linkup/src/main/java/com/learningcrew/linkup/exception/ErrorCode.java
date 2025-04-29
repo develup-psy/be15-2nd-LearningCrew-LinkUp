@@ -87,6 +87,7 @@ public enum ErrorCode {
     MEETING_ALREADY_JOINED(HttpStatus.BAD_REQUEST, "이미 참여 중인 모임입니다."),
     MEETING_CREATOR_CANNOT_EXIT(HttpStatus.BAD_REQUEST, "모임 생성자는 모임을 나갈 수 없습니다."),
     INVALID_MEETING_DATE_FILTER(HttpStatus.BAD_REQUEST, "유효하지 않은 날짜입니다."),
+    POINT_INCREASE_FAILED(HttpStatus.BAD_REQUEST,"복수 실패" ),
 
     // 장소 예약
     RESERVATION_NOT_FOUND(HttpStatus.NOT_FOUND, "예약 정보를 찾을 수 없습니다."),
@@ -152,7 +153,12 @@ public enum ErrorCode {
 
     // 사업자
     OWNER_NOT_FOUND(HttpStatus.BAD_REQUEST,"사업자가 존재하지 않습니다"),
-    DUPLICATE_OWNER_REGISTRATION(HttpStatus.BAD_REQUEST,"이미 사업자 등록이 완료되어 있습니다");
+    DUPLICATE_OWNER_REGISTRATION(HttpStatus.BAD_REQUEST,"이미 사업자 등록이 완료되어 있습니다"),
+    INVALID_UNIT_TIME(HttpStatus.BAD_REQUEST,"단위시간이 제대로 안적혀있습니다." ),
+    INVALID_DAY_OF_WEEK(HttpStatus.BAD_REQUEST,"요일을 제대로 적어주세요." ),
+    DUPLICATE_OPERATION_DAY(HttpStatus.BAD_REQUEST,"요일이 중복되었습니다." ),
+    NO_PERMISSION(HttpStatus.BAD_REQUEST,"본인이 소유한 장소가 아닙니다." ),
+    POINT_DECREASE_FAILED(HttpStatus.BAD_REQUEST,"포인트 차감에 실패했습니다." );
 
 
 

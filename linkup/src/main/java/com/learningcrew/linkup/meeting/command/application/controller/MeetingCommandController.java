@@ -24,6 +24,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "모임 관리", description = "모임 개설자 기능 API")
@@ -69,10 +71,10 @@ public class MeetingCommandController {
         Meeting meeting = meetingRepository.findById(meetingId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEETING_NOT_FOUND));
 
-        if (meeting.getLeaderId() != request.getMemberId()) {
+        if (meeting.getLeaderId() != manageParticipationRequest.getMemberId()) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-
+        // 2. 참가 승인
         long participationId = participationService.acceptParticipation(meeting, memberId);
 
         return ResponseEntity.ok(ApiResponse.success(
@@ -86,15 +88,13 @@ public class MeetingCommandController {
     @Operation(summary = "참가 거절", description = "개설자가 참가 신청을 거절한다.")
     @PutMapping("/meetings/{meetingId}/participation/{memberId}/reject")
     public ResponseEntity<ApiResponse<ManageParticipationResponse>> rejectParticipation(
-            @PathVariable int meetingId,
-            @PathVariable int memberId,
-            @RequestBody ManageParticipationRequest request
+            @PathVariable int meetingId, @PathVariable int memberId, @RequestBody ManageParticipationRequest manageParticipationRequest
     ) {
         // 1. 요청된 모임의 주최자가 맞는지 확인
         Meeting meeting = meetingRepository.findById(meetingId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEETING_NOT_FOUND));
 
-        if (meeting.getLeaderId() != request.getMemberId()) {
+        if (meeting.getLeaderId() != manageParticipationRequest.getMemberId()) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
@@ -136,4 +136,14 @@ public class MeetingCommandController {
         meetingCommandService.deleteMeeting(meetingId);
         return ResponseEntity.ok(ApiResponse.success(new MeetingCommandResponse(meetingId)));
     }
+
+    @PutMapping("/meetings/{meetingId}/complete")
+    public ResponseEntity<ApiResponse<MeetingCommandResponse>> completeMeeting(@PathVariable int meetingId) {
+        meetingCommandService.forceCompleteMeeting(meetingId);
+
+        MeetingCommandResponse response = new MeetingCommandResponse(meetingId);
+
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
 }
