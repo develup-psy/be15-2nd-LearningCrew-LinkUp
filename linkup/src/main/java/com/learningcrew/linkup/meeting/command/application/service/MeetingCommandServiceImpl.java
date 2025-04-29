@@ -15,6 +15,7 @@ import com.learningcrew.linkup.notification.command.application.helper.MeetingNo
 import com.learningcrew.linkup.notification.command.application.helper.PointNotificationHelper;
 import com.learningcrew.linkup.place.command.domain.aggregate.entity.Place;
 import com.learningcrew.linkup.place.query.service.PlaceQueryService;
+import com.learningcrew.linkup.point.command.application.service.PointCommandService;
 import com.learningcrew.linkup.point.command.domain.aggregate.PointTransaction;
 import com.learningcrew.linkup.point.command.domain.repository.PointRepository;
 import lombok.RequiredArgsConstructor;
@@ -61,7 +62,7 @@ public class MeetingCommandServiceImpl implements MeetingCommandService {
     private final MeetingParticipationCommandService meetingParticipationCommandService;
     private final PlaceQueryService placeQueryService;
     private final PointRepository pointRepository;
-
+    private final PointCommandService pointCommandService;
     private final UserFeignClient userFeignClient;
 
     /**
@@ -219,6 +220,7 @@ public class MeetingCommandServiceImpl implements MeetingCommandService {
         pointRepository.save(transaction);
     }
 
+    @Transactional
     public void cancelMeetingByLeader(int meetingId) {
         // 1. 모임 상태를 DELETED로 변경
         Meeting meeting = meetingRepository.findById(meetingId)
@@ -241,39 +243,60 @@ public class MeetingCommandServiceImpl implements MeetingCommandService {
         }
     }
 
+    @Transactional
     public void forceCompleteMeeting(int meetingId) {
+        System.out.println("[DEBUG] 모임 강제완료 시작 - meetingId: " + meetingId);
+
+        // 1. 모임 조회
         Meeting meeting = meetingRepository.findById(meetingId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND));
+        System.out.println("[DEBUG] 모임 조회 완료 - placeId: " + meeting.getPlaceId());
 
+        // 2. ACCEPTED 참여자 조회
+        List<MeetingParticipationHistory> acceptedParticipants =
+                meetingParticipationHistoryRepository.findByMeetingIdAndStatusId(
+                        meetingId,
+                        STATUS_ACCEPTED
+                );
+
+        System.out.println("[DEBUG] 참여자 수 조회 완료 - 인원: " + acceptedParticipants.size());
+
+        // 3. 참여자 없을 때 예외 처리 추가 (중요)
+        if (acceptedParticipants.isEmpty()) {
+            System.out.println("[ERROR] 참가자 없음 - 모임 완료 불가");
+            throw new BusinessException(ErrorCode.BAD_REQUEST, "참가자가 존재하지 않아 모임을 완료할 수 없습니다.");
+        }
+
+        // 4. 환불/정산 계산
         int rentalCost = placeQueryService.getPlaceById(meeting.getPlaceId()).getRentalCost();
-        List<MeetingParticipationHistory> participants =
-                meetingParticipationHistoryRepository.findByMeetingIdAndStatusId(meetingId, STATUS_ACCEPTED);
+        System.out.println("[DEBUG] 장소 대여비 조회 완료 - rentalCost: " + rentalCost);
 
-        int perPersonCost = rentalCost / participants.size();
+        int perPersonCost = rentalCost / acceptedParticipants.size();
         int prePaid = rentalCost / meeting.getMinUser();
 
-        for (MeetingParticipationHistory p : participants) {
+        System.out.println("[DEBUG] 1인당 요금 계산 완료 - perPersonCost: " + perPersonCost + ", prePaid: " + prePaid);
+
+        for (MeetingParticipationHistory participant : acceptedParticipants) {
+            int userId = participant.getMemberId();
+            System.out.println("[DEBUG] 참여자 처리 시작 - userId: " + userId);
+
             if (prePaid > perPersonCost) {
                 int refundAmount = prePaid - perPersonCost;
-                int userId = p.getMemberId();
-                userFeignClient.increasePoint(userId, refundAmount);
+                System.out.println("[DEBUG] 환불 대상 - userId: " + userId + ", refundAmount: " + refundAmount);
 
-                pointRepository.save(new PointTransaction(
-                        null,
-                        userId,
-                        refundAmount,
-                        "REFUND",
-                        null
-                ));
+                // 포인트 환불
+                pointCommandService.refundExtraPoint(userId, refundAmount);
             }
 
-            // 상태 DONE 처리
-            p.setStatusId(STATUS_DONE);
+            participant.setStatusId(STATUS_DONE);
+            System.out.println("[DEBUG] 참여자 상태 DONE 업데이트 - userId: " + userId);
         }
 
         // 모임 상태도 DONE으로 업데이트
         meeting.setStatusId(STATUS_DONE);
         meetingRepository.save(meeting);
+
+        System.out.println("[DEBUG] 모임 상태 DONE 업데이트 완료 - meetingId: " + meetingId);
     }
 
     /**
