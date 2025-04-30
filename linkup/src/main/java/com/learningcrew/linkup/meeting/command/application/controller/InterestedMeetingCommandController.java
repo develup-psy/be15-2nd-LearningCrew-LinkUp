@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name="모임 찜 관리", description = "모임 찜 등록 및 삭제 API")
 public class InterestedMeetingCommandController {
 
-    private final InterestedMeetingCommandService service;
+    private final InterestedMeetingCommandService interestedMeetingCommandService;
 
     @Operation(
             summary = "모임 찜 등록",
@@ -32,7 +32,7 @@ public class InterestedMeetingCommandController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        int meetingId = service.createInterestedMeeting(request);
+        int meetingId = interestedMeetingCommandService.createInterestedMeeting(request);
         InterestedMeetingCommandResponse response
                 = InterestedMeetingCommandResponse
                 .builder()
@@ -57,7 +57,7 @@ public class InterestedMeetingCommandController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        service.deleteInterestedMeeting(request);
+        interestedMeetingCommandService.deleteInterestedMeeting(request);
 
         return ResponseEntity.ok(ApiResponse.success(null));
     }

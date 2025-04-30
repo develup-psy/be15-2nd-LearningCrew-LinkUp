@@ -28,7 +28,7 @@ public class MeetingParticipationController {
 
     private final MeetingParticipationCommandService meetingParticipationCommandService;
     private final MeetingRepository meetingRepository;
-    private final MeetingParticipationHistoryRepository participationRepository;
+    private final MeetingParticipationHistoryRepository meetingParticipationHistoryRepository;
 
     @Operation(summary = "모임 참가 신청 가능 여부 확인", description = "포인트 기준 참가 가능 여부 확인")
     @GetMapping("/meetings/{meetingId}/participation/check")
@@ -74,7 +74,7 @@ public class MeetingParticipationController {
             @PathVariable int memberId
     ) {
         // 참여 이력 조회 (ACCEPTED일 때만 참가 중인 경우에 해당)
-        MeetingParticipationHistory participation = participationRepository.findByMeetingIdAndMemberIdAndStatusId(meetingId, memberId, STATUS_ACCEPTED)
+        MeetingParticipationHistory participation = meetingParticipationHistoryRepository.findByMeetingIdAndMemberIdAndStatusId(meetingId, memberId, STATUS_ACCEPTED)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "참여 정보를 찾을 수 없습니다."));
 
         // soft delete 수행

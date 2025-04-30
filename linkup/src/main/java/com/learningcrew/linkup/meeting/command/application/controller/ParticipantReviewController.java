@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
 @Tag(name = "참가자 평가", description = "참가자 평가 API")
 public class ParticipantReviewController {
 
-    private final ParticipantReviewCommandService service;
+    private final ParticipantReviewCommandService participantReviewCommandService;
 
     @Operation(
             summary = "참가자 평가",
@@ -35,7 +35,7 @@ public class ParticipantReviewController {
     ) {
         int reviewerId = request.getReviewerId();
 
-        long reviewId = service.createParticipantReview(request, revieweeId, reviewerId, meetingId);
+        long reviewId = participantReviewCommandService.createParticipantReview(request, revieweeId, reviewerId, meetingId);
 
         ParticipantReviewCommandResponse response
                 = ParticipantReviewCommandResponse

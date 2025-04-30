@@ -25,7 +25,7 @@ public class ParticipantReviewCommandServiceImpl implements ParticipantReviewCom
     private static final int MAX_SCORE = 5;
     private static final int STATUS_DONE = 5;
 
-    private final ParticipantReviewRepository reviewRepository;
+    private final ParticipantReviewRepository participantReviewRepository;
     private final MeetingRepository meetingRepository;
     private final MeetingParticipationHistoryRepository participationRepository;
 
@@ -65,7 +65,7 @@ public class ParticipantReviewCommandServiceImpl implements ParticipantReviewCom
         }
 
         // 6. 중복 리뷰 확인
-        boolean isAlreadyReviewed = reviewRepository.existsByMeetingIdAndReviewerIdAndRevieweeId(
+        boolean isAlreadyReviewed = participantReviewRepository.existsByMeetingIdAndReviewerIdAndRevieweeId(
                 meetingId, reviewerId, revieweeId);
         if (isAlreadyReviewed) {
             throw new BusinessException(ErrorCode.REVIEW_ALREADY_EXISTS);
@@ -86,7 +86,7 @@ public class ParticipantReviewCommandServiceImpl implements ParticipantReviewCom
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        return reviewRepository.save(review).getReviewId();
+        return participantReviewRepository.save(review).getReviewId();
     }
 
 }

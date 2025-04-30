@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class InterestedMeetingCommandServiceImpl implements InterestedMeetingCommandService {
 
-    private final InterestedMeetingRepository repository;
+    private final InterestedMeetingRepository interestedMeetingRepository;
 
     /* 모임 찜 등록 */
     @Transactional
@@ -26,7 +26,7 @@ public class InterestedMeetingCommandServiceImpl implements InterestedMeetingCom
         InterestedMeetingId id = new InterestedMeetingId(request.getMeetingId(), request.getMemberId());
         InterestedMeeting interestedMeeting = new InterestedMeeting(id);
 
-        repository.save(interestedMeeting);
+        interestedMeetingRepository.save(interestedMeeting);
         return interestedMeeting.getMeetingId();
     }
 
@@ -41,12 +41,12 @@ public class InterestedMeetingCommandServiceImpl implements InterestedMeetingCom
 
         InterestedMeeting deleteInterestedMeeting = new InterestedMeeting(id);
 
-        repository.delete(deleteInterestedMeeting);
+        interestedMeetingRepository.delete(deleteInterestedMeeting);
     }
 
     private boolean isInterested(InterestedMeetingCommandRequest request) {
 
-        return repository.existsByInterestedMeetingId_MeetingIdAndInterestedMeetingId_MemberId(request.getMeetingId(), request.getMemberId());
+        return interestedMeetingRepository.existsByInterestedMeetingId_MeetingIdAndInterestedMeetingId_MemberId(request.getMeetingId(), request.getMemberId());
     }
 
 }
