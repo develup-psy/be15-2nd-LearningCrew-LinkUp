@@ -3,9 +3,8 @@ package com.learningcrew.linkup.meeting.query.service;
 import com.learningcrew.linkup.common.dto.Pagination;
 import com.learningcrew.linkup.meeting.command.domain.aggregate.MeetingStatus;
 import com.learningcrew.linkup.meeting.query.dto.request.MeetingSearchRequest;
-import com.learningcrew.linkup.meeting.query.dto.response.MeetingListResponse;
-import com.learningcrew.linkup.meeting.query.dto.response.MeetingSummaryDTO;
-import com.learningcrew.linkup.meeting.query.dto.response.ParticipantReviewDTO;
+import com.learningcrew.linkup.meeting.query.dto.request.ReviewSearchRequest;
+import com.learningcrew.linkup.meeting.query.dto.response.*;
 import com.learningcrew.linkup.meeting.query.mapper.AdminMeetingMapper;
 import com.learningcrew.linkup.meeting.query.mapper.ReviewMapper;
 import lombok.RequiredArgsConstructor;
@@ -39,17 +38,33 @@ public class AdminMeetingService {
                 .build();
     }
 
-    public List<ParticipantReviewDTO> getAllParticipantReviews() {
-        return reviewMapper.selectAllParticipantReviews();
+
+//    public List<ParticipantReviewDTO> getAllParticipantReviews() {
+//        return reviewMapper.selectAllParticipantReviews();
+//    }
+
+    public ParticipantReviewListResponse getParticipantReviews(ReviewSearchRequest request) {
+        List<ParticipantReviewDTO> reviews = reviewMapper.selectParticipantReviews(request);
+        long totalItems = reviewMapper.countParticipantReviews(request);
+
+        return ParticipantReviewListResponse.builder()
+                .participantReviews(reviews)
+                .pagination(Pagination.builder()
+                        .currentPage(request.getPage())
+                        .totalItems(totalItems)
+                        .totalPage((int) Math.ceil((double) totalItems / request.getSize()))
+                        .build())
+                .build();
+
     }
 
-    public List<ParticipantReviewDTO> getReviewsByReviewer(int memberId) {
-        return reviewMapper.selectReviewsByReviewer(memberId);
-    }
-
-    public List<ParticipantReviewDTO> getReviewsByReviewee(int memberId) {
-        return reviewMapper.selectReviewsByReviewee(memberId);
-    }
+//    public List<ParticipantReviewDTO> getReviewsByReviewer(int memberId) {
+//        return reviewMapper.selectReviewsByReviewer(memberId);
+//    }
+//
+//    public List<ParticipantReviewDTO> getReviewsByReviewee(int memberId) {
+//        return reviewMapper.selectReviewsByReviewee(memberId);
+//    }
 
 
 }

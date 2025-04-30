@@ -1,9 +1,12 @@
 package com.learningcrew.linkup.meeting.query.controller;
 
 import com.learningcrew.linkup.common.dto.ApiResponse;
+import com.learningcrew.linkup.meeting.command.application.service.ParticipantReviewCommandServiceImpl;
 import com.learningcrew.linkup.meeting.query.dto.request.MeetingSearchRequest;
+import com.learningcrew.linkup.meeting.query.dto.request.ReviewSearchRequest;
 import com.learningcrew.linkup.meeting.query.dto.response.MeetingListResponse;
 import com.learningcrew.linkup.meeting.query.dto.response.ParticipantReviewDTO;
+import com.learningcrew.linkup.meeting.query.dto.response.ParticipantReviewListResponse;
 import com.learningcrew.linkup.meeting.query.service.AdminMeetingService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -28,22 +31,22 @@ public class AdminMeetingController {
     }
 
     @GetMapping("/meetings/review")
-    @Operation(summary = "참가자 평가 조회", description = "관리자가 서비스에서 작성된 모든 참가자 평가를 조회하는 기능")
-    public ResponseEntity<ApiResponse<List<ParticipantReviewDTO>>> getAllParticipantReviews() {
-        return ResponseEntity.ok(ApiResponse.success(adminMeetingService.getAllParticipantReviews()));
+    @Operation(summary = "참가자 평가 조회", description = "관리자가 서비스에서 작성된 모든 참가자 평가를 조건에 따라 조회하는 기능")
+    public ResponseEntity<ApiResponse<ParticipantReviewListResponse>> getParticipantReviews(@ModelAttribute ReviewSearchRequest request) {
+        return ResponseEntity.ok(ApiResponse.success(adminMeetingService.getParticipantReviews(request)));
     }
 
-    @GetMapping("/meetings/review/reviewer/{memberId}")
-    @Operation(summary = "평가자 기준 참가자 평가 내역 조회", description = "특정 회원이 작성한 평가 내역을 조회합니다.")
-    public ResponseEntity<ApiResponse<List<ParticipantReviewDTO>>> getReviewsByReviewer(@PathVariable int memberId) {
-        return ResponseEntity.ok(ApiResponse.success(adminMeetingService.getReviewsByReviewer(memberId)));
-    }
-
-    @GetMapping("/meetings/review/reviewee/{memberId}")
-    @Operation(summary = "대상자 기준 참가자 평가 내역 조회", description = "특정 회원이 받은 평가 내역을 조회합니다.")
-    public ResponseEntity<ApiResponse<List<ParticipantReviewDTO>>> getReviewsByReviewee(@PathVariable int memberId) {
-        return ResponseEntity.ok(ApiResponse.success(adminMeetingService.getReviewsByReviewee(memberId)));
-    }
+//    @GetMapping("/meetings/review/reviewer/{memberId}")
+//    @Operation(summary = "평가자 기준 참가자 평가 내역 조회", description = "특정 회원이 작성한 평가 내역을 조회합니다.")
+//    public ResponseEntity<ApiResponse<List<ParticipantReviewDTO>>> getReviewsByReviewer(@PathVariable int memberId) {
+//        return ResponseEntity.ok(ApiResponse.success(adminMeetingService.getReviewsByReviewer(memberId)));
+//    }
+//
+//    @GetMapping("/meetings/review/reviewee/{memberId}")
+//    @Operation(summary = "대상자 기준 참가자 평가 내역 조회", description = "특정 회원이 받은 평가 내역을 조회합니다.")
+//    public ResponseEntity<ApiResponse<List<ParticipantReviewDTO>>> getReviewsByReviewee(@PathVariable int memberId) {
+//        return ResponseEntity.ok(ApiResponse.success(adminMeetingService.getReviewsByReviewee(memberId)));
+//    }
 
 
 }
