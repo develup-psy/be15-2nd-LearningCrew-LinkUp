@@ -10,9 +10,18 @@ import java.util.List;
 @Mapper
 public interface ObjectionMapper {
 
-    // 이의 제기 목록 조회 (전체, 상태별, 사용자별 통합)
-    List<ObjectionDTO> selectObjections(@Param("req") ObjectionSearchRequest request);
+    // 이의 제기 목록 조회 (상태, 사용자 ID, 패널티 유형 필터링)
+    List<ObjectionDTO> selectObjections(@Param("statusId") Long statusId,
+                                        @Param("memberId") Long memberId,
+                                        @Param("penaltyTypeId") Long penaltyTypeId,
+                                        @Param("size") int size,
+                                        @Param("offset") int offset);
 
-    // 이의 제기 전체 건수 (페이징용)
-    long countObjections(@Param("req") ObjectionSearchRequest request);
+    // 이의 제기 목록 전체 건수 조회
+    long countObjections(@Param("statusId") Long statusId,
+                         @Param("memberId") Long memberId,
+                         @Param("penaltyTypeId") Long penaltyTypeId);
+
+    // 이의 제기 상세 조회
+    ObjectionDTO selectObjectionById(Long objectionId);
 }
