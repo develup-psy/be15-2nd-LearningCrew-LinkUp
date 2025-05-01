@@ -14,6 +14,7 @@ import com.learningcrew.linkup.meeting.command.domain.repository.MeetingReposito
 import com.learningcrew.linkup.notification.command.application.helper.MeetingNotificationHelper;
 import com.learningcrew.linkup.notification.command.application.helper.PointNotificationHelper;
 import com.learningcrew.linkup.place.command.domain.aggregate.entity.Place;
+import com.learningcrew.linkup.place.command.domain.repository.PlaceRepository;
 import com.learningcrew.linkup.place.query.service.PlaceQueryService;
 import com.learningcrew.linkup.point.command.application.service.PointCommandService;
 import com.learningcrew.linkup.point.command.domain.aggregate.PointTransaction;
@@ -48,6 +49,7 @@ public class MeetingCommandServiceImpl implements MeetingCommandService {
     private static final int STATUS_DONE = 5;
 
     private static final int MEETING_TIME_UNIT = 10;
+    private final PlaceRepository placeRepository;
 
     private List<Meeting> cachedTodaysMeetings;
 //    private List<Meeting> cachedYesterdaysMeetings;
@@ -133,11 +135,7 @@ public class MeetingCommandServiceImpl implements MeetingCommandService {
         }
 
         // 4. 기존 개설자의 참여 내역 soft delete
-//        meetingParticipationHistoryRepository.findByMeetingIdAndMemberId(meetingId, request.getMemberId())
-//                .ifPresent(oldLeaderHistory -> {
-//                    oldLeaderHistory.setStatusId(STATUS_DELETED);
-//                    meetingParticipationHistoryRepository.save(oldLeaderHistory);
-//                });
+
         // 5. 환불 처리 -> 인원이 감소해야 필요한 로직
 
         // 6. 모임 리더 변경
@@ -146,7 +144,6 @@ public class MeetingCommandServiceImpl implements MeetingCommandService {
         Meeting saved = meetingRepository.save(meeting);
 
         // 모임 status 변경 -> 인원이 감소해야 필요한 로직
-//        meetingStatusService.changeStatusByMemberCount(saved);
 
         /* 개설자 변경 알림 발송 */
         meetingNotificationHelper.sendLeaderChangeNotification(
@@ -311,7 +308,7 @@ public class MeetingCommandServiceImpl implements MeetingCommandService {
         }
 
         if (request.getStartTime().getMinute() % MEETING_TIME_UNIT != 0 || request.getEndTime().getMinute() % MEETING_TIME_UNIT != 0) {
-            throw new BusinessException(ErrorCode.BAD_REQUEST, "시작/종료 시간은 30분 단위여야 합니다.");
+            throw new BusinessException(ErrorCode.BAD_REQUEST, "시작/종료 시간은 %s분 단위여야 합니다.".formatted(MEETING_TIME_UNIT));
         }
 
         int minUser = request.getMinUser();
@@ -319,6 +316,20 @@ public class MeetingCommandServiceImpl implements MeetingCommandService {
 
         if (minUser < MIN_USER || maxUser > MAX_USER || minUser > maxUser) {
             throw new BusinessException(ErrorCode.BAD_REQUEST, "유효하지 않은 인원 설정입니다.");
+        }
+
+        Integer placeId = request.getPlaceId();
+        if (placeId != null) {
+            Place place = placeRepository.findById(placeId)
+                    .orElseThrow(() -> new BusinessException(ErrorCode.PLACE_NOT_FOUND));
+
+            /* 장소 시작/종료 시간과 일치하는 지 (휴무) */
+
+
+            /* 장소 최소/최대 인원 조건 체크 */
+            if (minUser < place.getMinUser() || maxUser > place.getMaxUser()) {
+                throw new BusinessException(ErrorCode.BAD_REQUEST, "해당 장소를 예약할 수 없는 모임 참여 인원입니다.");
+            }
         }
     }
 

@@ -19,7 +19,7 @@ public class InterestedMeetingCommandServiceImpl implements InterestedMeetingCom
     /* 모임 찜 등록 */
     @Transactional
     public int createInterestedMeeting(InterestedMeetingCommandRequest request) {
-        if (this.isInterested(request)) {
+        if (isInterested(request.getMeetingId(), request.getMemberId())) {
             throw new BusinessException(ErrorCode.BAD_REQUEST, "이미 찜 등록된 모임입니다.");
         }
 
@@ -33,20 +33,20 @@ public class InterestedMeetingCommandServiceImpl implements InterestedMeetingCom
 
     /* 모임 찜 취소 */
     @Transactional
-    public void deleteInterestedMeeting(InterestedMeetingCommandRequest request) {
-        if (!this.isInterested(request)) {
+    public void deleteInterestedMeeting(int memberId, int meetingId, int requesterId) {
+        if (!isInterested(meetingId, memberId)) {
             throw new BusinessException(ErrorCode.BAD_REQUEST, "찜 등록되지 않은 모임입니다.");
         }
-        InterestedMeetingId id = new InterestedMeetingId(request.getMeetingId(), request.getMemberId());
+        InterestedMeetingId id = new InterestedMeetingId(meetingId, memberId);
 
         InterestedMeeting deleteInterestedMeeting = new InterestedMeeting(id);
 
         interestedMeetingRepository.delete(deleteInterestedMeeting);
     }
 
-    private boolean isInterested(InterestedMeetingCommandRequest request) {
+    private boolean isInterested(int meetingId, int memberId) {
 
-        return interestedMeetingRepository.existsByInterestedMeetingId_MeetingIdAndInterestedMeetingId_MemberId(request.getMeetingId(), request.getMemberId());
+        return interestedMeetingRepository.existsByInterestedMeetingId_MeetingIdAndInterestedMeetingId_MemberId(meetingId, memberId);
     }
 
 }

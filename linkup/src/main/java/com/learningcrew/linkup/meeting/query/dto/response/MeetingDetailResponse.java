@@ -9,5 +9,5 @@ import java.util.List;
 @Builder
 public class MeetingDetailResponse {
     private MeetingDTO meeting;
-    private List<MemberDTO> participants;
+//    private List<MemberDTO> participants;
 }

@@ -6,5 +6,5 @@ public interface InterestedMeetingCommandService {
 
     int createInterestedMeeting(InterestedMeetingCommandRequest request);
 
-    void deleteInterestedMeeting(InterestedMeetingCommandRequest request);
+    void deleteInterestedMeeting(int memberId, int meetingId, int requesterId);
 }

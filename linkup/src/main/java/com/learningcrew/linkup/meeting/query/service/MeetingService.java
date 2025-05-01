@@ -52,15 +52,26 @@ public class MeetingService {
         MeetingStatus status = MeetingStatus.fromId(meeting.getStatusId());
         meeting.setStatusName(status.getLabel());
 
-        List<MemberDTO> participants = Collections.emptyList();
-
-        // 상태가 ACCEPTED일 때만 참가자 목록 조회
-        if (status == MeetingStatus.ACCEPTED) {
-            participants = meetingMapper.selectParticipantsByMeetingId(meetingId);
-        }
+        // 상태가 ACCEPTED일 때만 참가자 목록 조회 -> 아래로 이관
 
         return MeetingDetailResponse.builder()
                 .meeting(meeting)
+                .build();
+    }
+
+    public ParticipantsResponse getParticipants(int meetingId, int requesterId) {
+        List<MemberDTO> participants = meetingMapper.selectParticipantsByMeetingId(meetingId);
+
+        // 유효한 요청인지 확인
+        boolean isValidRequest = participants.stream()
+                .map(MemberDTO::getMemberId)
+                .anyMatch(x -> x == requesterId);
+
+        if (!isValidRequest) {
+            throw new BusinessException(ErrorCode.BAD_REQUEST, "참가자 조회 권한이 없습니다.");
+        }
+
+        return ParticipantsResponse.builder()
                 .participants(participants)
                 .build();
     }

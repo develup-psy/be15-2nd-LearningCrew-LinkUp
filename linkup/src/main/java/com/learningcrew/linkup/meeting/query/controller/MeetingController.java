@@ -66,11 +66,8 @@ public class MeetingController {
         return ResponseEntity.ok(ApiResponse.success(meetingService.getInterestedMeetings(userId)));
     }
 
-    @Operation(
-            summary = "모임 참가 요청 목록 조회",
-            description = "개설자가 자신이 만든 모임에 참가 요청한 회원 목록을 확인한다."
-    )
     @GetMapping("/meetings/{meetingId}/participation_request")
+    @Operation(summary = "모임 참가 요청 목록 조회", description = "개설자가 자신이 만든 모임에 참가 요청한 회원 목록을 확인한다.")
     public ResponseEntity<ApiResponse<ParticipantsResponse>> getParticipationRequests(
             @PathVariable int meetingId,
             @Parameter(description = "요청자(개설자) ID", required = true)
@@ -81,8 +78,14 @@ public class MeetingController {
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
-
-
-
+    @GetMapping("/my/meetings/{meetingId}/participation")
+    @Operation(summary = "참가자 목록 조회", description = "개설자 또는 참가자가 자신이 참가한 모임에 대해 참가자 목록을 확인한다.")
+    public ResponseEntity<ApiResponse<ParticipantsResponse>> getParticipants(
+            @PathVariable int meetingId,
+            @RequestParam int requesterId
+    ) {
+        ParticipantsResponse participants = meetingService.getParticipants(meetingId, requesterId);
+        return ResponseEntity.ok(ApiResponse.success(participants));
+    }
 
 }

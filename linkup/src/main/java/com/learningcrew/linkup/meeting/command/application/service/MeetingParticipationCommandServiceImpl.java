@@ -80,6 +80,9 @@ public class MeetingParticipationCommandServiceImpl implements MeetingParticipat
         int meetingId = meeting.getMeetingId();
         int memberId = request.getMemberId();
         /* 이미 참가 신청한 내역이 있는지 확인 (PENDING) */
+        if (meetingParticipationHistoryRepository.existsByMeetingIdAndMemberIdAndStatusId(meetingId, memberId, STATUS_PENDING)) {
+            throw new BusinessException(ErrorCode.BAD_REQUEST, "이미 참가 신청한 모임입니다.");
+        }
 
         /* 회원이 모임에 속해 있는지 확인 */
         if (meetingParticipationHistoryRepository.existsByMeetingIdAndMemberIdAndStatusId(meetingId, memberId, STATUS_ACCEPTED)) {
