@@ -50,14 +50,14 @@
         created_at AS createdAt,
         is_deleted AS isDeleted
         FROM community_comment
-        WHERE is_deleted = 'N' AND user_id = #{userId}
+        WHERE user_id = #{userId}
         ORDER BY created_at DESC
         LIMIT #{limit} OFFSET #{offset}
     </select>
 
     <select id="countCommentsByUser" resultType="long">
         SELECT COUNT(*) FROM community_comment
-        WHERE is_deleted = 'N' AND user_id = #{userId}
+        WHERE user_id = #{userId}
     </select>
 
     <!-- 전체 댓글 조회 (관리자용) -->
