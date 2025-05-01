@@ -14,7 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
-@RequestMapping("posts")
+@RequestMapping("/posts")
 @RequiredArgsConstructor
 public class PostController {
 
@@ -32,15 +32,19 @@ public class PostController {
     @PutMapping("/{postId}")
     public ResponseEntity<ApiResponse<PostResponse>> updatePost(
             @PathVariable int postId,
-            @RequestPart PostUpdateRequest postUpdateRequest,  // @RequestBody -> @RequestPart
-            @RequestPart(required = false) List<MultipartFile> postImgs) {  // 파일 업로드를 위한 MultipartFile
-        PostResponse response = postService.updatePost(postId, postUpdateRequest, postImgs);
+            @RequestPart PostUpdateRequest postUpdateRequest,
+            @RequestPart(required = false) List<MultipartFile> postImgs) {
+
+        int userId = postUpdateRequest.getUserId();  // DTO에서 꺼내기
+        PostResponse response = postService.updatePost(postId, postUpdateRequest, postImgs, userId);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
     @PutMapping("/{postId}/delete")
-    public ResponseEntity<ApiResponse<Void>> deletePost(@PathVariable int postId) {
-        postService.deletePost(postId);
+    public ResponseEntity<ApiResponse<Void>> deletePost(
+            @PathVariable int postId,
+            @RequestParam int userId) {  // 요청에서 userId를 쿼리 파라미터로 받음
+        postService.deletePost(postId, userId);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 }

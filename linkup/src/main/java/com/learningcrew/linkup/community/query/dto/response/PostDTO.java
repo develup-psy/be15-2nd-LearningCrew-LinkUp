@@ -16,6 +16,5 @@ public class PostDTO {
     private Boolean isNotice;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-
-
+    private Boolean isDeleted;
 }
