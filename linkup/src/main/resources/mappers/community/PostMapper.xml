@@ -23,27 +23,27 @@
         ORDER BY p.created_at DESC
     </select>
 
-    <!-- 게시글 전체 조회 (관리자용: 키워드 + userId 조건 가능) -->
-    <select id="selectAllPosts" resultType="com.learningcrew.linkup.community.query.dto.response.PostDTO">
-        SELECT
-        post_id AS postId,
-        user_id AS userId,
-        title,
-        content,
-        is_notice AS isNotice,
-        created_at AS createdAt,
-        updated_at AS updatedAt,
-        is_deleted AS isDeleted
-        FROM community_post
-        <if test="keyword != null and keyword != ''">
-            AND (title LIKE CONCAT('%', #{keyword}, '%') OR content LIKE CONCAT('%', #{keyword}, '%'))
-        </if>
-        <if test="userId != null">
-            AND user_id = #{userId}
-        </if>
-        ORDER BY created_at DESC
-        LIMIT #{limit} OFFSET #{offset}
-    </select>
+<!--    &lt;!&ndash; 게시글 전체 조회 (관리자용: 키워드 + userId 조건 가능) &ndash;&gt;-->
+<!--    <select id="selectAllPosts" resultType="com.learningcrew.linkup.community.query.dto.response.PostDTO">-->
+<!--        SELECT-->
+<!--        post_id AS postId,-->
+<!--        user_id AS userId,-->
+<!--        title,-->
+<!--        content,-->
+<!--        is_notice AS isNotice,-->
+<!--        created_at AS createdAt,-->
+<!--        updated_at AS updatedAt,-->
+<!--        is_deleted AS isDeleted-->
+<!--        FROM community_post-->
+<!--        <if test="keyword != null and keyword != ''">-->
+<!--            AND (title LIKE CONCAT('%', #{keyword}, '%') OR content LIKE CONCAT('%', #{keyword}, '%'))-->
+<!--        </if>-->
+<!--        <if test="userId != null">-->
+<!--            AND user_id = #{userId}-->
+<!--        </if>-->
+<!--        ORDER BY created_at DESC-->
+<!--        LIMIT #{limit} OFFSET #{offset}-->
+<!--    </select>-->
 
     <!-- 게시글 전체 조회 (회원용) -->
     <!-- 공지글 -->
@@ -58,10 +58,14 @@
         updated_at AS updatedAt,
         is_deleted AS isDeleted
         FROM community_post
-        WHERE is_deleted = 'N' AND is_notice = 'Y'
+        WHERE is_deleted = 'N'
+        AND is_notice = 'Y'
+        <if test="keyword != null and keyword != ''">
+            AND (title LIKE CONCAT('%', #{keyword}, '%')
+            OR content LIKE CONCAT('%', #{keyword}, '%'))
+        </if>
         ORDER BY created_at DESC
     </select>
-
     <!-- 일반 게시글 -->
     <select id="selectGeneralPostsForUser" resultType="com.learningcrew.linkup.community.query.dto.response.PostDTO">
         SELECT
@@ -119,16 +123,16 @@
         LIMIT #{limit} OFFSET #{offset}
     </select>
 
-    <!-- 전체 게시글 수 (페이징용) -->
-    <select id="countAllPosts" resultType="long">
-        SELECT COUNT(*) FROM community_post
-        <if test="keyword != null and keyword != ''">
-            AND (title LIKE CONCAT('%', #{keyword}, '%') OR content LIKE CONCAT('%', #{keyword}, '%'))
-        </if>
-        <if test="userId != null">
-            AND user_id = #{userId}
-        </if>
-    </select>
+<!--    &lt;!&ndash; 전체 게시글 수 (페이징용) &ndash;&gt;-->
+<!--    <select id="countAllPosts" resultType="long">-->
+<!--        SELECT COUNT(*) FROM community_post-->
+<!--        <if test="keyword != null and keyword != ''">-->
+<!--            AND (title LIKE CONCAT('%', #{keyword}, '%') OR content LIKE CONCAT('%', #{keyword}, '%'))-->
+<!--        </if>-->
+<!--        <if test="userId != null">-->
+<!--            AND user_id = #{userId}-->
+<!--        </if>-->
+<!--    </select>-->
 
     <!-- 일반 게시글 수 (회원 페이징용)    -->
     <select id="countGeneralPostsForUser" resultType="long">
@@ -155,5 +159,57 @@
         FROM post_image
         WHERE post_id = #{postId}
     </select>
+
+
+    <!-- 게시글 전체 조회 (관리자용: 키워드 + userId 조건 가능) -->
+    <select id="selectAllPosts" resultType="com.learningcrew.linkup.community.query.dto.response.PostDTO">
+        SELECT
+        post_id AS postId,
+        user_id AS userId,
+        title,
+        content,
+        is_notice AS isNotice,
+        created_at AS createdAt,
+        updated_at AS updatedAt,
+        is_deleted AS isDeleted
+        FROM community_post
+        <where>
+            1 = 1
+            <if test="keyword != null and keyword != ''">
+                AND  (title LIKE CONCAT('%', #{keyword}, '%') OR content LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+            <if test="userId != null">
+                AND user_id = #{userId}
+            </if>
+        </where>
+        ORDER BY created_at DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <!-- 전체 게시글 수 (페이징용) -->
+    <select id="countAllPosts" resultType="long">
+        SELECT COUNT(*) FROM community_post
+        <where>
+            1 = 1
+            <if test="keyword != null and keyword != ''">
+                AND  (title LIKE CONCAT('%', #{keyword}, '%') OR content LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+            <if test="userId != null">
+                AND user_id = #{userId}
+            </if>
+        </where>
+    </select>
+
+    <!-- 공지사항 게시글 수 조회 (회원용) -->
+    <select id="countNoticePostsForUser" resultType="long">
+        SELECT COUNT(*)
+        FROM community_post
+        WHERE is_deleted = 'N'
+        AND is_notice = 'Y'
+        <if test="keyword != null and keyword != ''">
+            AND (title LIKE CONCAT('%', #{keyword}, '%') OR content LIKE CONCAT('%', #{keyword}, '%'))
+        </if>
+    </select>
+
 
 </mapper>

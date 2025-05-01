@@ -1,6 +1,7 @@
 package com.learningcrew.linkup.community.query.service;
 
 import com.learningcrew.linkup.common.dto.Pagination;
+import com.learningcrew.linkup.common.query.mapper.RoleMapper;
 import com.learningcrew.linkup.community.command.domain.repository.PostRepository;
 import com.learningcrew.linkup.community.query.dto.request.CommunitySearchRequest;
 import com.learningcrew.linkup.community.query.dto.response.*;
@@ -23,6 +24,47 @@ public class PostQueryService {
     private final PostRepository postRepository;
     private final PostMapper postMapper;
     private final CommentMapper commentMapper;
+    private final RoleMapper roleMapper;
+
+//    // 관리자 여부를 확인하는 메서드
+//    public boolean isAdmin(int userId) {
+//        return roleMapper.findByUserId(userId)
+//                .map(role -> role.getRoleId() == 1)  // 관리자일 경우 role_id == 1
+//                .orElse(false);  // 조회 실패 시 false
+//    }
+//
+//    // 게시글 조회 로직
+//    @Transactional(readOnly = true)
+//    public PostListResponse getPostsForUser(CommunitySearchRequest request, boolean isAdmin) {
+//        // 관리자 여부에 따라 검색 조건 설정
+//        if (isAdmin) {
+//            // 관리자일 경우 삭제된 게시글도 포함
+//            request.setIsDeleted(null);
+//        } else {
+//            // 일반 사용자일 경우 삭제된 게시글 제외
+//            request.setIsDeleted("N");
+//        }
+//
+//        List<PostDTO> noticePosts = postMapper.selectNoticePostsForUser(request);
+//        List<PostDTO> generalPosts = postMapper.selectGeneralPostsForUser(request);
+//        long total = postMapper.countGeneralPostsForUser(request);
+//
+//        List<PostDTO> mergedPosts = new ArrayList<>();
+//        mergedPosts.addAll(noticePosts);
+//        mergedPosts.addAll(generalPosts);
+//
+//        Pagination pagination = Pagination.builder()
+//                .currentPage(request.getPage())
+//                .totalPage((int) Math.ceil((double) total / request.getSize()))
+//                .totalItems(total)
+//                .build();
+//
+//        return PostListResponse.builder()
+//                .posts(mergedPosts)
+//                .pagination(pagination)
+//                .build();
+//    }
+
 
     public List<PostQueryResponse> getAllPosts() {
         return postRepository.findAll().stream()
@@ -119,21 +161,21 @@ public class PostQueryService {
     }
 
 
-//    @Transactional(readOnly = true)
-//    public PostListResponse getPostsForUser(CommunitySearchRequest request) {
-//        List<PostDTO> posts = postMapper.selectAllPostsForUser(request);
-//        long total = postMapper.countAllPostsForUser(request);
-//
-//        Pagination pagination = Pagination.builder()
-//                .currentPage(request.getPage())
-//                .totalPage((int) Math.ceil((double) total / request.getSize()))
-//                .totalItems(total)
-//                .build();
-//
-//        return PostListResponse.builder()
-//                .posts(posts)
-//                .pagination(pagination)
-//                .build();
-//    }
+    @Transactional(readOnly = true)
+    public PostListResponse getAllPostsForUser(CommunitySearchRequest request) {
+        List<PostDTO> posts = postMapper.selectAllPostsForUser(request);
+        long total = postMapper.countAllPostsForUser(request);
+
+        Pagination pagination = Pagination.builder()
+                .currentPage(request.getPage())
+                .totalPage((int) Math.ceil((double) total / request.getSize()))
+                .totalItems(total)
+                .build();
+
+        return PostListResponse.builder()
+                .posts(posts)
+                .pagination(pagination)
+                .build();
+    }
 
 }
