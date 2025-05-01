@@ -17,8 +17,6 @@ public interface PostMapper {
     // 공지사항 목록 조회 (회원용)
     List<PostDTO> selectNoticePostsForUser(CommunitySearchRequest request);
 
-    // 공지사항 게시글 수 조회 (회원용)
-    long countNoticePostsForUser(CommunitySearchRequest request);
 
     // 일반 게시글 목록 조회 (회원용, 페이징)
     List<PostDTO> selectGeneralPostsForUser(CommunitySearchRequest request);
