@@ -11,11 +11,17 @@ import java.util.List;
 @Mapper
 public interface PostMapper {
 
-    // 게시글 전체 조회
+    // 게시글 전체 조회(관리자용)
     List<PostDTO> selectAllPosts(CommunitySearchRequest request);
+
+    // 게시글 전체 조회(회원용)
+    List<PostDTO> selectAllPostsForUser(CommunitySearchRequest request);
+
+    long countAllPostsForUser(CommunitySearchRequest request);
 
     // 게시글 수 조회
     long countAllPosts(CommunitySearchRequest request);
+
 
     // 게시글 상세 조회
     PostDetailResponse selectPostDetail(int postId);

@@ -95,4 +95,23 @@ public class PostQueryService {
                 .pagination(pagination)
                 .build();
     }
+
+
+    @Transactional(readOnly = true)
+    public PostListResponse getPostsForUser(CommunitySearchRequest request) {
+        List<PostDTO> posts = postMapper.selectAllPostsForUser(request);
+        long total = postMapper.countAllPostsForUser(request);
+
+        Pagination pagination = Pagination.builder()
+                .currentPage(request.getPage())
+                .totalPage((int) Math.ceil((double) total / request.getSize()))
+                .totalItems(total)
+                .build();
+
+        return PostListResponse.builder()
+                .posts(posts)
+                .pagination(pagination)
+                .build();
+    }
+
 }

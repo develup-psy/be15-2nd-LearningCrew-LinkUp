@@ -18,12 +18,17 @@ public class PostQueryController {
     private final PostQueryService postQueryService;
 
 
+//    @GetMapping
+//    @Operation(summary = "전체 게시글 목록 조회 (사용자용)", description = "회원이 서비스 내에 등록된 게시글을 조회한다.")
+//    public ResponseEntity<ApiResponse<PostListResponse>> getAllPosts(CommunitySearchRequest request) {
+//        return ResponseEntity.ok(ApiResponse.success(postQueryService.getPosts(request)));
+//    }
+
     @GetMapping
     @Operation(summary = "전체 게시글 목록 조회 (사용자용)", description = "회원이 서비스 내에 등록된 게시글을 조회한다.")
     public ResponseEntity<ApiResponse<PostListResponse>> getAllPosts(CommunitySearchRequest request) {
-        return ResponseEntity.ok(ApiResponse.success(postQueryService.getPosts(request)));
+        return ResponseEntity.ok(ApiResponse.success(postQueryService.getPostsForUser(request)));
     }
-
 
     @GetMapping("/search/{keyword}")
     @Operation(summary = "키워드로 게시글 검색", description = "회원이 서비스 내에 등록된 게시글을 키워드로 검색하여 조회한다.")
