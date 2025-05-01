@@ -12,5 +12,4 @@ public interface ParticipantReviewRepository {
 
     boolean existsByMeetingIdAndReviewerId(int meetingId, int reviewerId);
 
-    List<ParticipantReview> saveAll(List<ParticipantReview> reviewEntities);
 }

@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -73,7 +72,6 @@ public class ParticipantReviewCommandServiceImpl implements ParticipantReviewCom
         }
 
         List<ParticipantReviewDTO> reviews = request.getReviews();
-        List<ParticipantReview> reviewEntities = new ArrayList<>();
 
         reviews.forEach(review -> {
             // 점수 유효성
@@ -96,11 +94,10 @@ public class ParticipantReviewCommandServiceImpl implements ParticipantReviewCom
                     .createdAt(LocalDateTime.now())
                     .build();
 
-            reviewEntities.add(reviewEntity);
+            ParticipantReview savedReview = participantReviewRepository.save(reviewEntity);
+            review.setReviewId(savedReview.getReviewId());
         });
-
-        participantReviewRepository.saveAll(reviewEntities);
-
+;
         return ParticipantReviewCommandResponse.builder()
                 .reviews(reviews)
                 .build();

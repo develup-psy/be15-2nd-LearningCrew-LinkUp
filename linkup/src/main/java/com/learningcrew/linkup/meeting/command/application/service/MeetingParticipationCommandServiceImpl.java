@@ -94,17 +94,19 @@ public class MeetingParticipationCommandServiceImpl implements MeetingParticipat
         }
 
         /* 4. 참가자 포인트 잔액 검사 */
-        Place place = placeQueryService.getPlaceById(meeting.getPlaceId());
-        int rentalCost = place.getRentalCost();
-        int minUser = meeting.getMinUser();
-        int costPerUser = rentalCost / minUser;
+        Integer placeId = meeting.getPlaceId();
+        if (placeId != null) {
+            Place place = placeQueryService.getPlaceById(meeting.getPlaceId());
+            int rentalCost = place.getRentalCost();
+            int minUser = meeting.getMinUser();
+            int costPerUser = rentalCost / minUser;
 
-        int pointBalance = userFeignClient.getPointBalance(request.getMemberId());
+            int pointBalance = userFeignClient.getPointBalance(request.getMemberId());
 
-        if (pointBalance < costPerUser) {
-            throw new BusinessException(ErrorCode.INSUFFICIENT_BALANCE, "참가에 필요한 포인트가 부족합니다. 최소 필요 포인트: " + costPerUser + "P");
+            if (pointBalance < costPerUser) {
+                throw new BusinessException(ErrorCode.INSUFFICIENT_BALANCE, "참가에 필요한 포인트가 부족합니다. 최소 필요 포인트: " + costPerUser + "P");
+            }
         }
-
         /* 모임이 참가 가능한 상태인지 확인 */
         if (meeting.getStatusId() == STATUS_REJECTED
             || meeting.getStatusId() == STATUS_DELETED
