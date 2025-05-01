@@ -79,11 +79,6 @@ public class ReservationCommandService {
         // 이 시점에 INSERT가 발생하고, reservationId는 AutoIncrement 값이 된다
         reservationRepository.save(reservation);
 
-
-
-
-
-
         return new ReservationCommandResponse(
                 reservation.getReservationId(),  // 반드시 DB 저장된 값
                 statusId,

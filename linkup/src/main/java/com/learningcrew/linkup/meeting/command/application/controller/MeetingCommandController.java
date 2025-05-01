@@ -66,7 +66,7 @@ public class MeetingCommandController {
     public ResponseEntity<ApiResponse<ManageParticipationResponse>> acceptParticipation(
             @PathVariable int meetingId,
             @PathVariable int memberId,
-            @RequestBody ManageParticipationRequest request
+            @RequestBody ManageParticipationRequest manageParticipationRequest
     ) {
         Meeting meeting = meetingRepository.findById(meetingId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEETING_NOT_FOUND));

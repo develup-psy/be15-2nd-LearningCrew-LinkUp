@@ -1,7 +1,11 @@
 package com.learningcrew.linkup.place.query.controller;
 
 import com.learningcrew.linkup.common.dto.ApiResponse;
+import com.learningcrew.linkup.place.query.dto.request.AdminPlaceListRequest;
+import com.learningcrew.linkup.place.query.dto.request.AdminPlaceReviewListRequest;
 import com.learningcrew.linkup.place.query.dto.request.PlaceListRequest;
+import com.learningcrew.linkup.place.query.dto.response.AdminPlaceListResponse;
+import com.learningcrew.linkup.place.query.dto.response.AdminPlaceReviewListResponse;
 import com.learningcrew.linkup.place.query.dto.response.PlaceDetailResponse;
 import com.learningcrew.linkup.place.query.dto.response.PlaceListResponse;
 import com.learningcrew.linkup.place.query.service.PlaceQueryService;
@@ -38,8 +42,8 @@ public class PlaceQueryController {
     }
     @GetMapping("/admin/places")
     @Operation(summary = "관리자 장소 목록 조회", description = "관리자가 서비스에 등록된 모든 장소의 목록을 조회한다.")
-    public ResponseEntity<ApiResponse<PlaceListResponse>> getPlacesByAdmin(PlaceListRequest placeListRequest) {
-        PlaceListResponse response = placeQueryService.getPlacesByAdmin(placeListRequest);
+    public ResponseEntity<ApiResponse<AdminPlaceListResponse>> getPlacesByAdmin(AdminPlaceListRequest placeListRequest) {
+        AdminPlaceListResponse response = placeQueryService.getPlacesByAdmin(placeListRequest);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
@@ -49,9 +53,21 @@ public class PlaceQueryController {
             @PathVariable("ownerId") Integer ownerId,
             PlaceListRequest request) {
 
-        request.setOwnerId(ownerId); // ⬅️ 필수 세팅
+        request.setOwnerId(ownerId);
         PlaceListResponse response = placeQueryService.getPlacesByOwner(request);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
+
+    @GetMapping("/admin/place-reviews")
+    @Operation(summary = "장소 후기 내역 조회 (관리자)", description = "관리자가 모든 장소의 후기 내역을 조회한다.")
+    public ResponseEntity<ApiResponse<AdminPlaceReviewListResponse>> getPlaceReviewsByAdmin(
+            AdminPlaceReviewListRequest request) {
+
+        AdminPlaceReviewListResponse response = placeQueryService.getPlaceReviewsByAdmin(request);
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+
+
 
 }
