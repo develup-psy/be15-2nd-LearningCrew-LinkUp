@@ -134,16 +134,10 @@ public class MeetingCommandServiceImpl implements MeetingCommandService {
             throw new BusinessException(ErrorCode.USER_NOT_FOUND, "해당 회원은 모임 참여자가 아닙니다.");
         }
 
-        // 4. 기존 개설자의 참여 내역 soft delete
-
-        // 5. 환불 처리 -> 인원이 감소해야 필요한 로직
-
-        // 6. 모임 리더 변경
+        // 4. 개설자 변경
 
         meeting.setLeaderId(newLeaderId);
         Meeting saved = meetingRepository.save(meeting);
-
-        // 모임 status 변경 -> 인원이 감소해야 필요한 로직
 
         /* 개설자 변경 알림 발송 */
         meetingNotificationHelper.sendLeaderChangeNotification(
@@ -155,30 +149,30 @@ public class MeetingCommandServiceImpl implements MeetingCommandService {
     }
 
     /**
-     * 3. 모임 삭제
+     * 3. 모임 삭제 -> cancelMeetingByLeader로 대체
      */
-    @Transactional
-    public void deleteMeeting(int meetingId) {
-        Meeting meeting = meetingRepository.findById(meetingId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.MEETING_NOT_FOUND));
-
-        // 모든 상태 참가자들을 DELETED 처리
-        for (int statusId : new int[]{STATUS_PENDING, STATUS_ACCEPTED, STATUS_REJECTED}) {
-            List<MeetingParticipationHistory> participants =
-                    meetingParticipationHistoryRepository.findByMeetingIdAndStatusId(meetingId, statusId);
-
-            for (MeetingParticipationHistory history : participants) {
-                history.setStatusId(STATUS_DELETED);
-                meetingParticipationHistoryRepository.save(history);
-            }
-        }
-
-        /* 모임의 status를 deleted로 변경하고 update */
-        meeting.setStatusId(STATUS_DELETED);
-
-        // 장소 대여비 회수 로직 추가
-        meetingRepository.save(meeting);
-    }
+//    @Transactional
+//    public void deleteMeeting(int meetingId) {
+//        Meeting meeting = meetingRepository.findById(meetingId)
+//                .orElseThrow(() -> new BusinessException(ErrorCode.MEETING_NOT_FOUND));
+//
+//        // 모든 상태 참가자들을 DELETED 처리
+//        for (int statusId : new int[]{STATUS_PENDING, STATUS_ACCEPTED, STATUS_REJECTED}) {
+//            List<MeetingParticipationHistory> participants =
+//                    meetingParticipationHistoryRepository.findByMeetingIdAndStatusId(meetingId, statusId);
+//
+//            for (MeetingParticipationHistory history : participants) {
+//                history.setStatusId(STATUS_DELETED);
+//                meetingParticipationHistoryRepository.save(history);
+//            }
+//        }
+//
+//        /* 모임의 status를 deleted로 변경하고 update */
+//        meeting.setStatusId(STATUS_DELETED);
+//
+//        // 장소 대여비 회수 로직 추가
+//        meetingRepository.save(meeting);
+//    }
 
     public void validateCreatorBalance(int creatorId, Integer placeId, int minUser) {
         if (placeId == null) return; // 장소 없으면 돈 필요 없음
@@ -323,7 +317,7 @@ public class MeetingCommandServiceImpl implements MeetingCommandService {
             Place place = placeRepository.findById(placeId)
                     .orElseThrow(() -> new BusinessException(ErrorCode.PLACE_NOT_FOUND));
 
-            /* 장소 시작/종료 시간과 일치하는 지 (휴무) */
+            /* 장소 시작/종료 시간과 일치하는 지 (휴무) */ // TODO
 
 
             /* 장소 최소/최대 인원 조건 체크 */

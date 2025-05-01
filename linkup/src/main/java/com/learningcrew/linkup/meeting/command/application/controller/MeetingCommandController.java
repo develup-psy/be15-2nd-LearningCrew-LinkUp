@@ -131,7 +131,7 @@ public class MeetingCommandController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
-        meetingCommandService.deleteMeeting(meetingId);
+        meetingCommandService.cancelMeetingByLeader(meetingId);
         return ResponseEntity.ok(ApiResponse.success(new MeetingCommandResponse(meetingId)));
     }
 
