@@ -1,8 +1,9 @@
 package com.learningcrew.linkup.meeting.command.application.service;
 
 import com.learningcrew.linkup.meeting.command.application.dto.request.ParticipantReviewCreateRequest;
+import com.learningcrew.linkup.meeting.command.application.dto.response.ParticipantReviewCommandResponse;
 
 public interface ParticipantReviewCommandService {
 
-    long createParticipantReview(ParticipantReviewCreateRequest request, int revieweeId, int reviewerId, int meetingId);
+    ParticipantReviewCommandResponse createParticipantReview(ParticipantReviewCreateRequest request, int reviewerId, int meetingId);
 }
