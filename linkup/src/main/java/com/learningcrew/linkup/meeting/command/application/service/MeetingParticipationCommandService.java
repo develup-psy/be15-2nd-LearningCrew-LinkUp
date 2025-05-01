@@ -15,5 +15,5 @@ public interface MeetingParticipationCommandService {
 
     long rejectParticipation(Meeting meeting, int memberId);
 
-    long deleteMeetingParticipation(MeetingParticipationHistory participation);
+    long deleteMeetingParticipation(int meetingId, int memberId);
 }

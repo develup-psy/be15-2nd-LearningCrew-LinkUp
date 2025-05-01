@@ -213,7 +213,7 @@ public class MeetingParticipationCommandServiceImpl implements MeetingParticipat
     private PointTransactionResponse payParticipation(int meetingId, int memberId) {
         // 모임 조회
         Meeting meeting = meetingRepository.findById(meetingId)
-                .orElseThrow( () -> new BusinessException(ErrorCode.MEETING_NOT_FOUND, "해당 모임을 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.MEETING_NOT_FOUND, "해당 모임을 찾을 수 없습니다."));
 
         Integer placeId = meeting.getPlaceId();
 
@@ -226,7 +226,7 @@ public class MeetingParticipationCommandServiceImpl implements MeetingParticipat
 
         // 장소 요금 계산
         Place place = placeRepository.findById(placeId)
-                        .orElseThrow();
+                .orElseThrow();
 
         int rentalCost = place.getRentalCost();
         int minUser = meeting.getMinUser();
@@ -301,29 +301,22 @@ public class MeetingParticipationCommandServiceImpl implements MeetingParticipat
      * 4. 참가 취소 (soft delete)
      */
     @Transactional
-    public long deleteMeetingParticipation(MeetingParticipationHistory history) {
-        if (history == null) {
-            throw new BusinessException(ErrorCode.NOT_FOUND, "참가 정보를 찾을 수 없습니다.");
-        }
+    public long deleteMeetingParticipation(int meetingId, int memberId) {
+        List<MeetingParticipationHistory> participations = meetingParticipationHistoryRepository.findAllByMeetingIdAndStatusId(meetingId, STATUS_ACCEPTED);
 
-        int acceptedStatusId = STATUS_ACCEPTED;
+        // 참여 기록 확인
+        MeetingParticipationHistory participation = participations.stream().findFirst()
+                .orElseThrow(() -> new BusinessException(ErrorCode.BAD_REQUEST, "참여 기록이 조회되지 않습니다."));
 
-        // JPA를 통해 참여 기록 재조회하여 상태 확인
-        MeetingParticipationHistory participation = meetingParticipationHistoryRepository.findByMeetingIdAndMemberId(history.getMeetingId(), history.getMemberId())
-                .orElseThrow( () -> new BusinessException(ErrorCode.BAD_REQUEST, "참여 기록이 조회되지 않습니다."));
-
-        System.out.println("✅ 현재 상태 ID: " + participation.getStatusId());
-        System.out.println("✅ ACCEPTED ID: " + acceptedStatusId);
-
-        if (participation.getStatusId() != acceptedStatusId) {
-            throw new BusinessException(ErrorCode.BAD_REQUEST, "환불 가능한 참가 정보가 아닙니다.");
-        }
-
-
-        Meeting meeting = meetingRepository.findById(history.getMeetingId())
+        Meeting meeting = meetingRepository.findById(participation.getMeetingId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEETING_NOT_FOUND));
 
-        if (meeting.getStatusId() == STATUS_DELETED) {  // soft deleted 된 모임
+        // 개설자는 참가자가 본인 뿐일때만 참가 취소 가능
+        if (meeting.getLeaderId() == memberId && participations.size() > 1) {
+            throw new BusinessException(ErrorCode.MEETING_CREATOR_CANNOT_EXIT);
+        }
+
+        if (meeting.getStatusId() == STATUS_DELETED) { // soft deleted 된 모임
             throw new BusinessException(ErrorCode.MEETING_NOT_FOUND);
         }
 
@@ -332,14 +325,14 @@ public class MeetingParticipationCommandServiceImpl implements MeetingParticipat
             throw new BusinessException(ErrorCode.BAD_REQUEST, "참가 취소가 불가능한 모임입니다.");
         }
         // 취소 로직 실행
-//        cancelParticipation(history.getMeetingId(), history.getMemberId());
+        cancelParticipation(meetingId, memberId);
 
-        // 상태 DELETED로 변경 후 저장
-        history.setStatusId(STATUS_DELETED);
-        meetingParticipationHistoryRepository.save(history);
+        // 상태 DELETED로 변경 후 저장 -> cancelParticipation에 포함
+//        participation.setStatusId(STATUS_DELETED);
+//        meetingParticipationHistoryRepository.save(participation);
 
         meetingStatusService.changeStatusByMemberCount(meeting);
-        return history.getParticipationId();
+        return participation.getParticipationId();
     }
 
     /**
@@ -431,37 +424,35 @@ public class MeetingParticipationCommandServiceImpl implements MeetingParticipat
     @Transactional
     public void cancelParticipation(int meetingId, int memberId) {
         // 1. 참여 기록 확인
-        MeetingParticipationHistory participation = meetingParticipationHistoryRepository.findByMeetingIdAndMemberId(meetingId, memberId)
+        MeetingParticipationHistory participation = meetingParticipationHistoryRepository.findByMeetingIdAndMemberIdAndStatusId(meetingId, memberId, STATUS_ACCEPTED)
                 .orElseThrow(() -> new BusinessException(ErrorCode.BAD_REQUEST, "참여 기록이 없습니다."));
 
         System.out.println(STATUS_ACCEPTED);
         System.out.println(participation.getStatusId());
-
 
         // 2. 환불 금액 계산
         Meeting meeting = meetingRepository.findById(meetingId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEETING_NOT_FOUND));
 
         Integer placeId = meeting.getPlaceId();
-        if (placeId == null) return; // 장소 없으면 환불 불필요
+        if (placeId != null) { // 장소 없으면 환불 불필요
+            Place place = placeRepository.findById(placeId)
+                    .orElseThrow(() -> new BusinessException(ErrorCode.PLACE_NOT_FOUND));
+            int refundAmount = place.getRentalCost() / meeting.getMinUser();
 
-        Place place = placeRepository.findById(placeId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.PLACE_NOT_FOUND));
-        int refundAmount = place.getRentalCost() / meeting.getMinUser();
+            // 3. 포인트 환불
+            userFeignClient.increasePoint(memberId, refundAmount);
 
-        // 3. 포인트 환불
-        userFeignClient.increasePoint(memberId, refundAmount);
-
-        // 4. 환불 기록
-        PointTransaction transaction = new PointTransaction(
-                null,
-                memberId,
-                refundAmount,
-                "REFUND",
-                null
-        );
-        pointRepository.save(transaction);
-
+            // 4. 환불 기록
+            PointTransaction transaction = new PointTransaction(
+                    null,
+                    memberId,
+                    refundAmount,
+                    "REFUND",
+                    null
+            );
+            pointRepository.save(transaction);
+        }
         // 5. 참여 기록 상태 변경
         participation.setStatusId(STATUS_DELETED);
 
