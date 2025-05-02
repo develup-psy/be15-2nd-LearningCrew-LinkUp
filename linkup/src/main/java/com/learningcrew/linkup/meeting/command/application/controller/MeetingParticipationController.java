@@ -7,8 +7,6 @@ import com.learningcrew.linkup.meeting.command.application.dto.request.MeetingPa
 import com.learningcrew.linkup.meeting.command.application.dto.response.MeetingParticipationCommandResponse;
 import com.learningcrew.linkup.meeting.command.application.service.MeetingParticipationCommandService;
 import com.learningcrew.linkup.meeting.command.domain.aggregate.Meeting;
-import com.learningcrew.linkup.meeting.command.domain.aggregate.MeetingParticipationHistory;
-import com.learningcrew.linkup.meeting.command.domain.repository.MeetingParticipationHistoryRepository;
 import com.learningcrew.linkup.meeting.command.domain.repository.MeetingRepository;
 import com.learningcrew.linkup.point.command.application.dto.response.MeetingPaymentResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,7 +26,6 @@ public class MeetingParticipationController {
 
     private final MeetingParticipationCommandService meetingParticipationCommandService;
     private final MeetingRepository meetingRepository;
-    private final MeetingParticipationHistoryRepository participationRepository;
 
     @Operation(summary = "모임 참가 신청 가능 여부 확인", description = "포인트 기준 참가 가능 여부 확인")
     @GetMapping("/meetings/{meetingId}/participation/check")
@@ -71,14 +68,11 @@ public class MeetingParticipationController {
     @DeleteMapping("/meetings/{meetingId}/participation/{memberId}")
     public ResponseEntity<ApiResponse<MeetingParticipationCommandResponse>> deleteMeetingParticipation(
             @PathVariable int meetingId,
-            @PathVariable int memberId
+            @PathVariable int memberId,
+            @RequestParam int requesterId
     ) {
-        // 참여 이력 조회 (ACCEPTED일 때만 참가 중인 경우에 해당)
-        MeetingParticipationHistory participation = participationRepository.findByMeetingIdAndMemberIdAndStatusId(meetingId, memberId, STATUS_ACCEPTED)
-                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "참여 정보를 찾을 수 없습니다."));
-
         // soft delete 수행
-        long participationId = meetingParticipationCommandService.deleteMeetingParticipation(participation);
+        long participationId = meetingParticipationCommandService.deleteMeetingParticipation(meetingId, memberId, requesterId);
 
         return ResponseEntity.ok(ApiResponse.success(MeetingParticipationCommandResponse.builder()
                 .participationId(participationId)
