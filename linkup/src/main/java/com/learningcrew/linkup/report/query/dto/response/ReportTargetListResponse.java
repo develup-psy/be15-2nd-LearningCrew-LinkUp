@@ -11,10 +11,10 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReportListResponse {
+public class ReportTargetListResponse {
 
-    @Schema(description = "신고 내역 목록")
-    private List<ReportDTO> reports;
+    @Schema(description = "피신고 대상 목록")
+    private List<ReportTargetDTO> targetList;
 
     @Schema(description = "페이지네이션 정보")
     private Pagination pagination;
