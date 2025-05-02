@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learningcrew.linkup.place.query.mapper.PlaceReviewMapper">
+
+    <select id="findPlaceReviews" resultType="com.learningcrew.linkup.place.query.dto.response.PlaceReviewResponse">
+        SELECT
+        pr.review_id,
+        pr.member_id,
+        m.nickname AS member_name,
+        pr.place_id,
+        p.place_name AS place_name,
+        pr.review_score,
+        pr.review_content,
+        pr.review_image_url
+        FROM place_review pr
+        JOIN member m ON pr.member_id = m.member_id
+        JOIN place p ON pr.place_id = p.place_id
+        WHERE 1=1
+        <if test="memberId != null">
+            AND pr.member_id = #{memberId}
+        </if>
+        <if test="placeId != null">
+            AND pr.place_id = #{placeId}
+        </if>
+    </select>
+
+</mapper>

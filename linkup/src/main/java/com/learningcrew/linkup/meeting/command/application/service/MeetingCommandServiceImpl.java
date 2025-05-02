@@ -15,9 +15,10 @@ import com.learningcrew.linkup.notification.command.application.helper.MeetingNo
 import com.learningcrew.linkup.notification.command.application.helper.PointNotificationHelper;
 import com.learningcrew.linkup.place.command.domain.aggregate.entity.Place;
 import com.learningcrew.linkup.place.command.domain.repository.PlaceRepository;
+import com.learningcrew.linkup.place.command.domain.repository.ReservationRepository;
 import com.learningcrew.linkup.place.query.service.PlaceQueryService;
+import com.learningcrew.linkup.point.command.application.dto.response.PointTransactionResponse;
 import com.learningcrew.linkup.point.command.application.service.PointCommandService;
-import com.learningcrew.linkup.point.command.domain.aggregate.PointTransaction;
 import com.learningcrew.linkup.point.command.domain.repository.PointRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -60,6 +61,7 @@ public class MeetingCommandServiceImpl implements MeetingCommandService {
     private final MeetingParticipationHistoryRepository meetingParticipationHistoryRepository;
     private final MeetingNotificationHelper meetingNotificationHelper;
     private final PointNotificationHelper pointNotificationHelper;
+    private final ReservationRepository reservationRepository;
 
     private final MeetingParticipationCommandService meetingParticipationCommandService;
     private final PlaceQueryService placeQueryService;
@@ -74,6 +76,9 @@ public class MeetingCommandServiceImpl implements MeetingCommandService {
     public int createMeeting(MeetingCreateRequest request) {
         /* 1. 검증 로직 */
         validateMeetingCreateRequest(request);
+
+        // 잔액 확인
+        validateCreatorBalance(request.getLeaderId(), request.getPlaceId(), request.getMinUser());
 
         /* 2. 모임 저장 */
         Meeting meeting = Meeting.builder()
@@ -98,6 +103,26 @@ public class MeetingCommandServiceImpl implements MeetingCommandService {
 
         Meeting savedMeeting = meetingRepository.save(meeting);
         meetingStatusService.changeStatusByMemberCount(savedMeeting); // 혹시 minUser 1이면 status 바로 변경
+
+        if (request.getPlaceId() != null) {
+            Place place = placeQueryService.getPlaceById(request.getPlaceId());
+            int costPerUser = place.getRentalCost() / request.getMinUser();
+
+            PointTransactionResponse response = pointCommandService.paymentTransaction(
+                    request.getLeaderId(),
+                    costPerUser
+            );
+            int ownerId = place.getOwnerId();
+            userFeignClient.increasePoint(ownerId, place.getRentalCost());
+            pointCommandService.payPlaceRentalCost(ownerId, place.getRentalCost());
+
+            pointNotificationHelper.sendPaymentNotification(
+                    request.getLeaderId(),
+                    place.getPlaceName(),
+                    costPerUser,
+                    response.getCurrentPoint()
+            );
+        }
 
         /* 3. 개설자를 모임 참가자에 등록 */
         MeetingParticipationCreateRequest participationRequest = MeetingParticipationCreateRequest.builder()
@@ -187,28 +212,6 @@ public class MeetingCommandServiceImpl implements MeetingCommandService {
             throw new BusinessException(ErrorCode.INSUFFICIENT_BALANCE,
                     "개설자의 포인트가 부족합니다. 최소 필요 포인트: " + costPerUser);
         }
-
-        userFeignClient.decreasePoint(creatorId, costPerUser);
-
-        PointTransaction transaction = new PointTransaction(
-                null,
-                creatorId,
-                costPerUser*(-1),
-                "PAYMENT", // 또는 다른 타입으로 구분 가능 eg. "CREATOR_PAYMENT"
-                null // createdAt은 DB default
-        );
-
-        int afterPointBalance = userFeignClient.getPointBalance(creatorId);
-
-        /* 개설자 포인트 사용 알림 발송 */
-        pointNotificationHelper.sendPaymentNotification(
-                creatorId,
-                place.getPlaceName(),
-                costPerUser,
-                afterPointBalance
-        );
-
-        pointRepository.save(transaction);
     }
 
     @Transactional

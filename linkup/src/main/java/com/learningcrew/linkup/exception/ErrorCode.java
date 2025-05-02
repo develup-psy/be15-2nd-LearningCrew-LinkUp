@@ -158,7 +158,9 @@ public enum ErrorCode {
     INVALID_DAY_OF_WEEK(HttpStatus.BAD_REQUEST,"요일을 제대로 적어주세요." ),
     DUPLICATE_OPERATION_DAY(HttpStatus.BAD_REQUEST,"요일이 중복되었습니다." ),
     NO_PERMISSION(HttpStatus.BAD_REQUEST,"본인이 소유한 장소가 아닙니다." ),
-    POINT_DECREASE_FAILED(HttpStatus.BAD_REQUEST,"포인트 차감에 실패했습니다." );
+    POINT_DECREASE_FAILED(HttpStatus.BAD_REQUEST,"포인트 차감에 실패했습니다." ),
+    REVIEW_ALREADY_WRITTEN(HttpStatus.BAD_REQUEST,"이미 리뷰를 작성하셨습니다. " ),
+    POINT_REFUND_FAILED(HttpStatus.BAD_REQUEST,"실패");
 
 
 

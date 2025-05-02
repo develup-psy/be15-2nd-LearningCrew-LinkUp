@@ -12,4 +12,7 @@ import java.util.Optional;
 public interface JpaMeetingParticipationHistoryRepository extends MeetingParticipationHistoryRepository, JpaRepository<MeetingParticipationHistory, Long> {
 
     List<MeetingParticipationHistory> findByMeetingIdAndStatusIdIn(int meetingId, List<Integer> statusIds);
+
+    List<MeetingParticipationHistory> findByMemberIdAndMeetingId(int memberId, int meetingId);
+
 }

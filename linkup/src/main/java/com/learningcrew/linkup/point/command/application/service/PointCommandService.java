@@ -4,6 +4,7 @@ import com.learningcrew.linkup.common.dto.ApiResponse;
 import com.learningcrew.linkup.common.infrastructure.UserFeignClient;
 import com.learningcrew.linkup.exception.BusinessException;
 import com.learningcrew.linkup.exception.ErrorCode;
+import com.learningcrew.linkup.notification.command.application.helper.PointNotificationHelper;
 import com.learningcrew.linkup.point.command.application.dto.request.PointTransactionRequest;
 import com.learningcrew.linkup.point.command.application.dto.request.WithdrawRequest;
 import com.learningcrew.linkup.point.command.application.dto.response.PointTransactionResponse;
@@ -24,6 +25,7 @@ public class PointCommandService {
     private final PointRepository pointRepository;
     private final UserFeignClient userFeignClient;
     private final AccountRepository accountRepository;
+    private final PointNotificationHelper pointNotificationHelper;
 
     @Transactional
     public PointTransactionResponse createPointTransaction(PointTransactionRequest request) {
@@ -96,7 +98,7 @@ public class PointCommandService {
             throw new BusinessException(ErrorCode.POINT_DECREASE_FAILED);
         }
 
-        // 2. 포인트 트랜잭션 기록
+        // 2. 트랜잭션 기록
         PointTransaction pointTransaction = new PointTransaction(
                 null,
                 userId,
@@ -106,15 +108,19 @@ public class PointCommandService {
         );
         pointRepository.save(pointTransaction);
 
-        // 3. 최신 포인트 조회
+        // 3. 최신 포인트 잔액 조회
         int latestPointBalance = userFeignClient.getPointBalance(userId);
 
         return new PointTransactionResponse("포인트 결제가 완료되었습니다.", latestPointBalance);
     }
+
     @Transactional
     public void refundParticipationPoint(int userId, int amount) {
         // 1. 포인트 증가
-        userFeignClient.increasePoint(userId, amount);
+        ApiResponse<Void> response = userFeignClient.increasePoint(userId, amount);
+        if (response == null || !response.isSuccess()) {
+            throw new BusinessException(ErrorCode.POINT_REFUND_FAILED, "포인트 환불 실패");
+        }
 
         // 2. 트랜잭션 기록
         PointTransaction pointTransaction = new PointTransaction(

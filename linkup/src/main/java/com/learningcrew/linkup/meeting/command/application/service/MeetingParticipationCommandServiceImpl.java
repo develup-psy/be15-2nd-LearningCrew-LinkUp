@@ -173,12 +173,6 @@ public class MeetingParticipationCommandServiceImpl implements MeetingParticipat
             throw new BusinessException(ErrorCode.BAD_REQUEST, "모임 상태가 유효하지 않아 승인할 수 없습니다.");
         }
 
-        try {
-            payParticipation(meeting, memberId);
-        } catch (BusinessException e) {
-            throw new BusinessException(ErrorCode.INSUFFICIENT_BALANCE, "포인트 부족으로 참가 승인을 할 수 없습니다.");
-        }
-
 
         // 3. 포인트 차감 및 트랜잭션 기록
         Place place = placeQueryService.getPlaceById(meeting.getPlaceId());
@@ -191,22 +185,22 @@ public class MeetingParticipationCommandServiceImpl implements MeetingParticipat
         // 포인트 트랜잭션(PAYMENT) 기록
         pointCommandService.paymentTransaction(memberId, costPerUser);
 
-        /* 참가 승인 알림 발송 */
-        meetingNotificationHelper.sendParticipationAcceptNotification(
-                memberId,       // 알림 받을 사람 (모임 개설자)
-                meeting.getMeetingTitle()           // 모임 제목 (바인딩될 {meetingTitle})
-        );
+//        /* 참가 승인 알림 발송 */
+//        meetingNotificationHelper.sendParticipationAcceptNotification(
+//                memberId,       // 알림 받을 사람 (모임 개설자)
+//                meeting.getMeetingTitle()           // 모임 제목 (바인딩될 {meetingTitle})
+//        );
 
         participation.setStatusId(STATUS_ACCEPTED);
 
         meetingParticipationHistoryRepository.save(participation);
         meetingStatusService.changeStatusByMemberCount(meeting);
 
-        // 5. 참가 승인 알림 발송
-        meetingNotificationHelper.sendParticipationAcceptNotification(
-                memberId,
-                meeting.getMeetingTitle()
-        );
+//        // 5. 참가 승인 알림 발송
+//        meetingNotificationHelper.sendParticipationAcceptNotification(
+//                memberId,
+//                meeting.getMeetingTitle()
+//        );
         return participation.getParticipationId();
     }
 
@@ -249,13 +243,13 @@ public class MeetingParticipationCommandServiceImpl implements MeetingParticipat
         );
         pointRepository.save(transaction);
 
-        /* 모임 신청자 포인트 사용 알림 발송 */
-        pointNotificationHelper.sendPaymentNotification(
-                memberId,
-                meeting.getMeetingTitle(),
-                amountPerPerson,
-                pointBalance
-        );
+//        /* 모임 신청자 포인트 사용 알림 발송 */
+//        pointNotificationHelper.sendPaymentNotification(
+//                memberId,
+//                meeting.getMeetingTitle(),
+//                amountPerPerson,
+//                pointBalance
+//        );
 
         return new PointTransactionResponse("결제가 완료되었습니다.", pointBalance);
     }

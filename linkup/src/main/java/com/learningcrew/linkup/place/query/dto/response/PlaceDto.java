@@ -10,5 +10,5 @@ public class PlaceDto {
     private String placeName;
     private Double reviewRating;
     private String address;
-
+    private Integer rentalCost;
 }
