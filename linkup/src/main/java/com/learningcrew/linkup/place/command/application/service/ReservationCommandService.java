@@ -1,6 +1,8 @@
 package com.learningcrew.linkup.place.command.application.service;
 
 
+import com.learningcrew.linkup.exception.BusinessException;
+import com.learningcrew.linkup.exception.ErrorCode;
 import com.learningcrew.linkup.meeting.command.domain.aggregate.Meeting;
 import com.learningcrew.linkup.meeting.command.domain.repository.MeetingRepository;
 
@@ -11,8 +13,10 @@ import com.learningcrew.linkup.place.command.application.dto.response.Reservatio
 import com.learningcrew.linkup.place.command.domain.aggregate.entity.Reservation;
 import com.learningcrew.linkup.place.command.domain.repository.ReservationRepository;
 import com.learningcrew.linkup.place.query.mapper.PlaceMapper;
+import com.learningcrew.linkup.place.query.service.PlaceQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -21,11 +25,10 @@ import java.util.Optional;
 public class ReservationCommandService {
 
     private final ReservationRepository reservationRepository;
-
     private final MeetingRepository meetingRepository;
-
     private final MeetingNotificationHelper meetingNotificationHelper;
     private final PlaceMapper placeMapper;
+    private final PlaceQueryService placeQueryService;
 
 
     public ReservationCommandResponse createReservation(ReservationCreateRequest request) {
@@ -84,6 +87,60 @@ public class ReservationCommandService {
                 statusId,
                 message
         );
+    }
+
+    @Transactional
+    public ReservationCommandResponse createExternalReservation(ReservationCreateRequest request) {
+        int ownerId = placeQueryService.getPlaceById(request.getPlaceId()).getOwnerId();
+
+        // 1. 중복 예약 여부 확인
+        int conflictCount = reservationRepository.countConflictingReservations(
+                request.getPlaceId(),
+                request.getReservationDate(),
+                request.getStartTime(),
+                request.getEndTime()
+        );
+
+        if (conflictCount > 0) {
+            throw new BusinessException(ErrorCode.RESERVATION_ALREADY_EXISTS, "이미 해당 시간대에 예약이 존재합니다.");
+        }
+
+        // 2. 상태: 승인된 외부 예약 (status_id = 2로 가정)
+        int statusId = 2;
+
+        // 3. 예약 엔티티 생성
+        Reservation reservation = Reservation.builder()
+                .placeId(request.getPlaceId())
+                .reservationDate(request.getReservationDate())
+                .startTime(request.getStartTime())
+                .endTime(request.getEndTime())
+                .statusId(statusId)
+                .meetingId(null) // 외부 예약은 모임과 연결되지 않음
+                .build();
+
+        reservationRepository.save(reservation);
+
+        return new ReservationCommandResponse(
+                reservation.getReservationId(),
+                statusId,
+                "외부 예약이 등록되었습니다."
+        );
+    }
+    @Transactional
+    public void deleteExternalReservation(Integer reservationId) {
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "해당 예약이 존재하지 않습니다."));
+
+        // 외부 예약인지 확인
+        if (reservation.getMeetingId() != null) {
+            throw new BusinessException(ErrorCode.BAD_REQUEST, "모임에 연결된 예약은 삭제할 수 없습니다.");
+        }
+
+        // 본인 소유 장소인지 확인
+        int placeId = reservation.getPlaceId();
+        int ownerId = placeQueryService.getPlaceById(placeId).getOwnerId();
+
+        reservationRepository.delete(reservation);
     }
 
 }

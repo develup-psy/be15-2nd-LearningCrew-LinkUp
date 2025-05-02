@@ -25,7 +25,7 @@ public class Reservation {
     private int placeId;
 
     @Column(name = "meeting_id")
-    private int meetingId;
+    private Integer meetingId;
 
     @Column(name = "status_id")
     private int statusId;

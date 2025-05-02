@@ -38,4 +38,14 @@ public interface RoleMapper {
     // role_name으로 role_id 조회
     @Select("SELECT role_id FROM ROLE WHERE role_name = #{roleName}")
     Optional<Integer> getRoleIdByName(String roleName);
+
+    // userId로 RoleDTO 조회 (USER 테이블에 role_id가 있다고 가정)
+    @Select("SELECT r.role_id, r.role_name " +
+            "FROM USER u JOIN ROLE r ON u.role_id = r.role_id " +
+            "WHERE u.user_id = #{userId}")
+    @ResultMap("roleMap")
+    Optional<RoleDTO> findByUserId(int userId);
+
+
 }
+

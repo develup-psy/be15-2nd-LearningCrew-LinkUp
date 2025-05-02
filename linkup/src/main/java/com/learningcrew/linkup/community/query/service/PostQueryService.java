@@ -1,6 +1,7 @@
 package com.learningcrew.linkup.community.query.service;
 
 import com.learningcrew.linkup.common.dto.Pagination;
+import com.learningcrew.linkup.common.query.mapper.RoleMapper;
 import com.learningcrew.linkup.community.command.domain.repository.PostRepository;
 import com.learningcrew.linkup.community.query.dto.request.CommunitySearchRequest;
 import com.learningcrew.linkup.community.query.dto.response.*;
@@ -12,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,6 +24,7 @@ public class PostQueryService {
     private final PostRepository postRepository;
     private final PostMapper postMapper;
     private final CommentMapper commentMapper;
+
 
     public List<PostQueryResponse> getAllPosts() {
         return postRepository.findAll().stream()
@@ -39,7 +42,27 @@ public class PostQueryService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
+    public PostListResponse getPostsForUser(CommunitySearchRequest request) {
+        List<PostDTO> noticePosts = postMapper.selectNoticePostsForUser(request);
+        List<PostDTO> generalPosts = postMapper.selectGeneralPostsForUser(request);
+        long total = postMapper.countGeneralPostsForUser(request);
 
+        List<PostDTO> mergedPosts = new ArrayList<>();
+        mergedPosts.addAll(noticePosts);
+        mergedPosts.addAll(generalPosts);
+
+        Pagination pagination = Pagination.builder()
+                .currentPage(request.getPage())
+                .totalPage((int) Math.ceil((double) total / request.getSize()))
+                .totalItems(total)
+                .build();
+
+        return PostListResponse.builder()
+                .posts(mergedPosts)
+                .pagination(pagination)
+                .build();
+    }
 
     @Transactional(readOnly = true)
     public PostListResponse getPosts(CommunitySearchRequest request) {
@@ -57,6 +80,7 @@ public class PostQueryService {
                 .pagination(pagination)
                 .build();
     }
+
 
     @Transactional(readOnly = true)
     public PostDetailResponse getPostDetail(int postId) {
@@ -95,4 +119,23 @@ public class PostQueryService {
                 .pagination(pagination)
                 .build();
     }
+
+
+    @Transactional(readOnly = true)
+    public PostListResponse getAllPostsForUser(CommunitySearchRequest request) {
+        List<PostDTO> posts = postMapper.selectAllPostsForUser(request);
+        long total = postMapper.countAllPostsForUser(request);
+
+        Pagination pagination = Pagination.builder()
+                .currentPage(request.getPage())
+                .totalPage((int) Math.ceil((double) total / request.getSize()))
+                .totalItems(total)
+                .build();
+
+        return PostListResponse.builder()
+                .posts(posts)
+                .pagination(pagination)
+                .build();
+    }
+
 }
