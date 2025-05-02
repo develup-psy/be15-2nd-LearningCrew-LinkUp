@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import java.time.LocalTime;
 import java.util.Date;
+import java.util.Optional;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Integer> {
     @Query("""
@@ -21,5 +22,9 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
             @Param("startTime") LocalTime startTime,
             @Param("endTime") LocalTime endTime
     );
+
+    Optional<Reservation> findByMeetingId(int meetingId);
+
+
 }
 

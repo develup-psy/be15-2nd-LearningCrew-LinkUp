@@ -1,6 +1,10 @@
 package com.learningcrew.linkup.point.command.application.service;
 
+import com.learningcrew.linkup.common.dto.ApiResponse;
 import com.learningcrew.linkup.common.infrastructure.UserFeignClient;
+import com.learningcrew.linkup.exception.BusinessException;
+import com.learningcrew.linkup.exception.ErrorCode;
+import com.learningcrew.linkup.notification.command.application.helper.PointNotificationHelper;
 import com.learningcrew.linkup.point.command.application.dto.request.PointTransactionRequest;
 import com.learningcrew.linkup.point.command.application.dto.request.WithdrawRequest;
 import com.learningcrew.linkup.point.command.application.dto.response.PointTransactionResponse;
@@ -21,6 +25,7 @@ public class PointCommandService {
     private final PointRepository pointRepository;
     private final UserFeignClient userFeignClient;
     private final AccountRepository accountRepository;
+    private final PointNotificationHelper pointNotificationHelper;
 
     @Transactional
     public PointTransactionResponse createPointTransaction(PointTransactionRequest request) {
@@ -83,4 +88,108 @@ public class PointCommandService {
         ));
         return new PointTransactionResponse("전액 환불 완료", 0);
     }
+    @Transactional
+    public PointTransactionResponse paymentTransaction(int userId, int amount) {
+
+        // 1. 포인트 차감
+        ApiResponse<Void> decreaseResponse = userFeignClient.decreasePoint(userId, amount);
+
+        if (decreaseResponse == null || !decreaseResponse.isSuccess()) {
+            throw new BusinessException(ErrorCode.POINT_DECREASE_FAILED);
+        }
+
+        // 2. 트랜잭션 기록
+        PointTransaction pointTransaction = new PointTransaction(
+                null,
+                userId,
+                -Math.abs(amount), // PAYMENT는 무조건 음수로 저장
+                "PAYMENT",
+                null
+        );
+        pointRepository.save(pointTransaction);
+
+        // 3. 최신 포인트 잔액 조회
+        int latestPointBalance = userFeignClient.getPointBalance(userId);
+
+        return new PointTransactionResponse("포인트 결제가 완료되었습니다.", latestPointBalance);
+    }
+
+    @Transactional
+    public void refundParticipationPoint(int userId, int amount) {
+        // 1. 포인트 증가
+        ApiResponse<Void> response = userFeignClient.increasePoint(userId, amount);
+        if (response == null || !response.isSuccess()) {
+            throw new BusinessException(ErrorCode.POINT_REFUND_FAILED, "포인트 환불 실패");
+        }
+
+        // 2. 트랜잭션 기록
+        PointTransaction pointTransaction = new PointTransaction(
+                null,
+                userId,
+                amount, // 환불은 양수
+                "REFUND",
+                null
+        );
+        pointRepository.save(pointTransaction);
+    }
+    @Transactional
+    public void payPlaceRentalCost(int ownerId, int amount) {
+        // 1. 포인트 증가 (사업자에게 돈 줌)
+        ApiResponse<Void> increaseResponse = userFeignClient.increasePoint(ownerId, amount);
+
+        if (increaseResponse == null || !increaseResponse.isSuccess()) {
+            throw new BusinessException(ErrorCode.POINT_DECREASE_FAILED, "사업자에게 장소 대여비 지급 실패");
+        }
+
+        // 2. 트랜잭션 기록 (CHARGE 타입으로 기록)
+        PointTransaction pointTransaction = new PointTransaction(
+                null,
+                ownerId,
+                amount,
+                "CHARGE",
+                null
+        );
+        pointRepository.save(pointTransaction);
+    }
+    @Transactional
+    public void revokePlaceRentalCost(int ownerId, int amount) {
+        // 1. 포인트 감소 (사업자에게 돈 뺏음)
+        ApiResponse<Void> decreaseResponse = userFeignClient.decreasePoint(ownerId, amount);
+
+        if (decreaseResponse == null || !decreaseResponse.isSuccess()) {
+            throw new BusinessException(ErrorCode.POINT_DECREASE_FAILED, "사업자에게서 장소 대여비 회수 실패");
+        }
+
+        // 2. 트랜잭션 기록 (REFUND 타입)
+        PointTransaction pointTransaction = new PointTransaction(
+                null,
+                ownerId,
+                -amount,  // 차감이니까 음수
+                "REFUND",
+                null
+        );
+        pointRepository.save(pointTransaction);
+    }
+
+    @Transactional
+    public void refundExtraPoint(int userId, int refundAmount) {
+
+        // 1. 포인트 증가
+        ApiResponse<Void> response = userFeignClient.increasePoint(userId, refundAmount);
+        if (response == null || !response.isSuccess()) {
+            throw new BusinessException(ErrorCode.POINT_INCREASE_FAILED, "포인트 복구 실패");
+        }
+
+        // 2. 트랜잭션 기록
+        PointTransaction pointTransaction = new PointTransaction(
+                null,
+                userId,
+                refundAmount,
+                "REFUND",
+                null
+        );
+        pointRepository.save(pointTransaction);
+    }
+
+
 }
