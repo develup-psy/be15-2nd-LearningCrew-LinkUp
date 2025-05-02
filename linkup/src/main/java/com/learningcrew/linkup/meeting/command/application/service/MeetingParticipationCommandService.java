@@ -2,7 +2,6 @@ package com.learningcrew.linkup.meeting.command.application.service;
 
 import com.learningcrew.linkup.meeting.command.application.dto.request.MeetingParticipationCreateRequest;
 import com.learningcrew.linkup.meeting.command.domain.aggregate.Meeting;
-import com.learningcrew.linkup.meeting.command.domain.aggregate.MeetingParticipationHistory;
 
 public interface MeetingParticipationCommandService {
     void validateBalance(int meetingId, int memberId);
@@ -15,5 +14,5 @@ public interface MeetingParticipationCommandService {
 
     long rejectParticipation(Meeting meeting, int memberId);
 
-    long deleteMeetingParticipation(int meetingId, int memberId);
+    long deleteMeetingParticipation(int meetingId, int memberId, int requesterId);
 }

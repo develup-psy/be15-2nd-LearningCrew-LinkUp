@@ -68,10 +68,11 @@ public class MeetingParticipationController {
     @DeleteMapping("/meetings/{meetingId}/participation/{memberId}")
     public ResponseEntity<ApiResponse<MeetingParticipationCommandResponse>> deleteMeetingParticipation(
             @PathVariable int meetingId,
-            @PathVariable int memberId
+            @PathVariable int memberId,
+            @RequestParam int requesterId
     ) {
         // soft delete 수행
-        long participationId = meetingParticipationCommandService.deleteMeetingParticipation(meetingId, memberId);
+        long participationId = meetingParticipationCommandService.deleteMeetingParticipation(meetingId, memberId, requesterId);
 
         return ResponseEntity.ok(ApiResponse.success(MeetingParticipationCommandResponse.builder()
                 .participationId(participationId)

@@ -301,23 +301,29 @@ public class MeetingParticipationCommandServiceImpl implements MeetingParticipat
      * 4. 참가 취소 (soft delete)
      */
     @Transactional
-    public long deleteMeetingParticipation(int meetingId, int memberId) {
+    public long deleteMeetingParticipation(int meetingId, int memberId, int requesterId) {
         List<MeetingParticipationHistory> participations = meetingParticipationHistoryRepository.findAllByMeetingIdAndStatusId(meetingId, STATUS_ACCEPTED);
 
+        if (memberId != requesterId) {
+            throw new BusinessException(ErrorCode.FORBIDDEN);
+        }
+
         // 참여 기록 확인
-        MeetingParticipationHistory participation = participations.stream().findFirst()
+        MeetingParticipationHistory participation = participations.stream()
+                .filter(p -> p.getMemberId() == memberId)
+                .findFirst()
                 .orElseThrow(() -> new BusinessException(ErrorCode.BAD_REQUEST, "참여 기록이 조회되지 않습니다."));
 
         Meeting meeting = meetingRepository.findById(participation.getMeetingId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEETING_NOT_FOUND));
 
+        if (meeting.getStatusId() == STATUS_DELETED) { // soft deleted 된 모임
+            throw new BusinessException(ErrorCode.MEETING_NOT_FOUND);
+        }
+
         // 개설자는 참가자가 본인 뿐일때만 참가 취소 가능
         if (meeting.getLeaderId() == memberId && participations.size() > 1) {
             throw new BusinessException(ErrorCode.MEETING_CREATOR_CANNOT_EXIT);
-        }
-
-        if (meeting.getStatusId() == STATUS_DELETED) { // soft deleted 된 모임
-            throw new BusinessException(ErrorCode.MEETING_NOT_FOUND);
         }
 
         // 최대 인원 모집 (모임 확정) 혹은 진행 완료
@@ -326,6 +332,12 @@ public class MeetingParticipationCommandServiceImpl implements MeetingParticipat
         }
         // 취소 로직 실행
         cancelParticipation(meetingId, memberId);
+
+        // 개설자 참가 취소 시 모임 삭제 처리
+        if (memberId == meeting.getLeaderId()) {
+            meeting.setStatusId(STATUS_DELETED);
+            meetingRepository.save(meeting);
+        }
 
         // 상태 DELETED로 변경 후 저장 -> cancelParticipation에 포함
 //        participation.setStatusId(STATUS_DELETED);
