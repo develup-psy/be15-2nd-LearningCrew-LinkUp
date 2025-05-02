@@ -435,23 +435,24 @@ public class MeetingParticipationCommandServiceImpl implements MeetingParticipat
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEETING_NOT_FOUND));
 
         Integer placeId = meeting.getPlaceId();
-        if (placeId != null) return; // 장소 없으면 환불 불필요
-        Place place = placeRepository.findById(placeId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.PLACE_NOT_FOUND));
-        int refundAmount = place.getRentalCost() / meeting.getMinUser();
+        if (placeId != null) { // 장소 없으면 환불 불필요
+            Place place = placeRepository.findById(placeId)
+                    .orElseThrow(() -> new BusinessException(ErrorCode.PLACE_NOT_FOUND));
+            int refundAmount = place.getRentalCost() / meeting.getMinUser();
 
-        // 3. 포인트 환불
-        userFeignClient.increasePoint(memberId, refundAmount);
+            // 3. 포인트 환불
+            userFeignClient.increasePoint(memberId, refundAmount);
 
-        // 4. 환불 기록
-        PointTransaction transaction = new PointTransaction(
-                null,
-                memberId,
-                refundAmount,
-                "REFUND",
-                null
-        );
-        pointRepository.save(transaction);
+            // 4. 환불 기록
+            PointTransaction transaction = new PointTransaction(
+                    null,
+                    memberId,
+                    refundAmount,
+                    "REFUND",
+                    null
+            );
+            pointRepository.save(transaction);
+        }
 
         // 5. 참여 기록 상태 변경
         participation.setStatusId(STATUS_DELETED);

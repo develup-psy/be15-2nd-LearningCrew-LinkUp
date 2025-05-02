@@ -18,27 +18,23 @@ import com.learningcrew.linkup.notification.command.application.helper.MeetingNo
 import com.learningcrew.linkup.notification.command.application.helper.PointNotificationHelper;
 import com.learningcrew.linkup.place.command.domain.aggregate.entity.OperationTime;
 import com.learningcrew.linkup.place.command.domain.aggregate.entity.Place;
-import com.learningcrew.linkup.place.command.domain.aggregate.entity.Reservation;
 import com.learningcrew.linkup.place.command.domain.repository.OperationTimeRepository;
 import com.learningcrew.linkup.place.command.domain.repository.PlaceRepository;
 import com.learningcrew.linkup.place.command.domain.repository.ReservationRepository;
 import com.learningcrew.linkup.place.query.service.PlaceQueryService;
 import com.learningcrew.linkup.point.command.application.dto.response.PointTransactionResponse;
 import com.learningcrew.linkup.point.command.application.service.PointCommandService;
-import com.learningcrew.linkup.point.command.domain.repository.PointRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -58,7 +54,6 @@ public class MeetingCommandServiceImpl implements MeetingCommandService {
     private static final int STATUS_DONE = 5;
 
     private static final int MEETING_TIME_UNIT = 10;
-    private final PlaceRepository placeRepository;
 
     private List<Meeting> cachedTodaysMeetings;
     private List<Meeting> cachedYesterdaysMeetings;
@@ -75,7 +70,6 @@ public class MeetingCommandServiceImpl implements MeetingCommandService {
 
     private final MeetingParticipationCommandService meetingParticipationCommandService;
     private final PlaceQueryService placeQueryService;
-    private final PointRepository pointRepository;
     private final PointCommandService pointCommandService;
     private final UserFeignClient userFeignClient;
     private final MemberQueryClient memberQueryClient;
@@ -175,7 +169,7 @@ public class MeetingCommandServiceImpl implements MeetingCommandService {
 
         // 4. 개설자 변경
         meeting.setLeaderId(newLeaderId);
-        Meeting saved = meetingRepository.save(meeting);
+        meetingRepository.save(meeting);
 
         /* 개설자 변경 알림 발송 */
         meetingNotificationHelper.sendLeaderChangeNotification(
@@ -300,6 +294,9 @@ public class MeetingCommandServiceImpl implements MeetingCommandService {
 
         int minUser = request.getMinUser();
         int maxUser = request.getMaxUser();
+        DayOfWeek dayOfWeek = request.getDate().getDayOfWeek(); // 예: WED
+        LocalTime start = request.getStartTime();
+        LocalTime end = request.getEndTime();
 
         if (minUser < MIN_USER || maxUser > MAX_USER || minUser > maxUser) {
             throw new BusinessException(ErrorCode.BAD_REQUEST, "유효하지 않은 인원 설정입니다.");
@@ -353,10 +350,10 @@ public class MeetingCommandServiceImpl implements MeetingCommandService {
         LocalDate yesterday = today.minusDays(1);
 
         cachedTodaysMeetings = meetingRepository.findAllByDate(today);
-//        cachedYesterdaysMeetings = meetingRepository.findAllByDate(yesterday);
+        cachedYesterdaysMeetings = meetingRepository.findAllByDate(yesterday);
 
         log.info("오늘 모임 {}건 캐싱 완료", cachedTodaysMeetings.size());
-//        log.info("어제 모임 {}건 캐싱 완료", cachedYesterdaysMeetings.size());
+        log.info("어제 모임 {}건 캐싱 완료", cachedYesterdaysMeetings.size());
     }
 
     @Transactional
@@ -521,5 +518,31 @@ public class MeetingCommandServiceImpl implements MeetingCommandService {
         });
 
         return changesOfMannerTemperatures;
+    }
+
+    private String convertDayOfWeek(DayOfWeek dayOfWeek) {
+        return switch (dayOfWeek) {
+            case MONDAY -> "MON";
+            case TUESDAY -> "TUE";
+            case WEDNESDAY -> "WED";
+            case THURSDAY -> "THU";
+            case FRIDAY -> "FRI";
+            case SATURDAY -> "SAT";
+            case SUNDAY -> "SUN";
+        };
+    }
+    private void validateTimeConflict(MeetingCreateRequest request) {
+        if (request.getPlaceId() == null) return; // 장소 없는 경우는 무시
+
+        int conflictCount = reservationRepository.countConflictingReservations(
+                request.getPlaceId(),
+                java.sql.Date.valueOf(request.getDate()),
+                request.getStartTime(),
+                request.getEndTime()
+        );
+
+        if (conflictCount > 0) {
+            throw new BusinessException(ErrorCode.BAD_REQUEST, "해당 시간에는 이미 예약된 모임이 있습니다.");
+        }
     }
 }
