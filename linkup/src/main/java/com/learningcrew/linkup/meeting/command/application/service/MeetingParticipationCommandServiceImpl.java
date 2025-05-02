@@ -55,7 +55,7 @@ public class MeetingParticipationCommandServiceImpl implements MeetingParticipat
         int placeId = meeting.getPlaceId();
 
         Place place = placeRepository.findById(placeId)
-                .orElseThrow();
+                .orElseThrow(() -> new BusinessException(ErrorCode.PLACE_NOT_FOUND));
         int rentalCost = place.getRentalCost();
         int minUser = meeting.getMinUser();
         int costPerUser = rentalCost / minUser;
@@ -215,7 +215,8 @@ public class MeetingParticipationCommandServiceImpl implements MeetingParticipat
 
         // 장소 요금 계산
         Place place = placeRepository.findById(placeId)
-                        .orElseThrow();
+                .orElseThrow(() -> new BusinessException(ErrorCode.PLACE_NOT_FOUND));
+
 
         int rentalCost = place.getRentalCost();
         int minUser = meeting.getMinUser();
@@ -383,7 +384,7 @@ public class MeetingParticipationCommandServiceImpl implements MeetingParticipat
 
         // 장소 요금 계산
         Place place = placeRepository.findById(placeId)
-                .orElseThrow();
+                .orElseThrow(() -> new BusinessException(ErrorCode.PLACE_NOT_FOUND));
 
         int rentalCost = place.getRentalCost();
         int minUser = meeting.getMinUser();
