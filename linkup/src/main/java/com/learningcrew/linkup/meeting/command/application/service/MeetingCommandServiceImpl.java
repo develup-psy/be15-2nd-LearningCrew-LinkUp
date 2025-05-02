@@ -16,7 +16,10 @@ import com.learningcrew.linkup.meeting.command.domain.repository.MeetingReposito
 import com.learningcrew.linkup.meeting.command.domain.repository.ParticipantReviewRepository;
 import com.learningcrew.linkup.notification.command.application.helper.MeetingNotificationHelper;
 import com.learningcrew.linkup.notification.command.application.helper.PointNotificationHelper;
+import com.learningcrew.linkup.place.command.domain.aggregate.entity.OperationTime;
 import com.learningcrew.linkup.place.command.domain.aggregate.entity.Place;
+import com.learningcrew.linkup.place.command.domain.aggregate.entity.Reservation;
+import com.learningcrew.linkup.place.command.domain.repository.OperationTimeRepository;
 import com.learningcrew.linkup.place.command.domain.repository.PlaceRepository;
 import com.learningcrew.linkup.place.command.domain.repository.ReservationRepository;
 import com.learningcrew.linkup.place.query.service.PlaceQueryService;
@@ -32,7 +35,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -64,6 +70,8 @@ public class MeetingCommandServiceImpl implements MeetingCommandService {
     private final MeetingNotificationHelper meetingNotificationHelper;
     private final PointNotificationHelper pointNotificationHelper;
     private final ReservationRepository reservationRepository;
+    private final PlaceRepository placeRepository;
+    private final OperationTimeRepository operationTimeRepository;
 
     private final MeetingParticipationCommandService meetingParticipationCommandService;
     private final PlaceQueryService placeQueryService;
@@ -80,6 +88,9 @@ public class MeetingCommandServiceImpl implements MeetingCommandService {
     public int createMeeting(MeetingCreateRequest request) {
         /* 1. 검증 로직 */
         validateMeetingCreateRequest(request);
+
+        // 중복 시간 확인 ( 장소 기준 )
+        validateTimeConflict(request);
 
         // 잔액 확인
         validateCreatorBalance(request.getLeaderId(), request.getPlaceId(), request.getMinUser());
@@ -121,11 +132,10 @@ public class MeetingCommandServiceImpl implements MeetingCommandService {
             pointCommandService.payPlaceRentalCost(ownerId, place.getRentalCost());
 
             pointNotificationHelper.sendPaymentNotification(
-                    request.getLeaderId(),
-                    place.getPlaceName(),
-                    costPerUser,
-                    response.getCurrentPoint()
-            );
+                  request.getLeaderId(),
+                   place.getPlaceName(),
+                   costPerUser,
+                  response.getCurrentPoint());
         }
 
         /* 3. 개설자를 모임 참가자에 등록 */
@@ -164,7 +174,6 @@ public class MeetingCommandServiceImpl implements MeetingCommandService {
         }
 
         // 4. 개설자 변경
-
         meeting.setLeaderId(newLeaderId);
         Meeting saved = meetingRepository.save(meeting);
 
@@ -176,32 +185,6 @@ public class MeetingCommandServiceImpl implements MeetingCommandService {
 
         return meetingId;
     }
-
-    /**
-     * 3. 모임 삭제 -> cancelMeetingByLeader로 대체
-     */
-//    @Transactional
-//    public void deleteMeeting(int meetingId) {
-//        Meeting meeting = meetingRepository.findById(meetingId)
-//                .orElseThrow(() -> new BusinessException(ErrorCode.MEETING_NOT_FOUND));
-//
-//        // 모든 상태 참가자들을 DELETED 처리
-//        for (int statusId : new int[]{STATUS_PENDING, STATUS_ACCEPTED, STATUS_REJECTED}) {
-//            List<MeetingParticipationHistory> participants =
-//                    meetingParticipationHistoryRepository.findByMeetingIdAndStatusId(meetingId, statusId);
-//
-//            for (MeetingParticipationHistory history : participants) {
-//                history.setStatusId(STATUS_DELETED);
-//                meetingParticipationHistoryRepository.save(history);
-//            }
-//        }
-//
-//        /* 모임의 status를 deleted로 변경하고 update */
-//        meeting.setStatusId(STATUS_DELETED);
-//
-//        // 장소 대여비 회수 로직 추가
-//        meetingRepository.save(meeting);
-//    }
 
     public void validateCreatorBalance(int creatorId, Integer placeId, int minUser) {
         if (placeId == null) return; // 장소 없으면 돈 필요 없음
@@ -218,6 +201,9 @@ public class MeetingCommandServiceImpl implements MeetingCommandService {
         }
     }
 
+    /**
+     * 3. 모임 삭제
+     */
     @Transactional
     public void cancelMeetingByLeader(int meetingId) {
         // 1. 모임 상태를 DELETED로 변경
@@ -318,14 +304,40 @@ public class MeetingCommandServiceImpl implements MeetingCommandService {
         if (minUser < MIN_USER || maxUser > MAX_USER || minUser > maxUser) {
             throw new BusinessException(ErrorCode.BAD_REQUEST, "유효하지 않은 인원 설정입니다.");
         }
-
         Integer placeId = request.getPlaceId();
         if (placeId != null) {
             Place place = placeRepository.findById(placeId)
                     .orElseThrow(() -> new BusinessException(ErrorCode.PLACE_NOT_FOUND));
 
-            /* 장소 시작/종료 시간과 일치하는 지 (휴무) */ // TODO
+            /* 장소 시작/종료 시간과 일치하는 지 (휴무) */
 
+            List<OperationTime> operationTimes = operationTimeRepository.findByPlaceId(placeId);
+            String dayName = convertDayOfWeek(dayOfWeek);
+
+            Optional<OperationTime> opTimeOpt = operationTimes.stream()
+                    .filter(t -> t.getDayOfWeek().equalsIgnoreCase(dayName))
+                    .findFirst();
+
+            if (opTimeOpt.isEmpty()) {
+                throw new BusinessException(ErrorCode.BAD_REQUEST, "해당 요일은 장소가 휴무입니다.");
+            }
+
+            OperationTime opTime = opTimeOpt.get();
+
+            if (start.isBefore(opTime.getStartTime()) || end.isAfter(opTime.getEndTime())) {
+                throw new BusinessException(ErrorCode.BAD_REQUEST, "예약 시간이 운영 시간 외입니다.");
+            }
+
+            Optional<OperationTime> breakTimeOpt = operationTimes.stream()
+                    .filter(t -> t.getDayOfWeek().equalsIgnoreCase("BREAK"))
+                    .findFirst();
+
+            if (breakTimeOpt.isPresent()) {
+                OperationTime breakTime = breakTimeOpt.get();
+                if (start.isBefore(breakTime.getEndTime()) && end.isAfter(breakTime.getStartTime())) {
+                    throw new BusinessException(ErrorCode.BAD_REQUEST, "예약 시간이 브레이크 타임과 겹칩니다.");
+                }
+            }
 
             /* 장소 최소/최대 인원 조건 체크 */
             if (minUser < place.getMinUser() || maxUser > place.getMaxUser()) {

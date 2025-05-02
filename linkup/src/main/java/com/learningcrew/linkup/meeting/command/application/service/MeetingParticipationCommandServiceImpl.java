@@ -55,7 +55,7 @@ public class MeetingParticipationCommandServiceImpl implements MeetingParticipat
         int placeId = meeting.getPlaceId();
 
         Place place = placeRepository.findById(placeId)
-                .orElseThrow();
+                .orElseThrow(() -> new BusinessException(ErrorCode.PLACE_NOT_FOUND));
         int rentalCost = place.getRentalCost();
         int minUser = meeting.getMinUser();
         int costPerUser = rentalCost / minUser;
@@ -107,6 +107,7 @@ public class MeetingParticipationCommandServiceImpl implements MeetingParticipat
                 throw new BusinessException(ErrorCode.INSUFFICIENT_BALANCE, "참가에 필요한 포인트가 부족합니다. 최소 필요 포인트: " + costPerUser + "P");
             }
         }
+
         /* 모임이 참가 가능한 상태인지 확인 */
         if (meeting.getStatusId() == STATUS_REJECTED
             || meeting.getStatusId() == STATUS_DELETED
@@ -185,22 +186,16 @@ public class MeetingParticipationCommandServiceImpl implements MeetingParticipat
         // 포인트 트랜잭션(PAYMENT) 기록
         pointCommandService.paymentTransaction(memberId, costPerUser);
 
-//        /* 참가 승인 알림 발송 */
-//        meetingNotificationHelper.sendParticipationAcceptNotification(
-//                memberId,       // 알림 받을 사람 (모임 개설자)
-//                meeting.getMeetingTitle()           // 모임 제목 (바인딩될 {meetingTitle})
-//        );
-
         participation.setStatusId(STATUS_ACCEPTED);
 
         meetingParticipationHistoryRepository.save(participation);
         meetingStatusService.changeStatusByMemberCount(meeting);
 
-//        // 5. 참가 승인 알림 발송
-//        meetingNotificationHelper.sendParticipationAcceptNotification(
-//                memberId,
-//                meeting.getMeetingTitle()
-//        );
+        // 5. 참가 승인 알림 발송
+        meetingNotificationHelper.sendParticipationAcceptNotification(
+                memberId,
+                meeting.getMeetingTitle()
+        );
         return participation.getParticipationId();
     }
 
@@ -220,7 +215,8 @@ public class MeetingParticipationCommandServiceImpl implements MeetingParticipat
 
         // 장소 요금 계산
         Place place = placeRepository.findById(placeId)
-                .orElseThrow();
+                .orElseThrow(() -> new BusinessException(ErrorCode.PLACE_NOT_FOUND));
+
 
         int rentalCost = place.getRentalCost();
         int minUser = meeting.getMinUser();
@@ -243,13 +239,13 @@ public class MeetingParticipationCommandServiceImpl implements MeetingParticipat
         );
         pointRepository.save(transaction);
 
-//        /* 모임 신청자 포인트 사용 알림 발송 */
-//        pointNotificationHelper.sendPaymentNotification(
-//                memberId,
-//                meeting.getMeetingTitle(),
-//                amountPerPerson,
-//                pointBalance
-//        );
+        /* 모임 신청자 포인트 사용 알림 발송 */
+        pointNotificationHelper.sendPaymentNotification(
+                memberId,
+                meeting.getMeetingTitle(),
+                amountPerPerson,
+                pointBalance
+        );
 
         return new PointTransactionResponse("결제가 완료되었습니다.", pointBalance);
     }
@@ -334,8 +330,6 @@ public class MeetingParticipationCommandServiceImpl implements MeetingParticipat
         }
 
         // 상태 DELETED로 변경 후 저장 -> cancelParticipation에 포함
-//        participation.setStatusId(STATUS_DELETED);
-//        meetingParticipationHistoryRepository.save(participation);
 
         meetingStatusService.changeStatusByMemberCount(meeting);
         return participation.getParticipationId();
@@ -393,7 +387,7 @@ public class MeetingParticipationCommandServiceImpl implements MeetingParticipat
 
         // 장소 요금 계산
         Place place = placeRepository.findById(placeId)
-                .orElseThrow();
+                .orElseThrow(() -> new BusinessException(ErrorCode.PLACE_NOT_FOUND));
 
         int rentalCost = place.getRentalCost();
         int minUser = meeting.getMinUser();
@@ -441,24 +435,24 @@ public class MeetingParticipationCommandServiceImpl implements MeetingParticipat
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEETING_NOT_FOUND));
 
         Integer placeId = meeting.getPlaceId();
-        if (placeId != null) { // 장소 없으면 환불 불필요
-            Place place = placeRepository.findById(placeId)
-                    .orElseThrow(() -> new BusinessException(ErrorCode.PLACE_NOT_FOUND));
-            int refundAmount = place.getRentalCost() / meeting.getMinUser();
+        if (placeId != null) return; // 장소 없으면 환불 불필요
+        Place place = placeRepository.findById(placeId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.PLACE_NOT_FOUND));
+        int refundAmount = place.getRentalCost() / meeting.getMinUser();
 
-            // 3. 포인트 환불
-            userFeignClient.increasePoint(memberId, refundAmount);
+        // 3. 포인트 환불
+        userFeignClient.increasePoint(memberId, refundAmount);
 
-            // 4. 환불 기록
-            PointTransaction transaction = new PointTransaction(
-                    null,
-                    memberId,
-                    refundAmount,
-                    "REFUND",
-                    null
-            );
-            pointRepository.save(transaction);
-        }
+        // 4. 환불 기록
+        PointTransaction transaction = new PointTransaction(
+                null,
+                memberId,
+                refundAmount,
+                "REFUND",
+                null
+        );
+        pointRepository.save(transaction);
+
         // 5. 참여 기록 상태 변경
         participation.setStatusId(STATUS_DELETED);
 
