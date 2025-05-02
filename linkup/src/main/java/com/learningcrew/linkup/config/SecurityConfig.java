@@ -158,7 +158,9 @@ public class SecurityConfig {
 
                 // 신고 관리
                 "/report",
-                "/report/reportType/{reportTypeId}",
+                "/report/{reportId}",
+                "/report/target",
+                "/report/target/{targetType}/{targetId}",
                 "/report/reporter-user",
                 "/report/reportee-user",
                 "/report/reportee-user/{reportedId}",
@@ -171,16 +173,13 @@ public class SecurityConfig {
 
                 // 제재 및 이의제기
                 "/penalty",
-                "/penalty/{penaltyType}",
-                "/penalty/user/{memberId}",
-                "/penalty/user/{memberId}/{penaltyType}",
+                "/penalty{penaltyId}",
                 "/penalty/post/{postId}",
                 "/penalty/comment/{commentId}",
                 "/penalty/placeReview/{reviewId}/done",
                 "/penalty/{penaltyId}",
                 "/objections",
-                "/objections/status/{statusId}",
-                "/objections/review/{reviewId}",
+                "/objections/{objectionId}",
                 "/objections/{objectionId}/accept",
                 "/objections/{objectionId}/reject",
 
