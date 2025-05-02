@@ -173,15 +173,12 @@ public class PointCommandService {
 
     @Transactional
     public void refundExtraPoint(int userId, int refundAmount) {
-        System.out.println("[DEBUG] 모임 강제완료 환불 시작: userId=" + userId + ", 환불금액=" + refundAmount);
 
         // 1. 포인트 증가
         ApiResponse<Void> response = userFeignClient.increasePoint(userId, refundAmount);
         if (response == null || !response.isSuccess()) {
-            System.out.println("[ERROR] 포인트 증가 실패: userId=" + userId);
             throw new BusinessException(ErrorCode.POINT_INCREASE_FAILED, "포인트 복구 실패");
         }
-        System.out.println("[DEBUG] 포인트 증가 성공");
 
         // 2. 트랜잭션 기록
         PointTransaction pointTransaction = new PointTransaction(
@@ -192,7 +189,6 @@ public class PointCommandService {
                 null
         );
         pointRepository.save(pointTransaction);
-        System.out.println("[DEBUG] 트랜잭션 저장 완료");
     }
 
 
