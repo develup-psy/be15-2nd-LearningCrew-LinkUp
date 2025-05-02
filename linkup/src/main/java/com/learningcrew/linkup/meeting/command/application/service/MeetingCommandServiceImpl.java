@@ -14,7 +14,11 @@ import com.learningcrew.linkup.meeting.command.domain.repository.MeetingReposito
 import com.learningcrew.linkup.notification.command.application.helper.MeetingNotificationHelper;
 import com.learningcrew.linkup.notification.command.application.helper.PointNotificationHelper;
 import com.learningcrew.linkup.place.command.domain.aggregate.entity.Place;
+import com.learningcrew.linkup.place.command.domain.aggregate.entity.Reservation;
+import com.learningcrew.linkup.place.command.domain.repository.ReservationRepository;
 import com.learningcrew.linkup.place.query.service.PlaceQueryService;
+import com.learningcrew.linkup.point.command.application.dto.response.PointTransactionResponse;
+import com.learningcrew.linkup.point.command.application.service.PointCommandService;
 import com.learningcrew.linkup.point.command.domain.aggregate.PointTransaction;
 import com.learningcrew.linkup.point.command.domain.repository.PointRepository;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +38,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Transactional
 public class MeetingCommandServiceImpl implements MeetingCommandService {
-    private static final int MIN_USER = 1;
+    private static final int MIN_USER = 2;
     private static final int MAX_USER = 30;
 
     private static final int MANNER_TEMPERATURE_SUBTRACT = 2;
@@ -46,6 +50,8 @@ public class MeetingCommandServiceImpl implements MeetingCommandService {
     private static final int STATUS_DELETED = 4;
     private static final int STATUS_DONE = 5;
 
+    private static final int MEETING_TIME_UNIT = 10;
+
     private List<Meeting> cachedTodaysMeetings;
 //    private List<Meeting> cachedYesterdaysMeetings;
 
@@ -55,12 +61,12 @@ public class MeetingCommandServiceImpl implements MeetingCommandService {
     private final MeetingParticipationHistoryRepository meetingParticipationHistoryRepository;
     private final MeetingNotificationHelper meetingNotificationHelper;
     private final PointNotificationHelper pointNotificationHelper;
+    private final ReservationRepository reservationRepository;
 
     private final MeetingParticipationCommandService meetingParticipationCommandService;
-    private final MeetingParticipationCommandService participationCommandService;
     private final PlaceQueryService placeQueryService;
     private final PointRepository pointRepository;
-
+    private final PointCommandService pointCommandService;
     private final UserFeignClient userFeignClient;
 
     /**
@@ -70,6 +76,9 @@ public class MeetingCommandServiceImpl implements MeetingCommandService {
     public int createMeeting(MeetingCreateRequest request) {
         /* 1. 검증 로직 */
         validateMeetingCreateRequest(request);
+
+        // 잔액 확인
+        validateCreatorBalance(request.getLeaderId(), request.getPlaceId(), request.getMinUser());
 
         /* 2. 모임 저장 */
         Meeting meeting = Meeting.builder()
@@ -94,6 +103,26 @@ public class MeetingCommandServiceImpl implements MeetingCommandService {
 
         Meeting savedMeeting = meetingRepository.save(meeting);
         meetingStatusService.changeStatusByMemberCount(savedMeeting); // 혹시 minUser 1이면 status 바로 변경
+
+        if (request.getPlaceId() != null) {
+            Place place = placeQueryService.getPlaceById(request.getPlaceId());
+            int costPerUser = place.getRentalCost() / request.getMinUser();
+
+            PointTransactionResponse response = pointCommandService.paymentTransaction(
+                    request.getLeaderId(),
+                    costPerUser
+            );
+            int ownerId = place.getOwnerId();
+            userFeignClient.increasePoint(ownerId, place.getRentalCost());
+            pointCommandService.payPlaceRentalCost(ownerId, place.getRentalCost());
+
+//            pointNotificationHelper.sendPaymentNotification(
+//                    request.getLeaderId(),
+//                    place.getPlaceName(),
+//                    costPerUser,
+//                    response.getCurrentPoint()
+//            );
+        }
 
         /* 3. 개설자를 모임 참가자에 등록 */
         MeetingParticipationCreateRequest participationRequest = MeetingParticipationCreateRequest.builder()
@@ -130,24 +159,27 @@ public class MeetingCommandServiceImpl implements MeetingCommandService {
             throw new BusinessException(ErrorCode.USER_NOT_FOUND, "해당 회원은 모임 참여자가 아닙니다.");
         }
 
-        // 4. 기존 개설자의 참여 내역 soft delete
         meetingParticipationHistoryRepository.findByMeetingIdAndMemberId(meetingId, request.getMemberId())
                 .ifPresent(oldLeaderHistory -> {
                     oldLeaderHistory.setStatusId(STATUS_DELETED);
                     meetingParticipationHistoryRepository.save(oldLeaderHistory);
                 });
         // 5. 환불 처리
-
+        if (meeting.getPlaceId() != null) {
+            Place place = placeQueryService.getPlaceById(meeting.getPlaceId());
+            int costPerUser = place.getRentalCost() / meeting.getMinUser();
+            pointCommandService.refundParticipationPoint(request.getMemberId(), costPerUser);
+        }
         // 6. 모임 리더 변경
-
         meeting.setLeaderId(newLeaderId);
         Meeting saved = meetingRepository.save(meeting);
 
-        // 모임 status 변경
-        meetingStatusService.changeStatusByMemberCount(saved);
 
         /* 개설자 변경 알림 발송 */
-
+        meetingNotificationHelper.sendLeaderChangeNotification(
+                newLeaderId,       // 알림 받을 사람 (모임 개설자)
+                meeting.getMeetingTitle()           // 모임 제목 (바인딩될 {meetingTitle})
+        );
 
         return meetingId;
     }
@@ -160,7 +192,22 @@ public class MeetingCommandServiceImpl implements MeetingCommandService {
         Meeting meeting = meetingRepository.findById(meetingId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEETING_NOT_FOUND));
 
-        // 모든 상태 참가자들을 DELETED 처리
+        List<MeetingParticipationHistory> acceptedUsers =
+                meetingParticipationHistoryRepository.findByMeetingIdAndStatusId(meetingId, STATUS_ACCEPTED);
+
+        Place place = placeQueryService.getPlaceById(meeting.getPlaceId());
+        int rentalCost = place.getRentalCost();
+        int minUser = meeting.getMinUser();
+        int refundPerUser = rentalCost / minUser;
+
+        for (MeetingParticipationHistory participation : acceptedUsers) {
+            int userId = participation.getMemberId();
+            userFeignClient.increasePoint(userId, refundPerUser);
+            log.info("userId = {}, refundPerUser = {}", userId, refundPerUser);
+            pointCommandService.refundParticipationPoint(userId, refundPerUser);
+        }
+
+        // ✅ 그리고 나서 참여자 상태 모두 DELETED로 변경
         for (int statusId : new int[]{STATUS_PENDING, STATUS_ACCEPTED, STATUS_REJECTED}) {
             List<MeetingParticipationHistory> participants =
                     meetingParticipationHistoryRepository.findByMeetingIdAndStatusId(meetingId, statusId);
@@ -171,12 +218,23 @@ public class MeetingCommandServiceImpl implements MeetingCommandService {
             }
         }
 
-        /* 모임의 status를 deleted로 변경하고 update */
-        meeting.setStatusId(STATUS_DELETED);
+        // ✅ 예약 상태도 삭제
+        Reservation reservation = reservationRepository.findByMeetingId(meetingId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.RESERVATION_NOT_FOUND));
 
-        // 장소 대여비 회수 로직 추가
+        reservation.setStatusId(STATUS_DELETED);
+        reservationRepository.save(reservation);
+
+        // ✅ 사업자 포인트 회수
+        int ownerId = place.getOwnerId();
+        userFeignClient.decreasePoint(ownerId, rentalCost);
+        pointCommandService.paymentTransaction(ownerId, rentalCost);
+
+        // ✅ 모임 상태 변경
+        meeting.setStatusId(STATUS_DELETED);
         meetingRepository.save(meeting);
     }
+
 
     public void validateCreatorBalance(int creatorId, Integer placeId, int minUser) {
         if (placeId == null) return; // 장소 없으면 돈 필요 없음
@@ -191,30 +249,9 @@ public class MeetingCommandServiceImpl implements MeetingCommandService {
             throw new BusinessException(ErrorCode.INSUFFICIENT_BALANCE,
                     "개설자의 포인트가 부족합니다. 최소 필요 포인트: " + costPerUser);
         }
-
-        userFeignClient.decreasePoint(creatorId, costPerUser);
-
-        PointTransaction transaction = new PointTransaction(
-                null,
-                creatorId,
-                costPerUser*(-1),
-                "PAYMENT", // 또는 다른 타입으로 구분 가능 eg. "CREATOR_PAYMENT"
-                null // createdAt은 DB default
-        );
-
-        int afterPointBalance = userFeignClient.getPointBalance(creatorId);
-
-        /* 개설자 포인트 사용 알림 발송 */
-        pointNotificationHelper.sendPaymentNotification(
-                creatorId,
-                place.getPlaceName(),
-                costPerUser,
-                afterPointBalance
-        );
-
-        pointRepository.save(transaction);
     }
 
+    @Transactional
     public void cancelMeetingByLeader(int meetingId) {
         // 1. 모임 상태를 DELETED로 변경
         Meeting meeting = meetingRepository.findById(meetingId)
@@ -237,39 +274,60 @@ public class MeetingCommandServiceImpl implements MeetingCommandService {
         }
     }
 
+    @Transactional
     public void forceCompleteMeeting(int meetingId) {
+        System.out.println("[DEBUG] 모임 강제완료 시작 - meetingId: " + meetingId);
+
+        // 1. 모임 조회
         Meeting meeting = meetingRepository.findById(meetingId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND));
+        System.out.println("[DEBUG] 모임 조회 완료 - placeId: " + meeting.getPlaceId());
 
+        // 2. ACCEPTED 참여자 조회
+        List<MeetingParticipationHistory> acceptedParticipants =
+                meetingParticipationHistoryRepository.findByMeetingIdAndStatusId(
+                        meetingId,
+                        STATUS_ACCEPTED
+                );
+
+        System.out.println("[DEBUG] 참여자 수 조회 완료 - 인원: " + acceptedParticipants.size());
+
+        // 3. 참여자 없을 때 예외 처리 추가 (중요)
+        if (acceptedParticipants.isEmpty()) {
+            System.out.println("[ERROR] 참가자 없음 - 모임 완료 불가");
+            throw new BusinessException(ErrorCode.BAD_REQUEST, "참가자가 존재하지 않아 모임을 완료할 수 없습니다.");
+        }
+
+        // 4. 환불/정산 계산
         int rentalCost = placeQueryService.getPlaceById(meeting.getPlaceId()).getRentalCost();
-        List<MeetingParticipationHistory> participants =
-                meetingParticipationHistoryRepository.findByMeetingIdAndStatusId(meetingId, STATUS_ACCEPTED);
+        System.out.println("[DEBUG] 장소 대여비 조회 완료 - rentalCost: " + rentalCost);
 
-        int perPersonCost = rentalCost / participants.size();
+        int perPersonCost = rentalCost / acceptedParticipants.size();
         int prePaid = rentalCost / meeting.getMinUser();
 
-        for (MeetingParticipationHistory p : participants) {
+        System.out.println("[DEBUG] 1인당 요금 계산 완료 - perPersonCost: " + perPersonCost + ", prePaid: " + prePaid);
+
+        for (MeetingParticipationHistory participant : acceptedParticipants) {
+            int userId = participant.getMemberId();
+            System.out.println("[DEBUG] 참여자 처리 시작 - userId: " + userId);
+
             if (prePaid > perPersonCost) {
                 int refundAmount = prePaid - perPersonCost;
-                int userId = p.getMemberId();
-                userFeignClient.increasePoint(userId, refundAmount);
+                System.out.println("[DEBUG] 환불 대상 - userId: " + userId + ", refundAmount: " + refundAmount);
 
-                pointRepository.save(new PointTransaction(
-                        null,
-                        userId,
-                        refundAmount,
-                        "REFUND",
-                        null
-                ));
+                // 포인트 환불
+                pointCommandService.refundExtraPoint(userId, refundAmount);
             }
 
-            // 상태 DONE 처리
-            p.setStatusId(STATUS_DONE);
+            participant.setStatusId(STATUS_DONE);
+            System.out.println("[DEBUG] 참여자 상태 DONE 업데이트 - userId: " + userId);
         }
 
         // 모임 상태도 DONE으로 업데이트
         meeting.setStatusId(STATUS_DONE);
         meetingRepository.save(meeting);
+
+        System.out.println("[DEBUG] 모임 상태 DONE 업데이트 완료 - meetingId: " + meetingId);
     }
 
     /**
@@ -283,7 +341,7 @@ public class MeetingCommandServiceImpl implements MeetingCommandService {
             throw new BusinessException(ErrorCode.INVALID_MEETING_DATE_FILTER);
         }
 
-        if (request.getStartTime().getMinute() % 30 != 0 || request.getEndTime().getMinute() % 30 != 0) {
+        if (request.getStartTime().getMinute() % MEETING_TIME_UNIT != 0 || request.getEndTime().getMinute() % MEETING_TIME_UNIT != 0) {
             throw new BusinessException(ErrorCode.BAD_REQUEST, "시작/종료 시간은 30분 단위여야 합니다.");
         }
 
@@ -309,7 +367,7 @@ public class MeetingCommandServiceImpl implements MeetingCommandService {
     }
 
     @Transactional
-    @Scheduled(cron = "0 0,30 * * * *") // 매 30분마다 상태 갱신 시도
+    @Scheduled(cron = "0 */10 * * * *") // 매 10분마다 상태 갱신 시도
     public void updateMeetingStatuses() {
         if (cachedTodaysMeetings == null) {
             log.warn("오늘 모임 목록이 캐싱되지 않았습니다.");
@@ -379,8 +437,8 @@ public class MeetingCommandServiceImpl implements MeetingCommandService {
     }
 
 //    @Transactional
-//    @Scheduled(cron = "0 0,30 * * * *")
-//        // 매 30분마다 반영 시도
+//    @Scheduled(cron = "0 */10 * * * *")
+//        // 매 10분마다 반영 시도
 //        /* 매너온도 반영 */
 //    void updateMannerTemperatures() {
 //        if (cachedYesterdaysMeetings == null) {

@@ -1,6 +1,8 @@
 package com.learningcrew.linkup.place.query.mapper;
 
 import com.learningcrew.linkup.place.command.domain.aggregate.entity.Place;
+import com.learningcrew.linkup.place.query.dto.request.AdminPlaceListRequest;
+import com.learningcrew.linkup.place.query.dto.request.AdminPlaceReviewListRequest;
 import com.learningcrew.linkup.place.query.dto.request.FavoriteRequest;
 import com.learningcrew.linkup.place.query.dto.request.PlaceListRequest;
 import com.learningcrew.linkup.place.query.dto.response.*;
@@ -15,7 +17,7 @@ public interface PlaceMapper {
     // 회원의 즐겨찾기 목록 조회 (페이징 적용)
     List<PlaceDto> selectAllPlaces(PlaceListRequest placeListRequest);
 
-    List<PlaceDto> selectAllPlacesByAdmin(PlaceListRequest placeListRequest);
+    List<AdminPlaceDto> selectAllPlacesByAdmin(AdminPlaceListRequest placeListRequest);
 
     PlaceDetailResponse selectPlaceDetail(@Param("placeId")int placeId);
 
@@ -23,7 +25,7 @@ public interface PlaceMapper {
 
     long countPlaces(PlaceListRequest placeListRequest);
 
-    long countPlacesByAdmin(PlaceListRequest placeListRequest);
+    long countPlacesByAdmin(AdminPlaceListRequest placeListRequest);
 
     long countPlacesByOwner(PlaceListRequest placeListRequest);
 
@@ -43,4 +45,9 @@ public interface PlaceMapper {
 
     List<PlaceReviewResponse> selectReviews(int placeId);
 
+    // 리뷰 관련
+
+    List<AdminPlaceReviewDto> selectAllPlaceReviewsByAdmin(AdminPlaceReviewListRequest request);
+
+    long countPlaceReviewsByAdmin(AdminPlaceReviewListRequest request);
 }

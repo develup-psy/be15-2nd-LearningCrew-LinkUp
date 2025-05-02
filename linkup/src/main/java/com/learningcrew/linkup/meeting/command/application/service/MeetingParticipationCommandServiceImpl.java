@@ -12,8 +12,10 @@ import com.learningcrew.linkup.notification.command.application.helper.MeetingNo
 import com.learningcrew.linkup.notification.command.application.helper.PointNotificationHelper;
 import com.learningcrew.linkup.place.command.domain.aggregate.entity.Place;
 import com.learningcrew.linkup.place.command.domain.repository.PlaceRepository;
+import com.learningcrew.linkup.place.query.service.PlaceQueryService;
 import com.learningcrew.linkup.point.command.application.dto.response.MeetingPaymentResponse;
 import com.learningcrew.linkup.point.command.application.dto.response.PointTransactionResponse;
+import com.learningcrew.linkup.point.command.application.service.PointCommandService;
 import com.learningcrew.linkup.point.command.domain.aggregate.PointTransaction;
 import com.learningcrew.linkup.point.command.domain.repository.PointRepository;
 import lombok.RequiredArgsConstructor;
@@ -34,8 +36,10 @@ public class MeetingParticipationCommandServiceImpl implements MeetingParticipat
     private final MeetingRepository meetingRepository;
     private final PlaceRepository placeRepository;
     private final MeetingStatusService meetingStatusService;
+    private final PlaceQueryService placeQueryService;
     private final MeetingNotificationHelper meetingNotificationHelper;
     private final PointNotificationHelper pointNotificationHelper;
+    private final PointCommandService pointCommandService;
 
     private static final int STATUS_PENDING = 1;
     private static final int STATUS_ACCEPTED = 2;
@@ -75,6 +79,7 @@ public class MeetingParticipationCommandServiceImpl implements MeetingParticipat
     public long createMeetingParticipation(MeetingParticipationCreateRequest request, Meeting meeting) {
         int meetingId = meeting.getMeetingId();
         int memberId = request.getMemberId();
+        /* 이미 참가 신청한 내역이 있는지 확인 (PENDING) */
 
         /* 회원이 모임에 속해 있는지 확인 */
         if (meetingParticipationHistoryRepository.existsByMeetingIdAndMemberIdAndStatusId(meetingId, memberId, STATUS_ACCEPTED)) {
@@ -83,6 +88,18 @@ public class MeetingParticipationCommandServiceImpl implements MeetingParticipat
 
         if (meetingParticipationHistoryRepository.existsByMeetingIdAndMemberIdAndStatusId(meetingId, memberId, STATUS_REJECTED)) {
             throw new BusinessException(ErrorCode.BAD_REQUEST, "거절된 모임에는 참여할 수 없습니다.");
+        }
+
+        /* 4. 참가자 포인트 잔액 검사 */
+        Place place = placeQueryService.getPlaceById(meeting.getPlaceId());
+        int rentalCost = place.getRentalCost();
+        int minUser = meeting.getMinUser();
+        int costPerUser = rentalCost / minUser;
+
+        int pointBalance = userFeignClient.getPointBalance(request.getMemberId());
+
+        if (pointBalance < costPerUser) {
+            throw new BusinessException(ErrorCode.INSUFFICIENT_BALANCE, "참가에 필요한 포인트가 부족합니다. 최소 필요 포인트: " + costPerUser + "P");
         }
 
         /* 모임이 참가 가능한 상태인지 확인 */
@@ -151,21 +168,34 @@ public class MeetingParticipationCommandServiceImpl implements MeetingParticipat
             throw new BusinessException(ErrorCode.BAD_REQUEST, "모임 상태가 유효하지 않아 승인할 수 없습니다.");
         }
 
-        try {
-            payParticipation(meeting, memberId);
-        } catch (BusinessException e) {
-            throw new BusinessException(ErrorCode.INSUFFICIENT_BALANCE, "포인트 부족으로 참가 승인을 할 수 없습니다.");
-        }
-        participation.setStatusId(STATUS_ACCEPTED);
 
-        /* 참가 승인 알림 발송 */
-        meetingNotificationHelper.sendParticipationAcceptNotification(
-                memberId,       // 알림 받을 사람 (모임 개설자)
-                meeting.getMeetingTitle()           // 모임 제목 (바인딩될 {meetingTitle})
-        );
+        // 3. 포인트 차감 및 트랜잭션 기록
+        Place place = placeQueryService.getPlaceById(meeting.getPlaceId());
+        int rentalCost = place.getRentalCost();
+        int minUser = meeting.getMinUser();
+        int costPerUser = rentalCost / minUser;
+
+        int pointBalance = userFeignClient.getPointBalance(memberId);
+
+        // 포인트 트랜잭션(PAYMENT) 기록
+        pointCommandService.paymentTransaction(memberId, costPerUser);
+
+//        /* 참가 승인 알림 발송 */
+//        meetingNotificationHelper.sendParticipationAcceptNotification(
+//                memberId,       // 알림 받을 사람 (모임 개설자)
+//                meeting.getMeetingTitle()           // 모임 제목 (바인딩될 {meetingTitle})
+//        );
+
+        participation.setStatusId(STATUS_ACCEPTED);
 
         meetingParticipationHistoryRepository.save(participation);
         meetingStatusService.changeStatusByMemberCount(meeting);
+
+//        // 5. 참가 승인 알림 발송
+//        meetingNotificationHelper.sendParticipationAcceptNotification(
+//                memberId,
+//                meeting.getMeetingTitle()
+//        );
         return participation.getParticipationId();
     }
 
@@ -208,13 +238,13 @@ public class MeetingParticipationCommandServiceImpl implements MeetingParticipat
         );
         pointRepository.save(transaction);
 
-        /* 모임 신청자 포인트 사용 알림 발송 */
-        pointNotificationHelper.sendPaymentNotification(
-                memberId,
-                meeting.getMeetingTitle(),
-                amountPerPerson,
-                pointBalance
-        );
+//        /* 모임 신청자 포인트 사용 알림 발송 */
+//        pointNotificationHelper.sendPaymentNotification(
+//                memberId,
+//                meeting.getMeetingTitle(),
+//                amountPerPerson,
+//                pointBalance
+//        );
 
         return new PointTransactionResponse("결제가 완료되었습니다.", pointBalance);
     }
@@ -278,6 +308,7 @@ public class MeetingParticipationCommandServiceImpl implements MeetingParticipat
             throw new BusinessException(ErrorCode.BAD_REQUEST, "환불 가능한 참가 정보가 아닙니다.");
         }
 
+
         Meeting meeting = meetingRepository.findById(history.getMeetingId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEETING_NOT_FOUND));
 
@@ -289,7 +320,10 @@ public class MeetingParticipationCommandServiceImpl implements MeetingParticipat
         if (meeting.getStatusId() == STATUS_REJECTED || meeting.getStatusId() == STATUS_DONE) {
             throw new BusinessException(ErrorCode.BAD_REQUEST, "참가 취소가 불가능한 모임입니다.");
         }
+        // 취소 로직 실행
+//        cancelParticipation(history.getMeetingId(), history.getMemberId());
 
+        // 상태 DELETED로 변경 후 저장
         history.setStatusId(STATUS_DELETED);
         meetingParticipationHistoryRepository.save(history);
 
@@ -324,13 +358,12 @@ public class MeetingParticipationCommandServiceImpl implements MeetingParticipat
             costPerUser = place.getRentalCost() / minUser;
         }
 
-        // 사용자 확인 및 포인트 체크
-//        User user = userRepository.findById(userId)
-//                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
-//
-//        if (user.getPointBalance() < costPerUser) {
-//            throw new BusinessException(ErrorCode.INSUFFICIENT_BALANCE,
-//                    "포인트 잔액이 부족합니다. 최소 필요 포인트: " + costPerUser);
+        int currentPointBalance = userFeignClient.getPointBalance(userId);
+
+        if (currentPointBalance < costPerUser) {
+            throw new BusinessException(ErrorCode.INSUFFICIENT_BALANCE,
+                    "포인트 잔액이 부족합니다. 최소 필요 포인트: " + costPerUser);
+        }
     }
 
 

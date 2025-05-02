@@ -9,4 +9,6 @@ public interface MeetingCommandService {
     int updateLeader(int meetingId, int memberId, LeaderUpdateRequest request);
 
     void deleteMeeting(int meetingId);
+
+    void forceCompleteMeeting(int meetingId);
 }

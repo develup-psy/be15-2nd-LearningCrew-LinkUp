@@ -11,4 +11,5 @@ public class OperationTimeRequest {
     private String dayOfWeek;   // 예: "MON", "TUE", "WED", 등
     private LocalTime startTime; // 예: 09:00:00
     private LocalTime endTime;   // 예: 21:00:00
+    private int unitTime;
 }
