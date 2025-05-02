@@ -13,6 +13,7 @@ import java.util.List;
 public class PostDetailResponse {
     private Integer postId;
     private Integer userId;
+    private String nickname;
     private String title;
     private String content;
     private int likeCount;

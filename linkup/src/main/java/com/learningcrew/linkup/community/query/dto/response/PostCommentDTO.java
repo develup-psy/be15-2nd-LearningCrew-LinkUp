@@ -11,6 +11,7 @@ public class PostCommentDTO {
     private Integer commentId;
     private Integer postId;
     private Integer userId;
+    private String nickname;
     private String commentContent;
     private int likeCount;
     private LocalDateTime createdAt;
