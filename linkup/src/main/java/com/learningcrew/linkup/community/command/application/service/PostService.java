@@ -1,12 +1,11 @@
 package com.learningcrew.linkup.community.command.application.service;
 
-import com.learningcrew.linkup.common.infrastructure.UserFeignClient;
+import com.learningcrew.linkup.common.query.mapper.RoleMapper;
 import com.learningcrew.linkup.community.command.application.dto.PostCreateRequest;
 import com.learningcrew.linkup.community.command.application.dto.PostResponse;
 import com.learningcrew.linkup.community.command.application.dto.PostUpdateRequest;
 import com.learningcrew.linkup.community.command.domain.PostIsNotice;
 import com.learningcrew.linkup.community.command.domain.aggregate.Post;
-//import com.learningcrew.linkup.community.command.domain.constants.PostIsNotice;
 import com.learningcrew.linkup.community.command.domain.repository.PostRepository;
 import com.learningcrew.linkup.exception.BusinessException;
 import com.learningcrew.linkup.exception.ErrorCode;
@@ -25,22 +24,25 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final ModelMapper modelMapper;
-    private final UserFeignClient userFeignClient;
+    private final RoleMapper roleMapper;  // ✅ RoleRepository 대신 RoleMapper 사용
+
+    private boolean isAdmin(int userId) {
+        // 사용자 ID를 기준으로 role_id가 1인지 확인
+        return roleMapper.findByUserId(userId)
+                .map(role -> role.getRoleId() == 1)
+                .orElse(false);  // 조회 실패 시 false
+    }
 
     @Transactional
     public PostResponse createPost(PostCreateRequest postCreateRequest, List<MultipartFile> postImgs) {
-
         int userId = postCreateRequest.getUserId();
 
-        // 관리자가 아닌데 공지 등록 시도 → 예외
-        if ("Y".equalsIgnoreCase(postCreateRequest.getIsNotice())) {
+        if ("Y".equalsIgnoreCase(postCreateRequest.getIsNotice()) && !isAdmin(userId)) {
             throw new BusinessException(ErrorCode.NOT_ADMIN);
         }
 
-        // 매핑
         Post post = modelMapper.map(postCreateRequest, Post.class);
 
-        // Enum으로 직접 세팅
         if (postCreateRequest.getIsNotice() != null) {
             post.setPostIsNotice(PostIsNotice.valueOf(postCreateRequest.getIsNotice().toUpperCase()));
         }
@@ -53,33 +55,41 @@ public class PostService {
     }
 
     @Transactional
-    public PostResponse updatePost(int postId, PostUpdateRequest postUpdateRequest, List<MultipartFile> postImgs) {
+    public PostResponse updatePost(int postId, PostUpdateRequest postUpdateRequest, List<MultipartFile> postImgs, int userId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND));
 
-
-
-        // isNotice 값이 null일 경우 기본값 "N"을 사용하도록 처리
-        String isNotice = postUpdateRequest.getIsNotice();
-        if (isNotice == null) {
-            isNotice = "N";  // 기본값 설정
+        if (post.getUserId() != userId && !isAdmin(userId)) {
+            throw new BusinessException(ErrorCode.UNAUTHORIZED_REQUEST);
         }
 
-        // 게시물 업데이트 처리
+        String isNotice = postUpdateRequest.getIsNotice();
+        if (isNotice == null) {
+            isNotice = "N";
+        }
+
+        if ("Y".equalsIgnoreCase(isNotice) && !isAdmin(userId)) {
+            throw new BusinessException(ErrorCode.NOT_ADMIN);
+        }
+
         post.updatePostDetails(postUpdateRequest.getTitle(), postUpdateRequest.getContent(), isNotice);
         post.setPostUpdatedAt(LocalDateTime.now());
 
-        // 게시물 저장
         Post updatedPost = postRepository.save(post);
         return modelMapper.map(updatedPost, PostResponse.class);
     }
 
     @Transactional
-    public void deletePost(int postId) {
+    public void deletePost(int postId, int userId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND));
 
+        if (post.getUserId() != userId && !isAdmin(userId)) {
+            throw new BusinessException(ErrorCode.UNAUTHORIZED_REQUEST);
+        }
+
         post.setIsDelete("Y");
+        post.setPostDeletedAt(LocalDateTime.now());
         postRepository.save(post);
     }
 }

@@ -13,9 +13,8 @@ public class PostDTO {
     private Integer userId;
     private String title;
     private String content;
-    private Boolean isNotice;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-
-
+    private String isNotice;
+    private String isDeleted;
 }
