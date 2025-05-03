@@ -94,16 +94,21 @@ public class SecurityConfig {
                 "/members/**",
                 "/user/**",
                 "/businesses/**",
+                "/meetings",
                 "/meetings/{meetingId}",
+                "/meetings/user/{userId}/created",
+                "/meetings/user/{userId}/pending",
+                "/meetings/{meetingId}/participation_request",
                 "/meetings/{meetingId}/participation/{memberId}/accept",
                 "/meetings/{meetingId}/participation/{memberId}/reject",
                 "/meetings/{meetingId}/change-leader/{memberId}",
                 "/meetings/{meetingId}/cancel",
                 "/meetings/{meetingId}/participation",
                 "/meetings/{meetingId}/participation/{memberId}",
-                "/meetings/{meetingId}/interested",
+                "/meetings/interested/{userId}",
                 "/members/{memberId}/interested-meetings",
-                "/meetings/{meetingId}/review/{revieweeId}",
+                "/members/{memberId}/interested-meetings/{meetingId}",
+                "/meetings/{meetingId}/review",
                 "/user/{userId}/favorite",
                 "/notification/{userId}",
                 "/notification/{userId}/setting",
@@ -134,9 +139,10 @@ public class SecurityConfig {
                 // 모임 관리
                 "/meetings/list",
                 "/meetings",
-                "/my-meetings/{meetingId}/participation",
-                "/meetings/list/{userId}",
+                "/my/meetings/{meetingId}/participation",
+//                "/meetings/list/{userId}", 시트에 없는 엔드포인트: 다른 주소로 대체되었는지 확인 필요
                 "/meetings/{meetingId}/participation",
+                "/meetings/review",
 
                 // 장소 및 예약 관리
                 "/admin/places",
@@ -152,7 +158,9 @@ public class SecurityConfig {
 
                 // 신고 관리
                 "/report",
-                "/report/reportType/{reportTypeId}",
+                "/report/{reportId}",
+                "/report/target",
+                "/report/target/{targetType}/{targetId}",
                 "/report/reporter-user",
                 "/report/reportee-user",
                 "/report/reportee-user/{reportedId}",
@@ -165,16 +173,13 @@ public class SecurityConfig {
 
                 // 제재 및 이의제기
                 "/penalty",
-                "/penalty/{penaltyType}",
-                "/penalty/user/{memberId}",
-                "/penalty/user/{memberId}/{penaltyType}",
+                "/penalty{penaltyId}",
                 "/penalty/post/{postId}",
                 "/penalty/comment/{commentId}",
                 "/penalty/placeReview/{reviewId}/done",
                 "/penalty/{penaltyId}",
                 "/objections",
-                "/objections/status/{statusId}",
-                "/objections/review/{reviewId}",
+                "/objections/{objectionId}",
                 "/objections/{objectionId}/accept",
                 "/objections/{objectionId}/reject",
 
@@ -194,6 +199,8 @@ public class SecurityConfig {
         // 사용자 + 관리자
         auths.requestMatchers(
                 "/meetings/{meetingId}/participation",
+                "/meetings/user/{userId}",
+                "/meetings/user/{userId}/done",
                 "/posts/search/{keyword}",
                 "/posts/{postId}",
                 "/posts/{postId}/delete",

@@ -30,4 +30,7 @@ public class OperationTime {
 
     @Column(name = "end_time")
     private LocalTime endTime;
+
+    @Column(name = "unit_time")
+    private int unitTime;
 }

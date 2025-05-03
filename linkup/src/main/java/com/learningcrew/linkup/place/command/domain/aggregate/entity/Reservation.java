@@ -1,10 +1,7 @@
 package com.learningcrew.linkup.place.command.domain.aggregate.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalTime;
@@ -15,6 +12,7 @@ import java.util.Date;
 @NoArgsConstructor()
 @AllArgsConstructor
 @Getter
+@Setter
 @EntityListeners(AuditingEntityListener.class)
 @Builder
 public class Reservation {
@@ -27,7 +25,7 @@ public class Reservation {
     private int placeId;
 
     @Column(name = "meeting_id")
-    private int meetingId;
+    private Integer meetingId;
 
     @Column(name = "status_id")
     private int statusId;

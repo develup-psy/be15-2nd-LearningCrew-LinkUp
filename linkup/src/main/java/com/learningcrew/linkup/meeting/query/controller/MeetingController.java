@@ -42,6 +42,18 @@ public class MeetingController {
         return ResponseEntity.ok(ApiResponse.success(meetingService.getAcceptedMeetingsByUser(userId)));
     }
 
+    @GetMapping("/meetings/user/{userId}/pending")
+    @Operation(summary = "회원별 참가 신청된 모임 목록 조회", description = "회원이 참가 신청 후 수락 대기중인 모임 목록을 조회합니다.")
+    public ResponseEntity<ApiResponse<MeetingListResponse>> getPendingMeetingsByUser(@PathVariable int userId) {
+        return ResponseEntity.ok(ApiResponse.success(meetingService.getPendingMeetingsByUser(userId)));
+    }
+
+    @GetMapping("/meetings/user/{userId}/created")
+    @Operation(summary = "회원별 개설된 모임 목록 조회", description = "회원이 개설자 권한을 가진 모임 목록을 조회합니다.")
+    public ResponseEntity<ApiResponse<MeetingListResponse>> getCreatedMeetingsByUser(@PathVariable int userId) {
+        return ResponseEntity.ok(ApiResponse.success(meetingService.getCreatedMeetingsByUser(userId)));
+    }
+
     @GetMapping("/meetings/user/{userId}/done")
     @Operation(summary = "회원별 과거 모임 이력 조회", description = "해당 회원이 참가했던 과거 모임 목록을 조회합니다. (모임 날짜가 오늘 이전인 경우)")
     public ResponseEntity<ApiResponse<MeetingListResponse>> getPastMeetingsByUser(@PathVariable int userId) {
@@ -54,11 +66,8 @@ public class MeetingController {
         return ResponseEntity.ok(ApiResponse.success(meetingService.getInterestedMeetings(userId)));
     }
 
-    @Operation(
-            summary = "모임 참가 요청 목록 조회",
-            description = "개설자가 자신이 만든 모임에 참가 요청한 회원 목록을 확인한다."
-    )
     @GetMapping("/meetings/{meetingId}/participation_request")
+    @Operation(summary = "모임 참가 요청 목록 조회", description = "개설자가 자신이 만든 모임에 참가 요청한 회원 목록을 확인한다.")
     public ResponseEntity<ApiResponse<ParticipantsResponse>> getParticipationRequests(
             @PathVariable int meetingId,
             @Parameter(description = "요청자(개설자) ID", required = true)
@@ -69,8 +78,14 @@ public class MeetingController {
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
-
-
-
+    @GetMapping("/my/meetings/{meetingId}/participation")
+    @Operation(summary = "참가자 목록 조회", description = "개설자 또는 참가자가 자신이 참가한 모임에 대해 참가자 목록을 확인한다.")
+    public ResponseEntity<ApiResponse<ParticipantsResponse>> getParticipants(
+            @PathVariable int meetingId,
+            @RequestParam int requesterId
+    ) {
+        ParticipantsResponse participants = meetingService.getParticipants(meetingId, requesterId);
+        return ResponseEntity.ok(ApiResponse.success(participants));
+    }
 
 }

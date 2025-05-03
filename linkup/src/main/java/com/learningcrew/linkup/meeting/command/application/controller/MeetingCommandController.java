@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.*;
 public class MeetingCommandController {
 
     private final MeetingCommandService meetingCommandService;
-    private final MeetingParticipationCommandService participationService;
+    private final MeetingParticipationCommandService meetingParticipationCommandService;
     private final ReservationCommandService reservationCommandService;
     private final MeetingRepository meetingRepository;
 
@@ -64,16 +64,16 @@ public class MeetingCommandController {
     public ResponseEntity<ApiResponse<ManageParticipationResponse>> acceptParticipation(
             @PathVariable int meetingId,
             @PathVariable int memberId,
-            @RequestBody ManageParticipationRequest request
+            @RequestBody ManageParticipationRequest manageParticipationRequest
     ) {
         Meeting meeting = meetingRepository.findById(meetingId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEETING_NOT_FOUND));
 
-        if (meeting.getLeaderId() != request.getMemberId()) {
+        if (meeting.getLeaderId() != manageParticipationRequest.getMemberId()) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-
-        long participationId = participationService.acceptParticipation(meeting, memberId);
+        // 2. 참가 승인
+        long participationId = meetingParticipationCommandService.acceptParticipation(meeting, memberId);
 
         return ResponseEntity.ok(ApiResponse.success(
                 ManageParticipationResponse.builder()
@@ -86,20 +86,18 @@ public class MeetingCommandController {
     @Operation(summary = "참가 거절", description = "개설자가 참가 신청을 거절한다.")
     @PutMapping("/meetings/{meetingId}/participation/{memberId}/reject")
     public ResponseEntity<ApiResponse<ManageParticipationResponse>> rejectParticipation(
-            @PathVariable int meetingId,
-            @PathVariable int memberId,
-            @RequestBody ManageParticipationRequest request
+            @PathVariable int meetingId, @PathVariable int memberId, @RequestBody ManageParticipationRequest manageParticipationRequest
     ) {
         // 1. 요청된 모임의 주최자가 맞는지 확인
         Meeting meeting = meetingRepository.findById(meetingId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEETING_NOT_FOUND));
 
-        if (meeting.getLeaderId() != request.getMemberId()) {
+        if (meeting.getLeaderId() != manageParticipationRequest.getMemberId()) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
         // 2. 참가 거절
-        long participationId = participationService.rejectParticipation(meeting, memberId);
+        long participationId = meetingParticipationCommandService.rejectParticipation(meeting, memberId);
 
         return ResponseEntity.ok(ApiResponse.success(
                 ManageParticipationResponse.builder()
@@ -133,7 +131,17 @@ public class MeetingCommandController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
-        meetingCommandService.deleteMeeting(meetingId);
+        meetingCommandService.cancelMeetingByLeader(meetingId);
         return ResponseEntity.ok(ApiResponse.success(new MeetingCommandResponse(meetingId)));
     }
+
+    @PutMapping("/meetings/{meetingId}/complete")
+    public ResponseEntity<ApiResponse<MeetingCommandResponse>> completeMeeting(@PathVariable int meetingId) {
+        meetingCommandService.forceCompleteMeeting(meetingId);
+
+        MeetingCommandResponse response = new MeetingCommandResponse(meetingId);
+
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
 }

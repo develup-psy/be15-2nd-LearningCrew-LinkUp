@@ -1,18 +1,18 @@
-package com.learningcrew.linkup.meeting.command.domain.repository;
+    package com.learningcrew.linkup.meeting.command.domain.repository;
 
-import com.learningcrew.linkup.meeting.command.domain.aggregate.Meeting;
+    import com.learningcrew.linkup.meeting.command.domain.aggregate.Meeting;
 
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
+    import java.time.LocalDate;
+    import java.util.List;
+    import java.util.Optional;
 
-public interface MeetingRepository {
-    Meeting save(Meeting meeting);
+    public interface MeetingRepository {
+        Meeting save(Meeting meeting);
 
-    Optional<Meeting> findById(int meetingId);
+        Optional<Meeting> findById(int meetingId);
 
-    void flush();
+        void flush();
 
-    List<Meeting> findAllByDate(LocalDate today);
+        List<Meeting> findAllByDate(LocalDate today);
 
-}
+    }

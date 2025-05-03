@@ -26,5 +26,7 @@ public class UserCommentDto {
 
     @Schema(description = "댓글 작성일시", example = "2025-04-13T15:00:00")
     private LocalDateTime createdAt;
+
+    private String nickname;
 }
 

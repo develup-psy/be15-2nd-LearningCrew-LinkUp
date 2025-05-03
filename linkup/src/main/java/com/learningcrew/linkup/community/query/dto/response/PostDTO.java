@@ -11,11 +11,14 @@ import java.time.LocalDateTime;
 public class PostDTO {
     private Integer postId;
     private Integer userId;
+    private String nickname;
+    private String isNotice;
     private String title;
     private String content;
-    private Boolean isNotice;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private LocalDateTime deletedAt;
+    private String isDeleted;
 
 
 }

@@ -2,6 +2,8 @@ package com.learningcrew.linkup.place.query.service;
 
 import com.learningcrew.linkup.common.dto.Pagination;
 import com.learningcrew.linkup.place.command.domain.aggregate.entity.Place;
+import com.learningcrew.linkup.place.query.dto.request.AdminPlaceListRequest;
+import com.learningcrew.linkup.place.query.dto.request.AdminPlaceReviewListRequest;
 import com.learningcrew.linkup.place.query.dto.request.PlaceListRequest;
 import com.learningcrew.linkup.place.query.dto.response.*;
 import com.learningcrew.linkup.place.query.mapper.PlaceMapper;
@@ -36,16 +38,16 @@ public class PlaceQueryService {
     }
 
     @Transactional(readOnly = true)
-    public PlaceListResponse getPlacesByAdmin(PlaceListRequest placeListRequest) {
+    public AdminPlaceListResponse getPlacesByAdmin(AdminPlaceListRequest placeListRequest) {
 
-        List<PlaceDto> places = placeMapper.selectAllPlacesByAdmin(placeListRequest);
+        List<AdminPlaceDto> places = placeMapper.selectAllPlacesByAdmin(placeListRequest);
         long totalItems = placeMapper.countPlacesByAdmin(placeListRequest);
         int page = placeListRequest.getPage();
         int size = placeListRequest.getSize();
         int totalPage = (int) Math.ceil((double) totalItems / size);
 
-        return PlaceListResponse.builder()
-                .place(places)
+        return AdminPlaceListResponse.builder()
+                .adminPlaces(places)
                 .pagination(Pagination.builder()
                         .currentPage(page)
                         .totalPage(totalPage)
@@ -85,6 +87,24 @@ public class PlaceQueryService {
     }
     public Place getPlaceById(int placeId) {
         return placeMapper.selectPlaceById(placeId);
+    }
+
+    @Transactional(readOnly = true)
+    public AdminPlaceReviewListResponse getPlaceReviewsByAdmin(AdminPlaceReviewListRequest request) {
+        List<AdminPlaceReviewDto> reviews = placeMapper.selectAllPlaceReviewsByAdmin(request);
+        long totalItems = placeMapper.countPlaceReviewsByAdmin(request);
+        int page = request.getPage();
+        int size = request.getSize();
+        int totalPage = (int) Math.ceil((double) totalItems / size);
+
+        return AdminPlaceReviewListResponse.builder()
+                .reviews(reviews)
+                .pagination(Pagination.builder()
+                        .currentPage(page)
+                        .totalPage(totalPage)
+                        .totalItems(totalItems)
+                        .build())
+                .build();
     }
 
 }

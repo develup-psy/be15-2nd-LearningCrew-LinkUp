@@ -7,4 +7,6 @@ import java.util.Optional;
 public interface PlaceReviewRepository {
     Optional<PlaceReview> findById(Integer reviewId);
     PlaceReview save(PlaceReview review);
+    boolean existsByParticipationId(long participationId);
+
 }

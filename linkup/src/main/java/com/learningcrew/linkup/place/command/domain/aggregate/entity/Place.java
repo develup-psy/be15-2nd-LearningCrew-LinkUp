@@ -35,6 +35,9 @@ public class Place {
     private String address;
     private String description;
     private String equipment;
+
+    private int minUser;
+    private int maxUser;
     private char isActive;  // 'Y'/'N'
     @CreatedDate
     private LocalDateTime createdAt;

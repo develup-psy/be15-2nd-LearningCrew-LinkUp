@@ -10,6 +10,7 @@
         p.place_id AS placeId,
         p.place_name AS placeName,
         p.address AS address,
+        p.rental_cost AS rentalCost,
         COALESCE(AVG(r.review_score), 0) AS reviewRating
         FROM place p
         LEFT JOIN place_review r ON p.place_id = r.place_id
@@ -85,16 +86,24 @@
         WHERE place_id = #{placeId} AND status_id IN (2, 3)
     </select>
 
+ <!-- 관리자용 장소목록 조회 -->
+    <select id="selectAllPlacesByAdmin"
+            parameterType="com.learningcrew.linkup.place.query.dto.request.AdminPlaceListRequest"
+            resultType="com.learningcrew.linkup.place.query.dto.response.AdminPlaceDto">
 
-    <!-- 전체 장소 조회 쿼리(관리자용) -->
-    <select id="selectAllPlacesByAdmin" parameterType="com.learningcrew.linkup.place.query.dto.request.PlaceListRequest"
-            resultType="com.learningcrew.linkup.place.query.dto.response.PlaceDto">
         SELECT
-            p.place_id AS placeId,
-            p.place_name AS placeName,
-            p.address AS address,
-            COALESCE(AVG(r.review_score), 0) AS reviewRating
+        p.place_id AS placeId,
+        p.place_name AS placeName,
+        p.address AS address,
+        p.owner_id AS ownerId,
+        u.user_name AS userName,
+        s.sport_name AS sportName,
+        p.rental_cost AS rentalCost,
+        p.is_active AS isActive,
+        ROUND(COALESCE(AVG(r.review_score), 0), 1) AS averageScore
         FROM place p
+        LEFT JOIN user u ON p.owner_id = u.user_id
+        LEFT JOIN sport_type s ON p.sport_id = s.sport_id
         LEFT JOIN place_review r ON p.place_id = r.place_id
         WHERE 1 = 1
         <if test="sportId != null">
@@ -103,15 +112,16 @@
         <if test="address != null and address != ''">
             AND p.address LIKE CONCAT('%', #{address}, '%')
         </if>
-        <if test="isActive != null and isActive != ''">
+        <if test="isActive != null">
             AND p.is_active = #{isActive}
         </if>
-        GROUP BY p.place_id, p.place_name, p.address
+        GROUP BY p.place_id, p.place_name, p.address, p.owner_id, u.user_name, s.sport_name, p.rental_cost
         ORDER BY p.place_id DESC
         LIMIT #{limit} OFFSET #{offset}
     </select>
 
-    <select id="countPlacesByAdmin" parameterType="com.learningcrew.linkup.place.query.dto.request.PlaceListRequest"
+    <select id="countPlacesByAdmin"
+            parameterType="com.learningcrew.linkup.place.query.dto.request.AdminPlaceListRequest"
             resultType="long">
         SELECT COUNT(*)
         FROM place p
@@ -122,10 +132,11 @@
         <if test="address != null and address != ''">
             AND p.address LIKE CONCAT('%', #{address}, '%')
         </if>
-        <if test="isActive != null and isActive != ''">
+        <if test="isActive != null">
             AND p.is_active = #{isActive}
         </if>
     </select>
+
 
     <!-- 사업자별 자신의 등록 장소 목록 조회 -->
     <select id="selectPlacesByOwner"
@@ -182,6 +193,36 @@
         FROM place
         WHERE place_id = #{placeId}
     </select>
+
+    <!-- 관리자용 장소 후기 목록 조회 -->
+    <select id="selectAllPlaceReviewsByAdmin"
+            parameterType="com.learningcrew.linkup.place.query.dto.request.AdminPlaceReviewListRequest"
+            resultType="com.learningcrew.linkup.place.query.dto.response.AdminPlaceReviewDto">
+
+        SELECT
+        pr.review_id AS reviewId,
+        m.member_id AS memberId,
+        m.nickname AS writerName,
+        p.place_id AS placeId,
+        p.place_name AS placeName,
+        pr.review_score AS score,
+        pr.review_content AS content,
+        pr.review_image_url AS imageUrl
+        FROM place_review pr
+        JOIN member m ON pr.member_id = m.member_id
+        JOIN place p ON pr.place_id = p.place_id
+        ORDER BY pr.review_id DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <!-- 관리자용 장소 후기 개수 조회 -->
+    <select id="countPlaceReviewsByAdmin"
+            parameterType="com.learningcrew.linkup.place.query.dto.request.AdminPlaceReviewListRequest"
+            resultType="long">
+        SELECT COUNT(*)
+        FROM place_review
+    </select>
+
 
 
 

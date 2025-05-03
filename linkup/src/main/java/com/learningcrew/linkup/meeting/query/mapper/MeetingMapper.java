@@ -25,9 +25,13 @@ public interface MeetingMapper {
 
     List<MeetingSummaryDTO> selectInterestedMeetings(int userId);
 
-    /* 모임 ID와 status로 참가 내역 목록 조회 */
-    List<MeetingParticipationDTO> selectHistoriesByMeetingIdAndStatusId(int meetingId, int statusId);
+    /* 모임 ID로 참가 내역 목록 조회 */
+//    List<MeetingParticipationDTO> selectHistoriesByMeetingId(int meetingId);
 
     List<MemberDTO> getPendingParticipantsByMeetingId(int meetingId);
+
+    List<MeetingSummaryDTO> selectPendingMeetingsByUserId(int userId);
+
+    List<MeetingSummaryDTO> selectCreatedMeetingsByUserId(int userId);
 
 }
