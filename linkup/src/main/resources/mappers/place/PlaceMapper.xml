@@ -2,29 +2,57 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.learningcrew.linkup.place.query.mapper.PlaceMapper">
-
-    <!-- 전체 장소 조회 쿼리 -->
     <select id="selectAllPlaces" parameterType="com.learningcrew.linkup.place.query.dto.request.PlaceListRequest"
             resultType="com.learningcrew.linkup.place.query.dto.response.PlaceDto">
-        SELECT
-        p.place_id AS placeId,
-        p.place_name AS placeName,
-        p.address AS address,
-        p.rental_cost AS rentalCost,
-        COALESCE(AVG(r.review_score), 0) AS reviewRating
-        FROM place p
-        LEFT JOIN place_review r ON p.place_id = r.place_id
-        WHERE 1 = 1
-        <if test="sportId != null">
-            AND p.sport_id = #{sportId}
-        </if>
-        <if test="address != null and address != ''">
-            AND p.address LIKE CONCAT('%', #{address}, '%')
-        </if>
-        AND p.is_active = 'Y'
-        GROUP BY p.place_id, p.place_name, p.address
-        ORDER BY p.place_id DESC
-        LIMIT #{limit} OFFSET #{offset}
+
+        <choose>
+            <when test="latitude != null and longitude != null">
+                SELECT
+                p.place_id AS placeId,
+                p.place_name AS placeName,
+                p.address AS address,
+                p.rental_cost AS rentalCost,
+                COALESCE(AVG(r.review_score), 0) AS reviewRating,
+                (
+                6371 * ACOS(
+                COS(RADIANS(#{latitude})) * COS(RADIANS(p.latitude)) *
+                COS(RADIANS(p.longitude) - RADIANS(#{longitude})) +
+                SIN(RADIANS(#{latitude})) * SIN(RADIANS(p.latitude))
+                )
+                ) AS distance
+                FROM place p
+                LEFT JOIN place_review r ON p.place_id = r.place_id
+                WHERE p.latitude IS NOT NULL AND p.longitude IS NOT NULL
+                AND p.is_active = 'Y'
+                <if test="sportId != null">
+                    AND p.sport_id = #{sportId}
+                </if>
+                HAVING distance &lt;= 5
+                ORDER BY distance ASC
+                LIMIT #{limit} OFFSET #{offset}
+            </when>
+            <otherwise>
+                SELECT
+                p.place_id AS placeId,
+                p.place_name AS placeName,
+                p.address AS address,
+                p.rental_cost AS rentalCost,
+                COALESCE(AVG(r.review_score), 0) AS reviewRating
+                FROM place p
+                LEFT JOIN place_review r ON p.place_id = r.place_id
+                WHERE 1 = 1
+                <if test="sportId != null">
+                    AND p.sport_id = #{sportId}
+                </if>
+                <if test="address != null and address != ''">
+                    AND p.address LIKE CONCAT('%', #{address}, '%')
+                </if>
+                AND p.is_active = 'Y'
+                GROUP BY p.place_id, p.place_name, p.address
+                ORDER BY p.place_id DESC
+                LIMIT #{limit} OFFSET #{offset}
+            </otherwise>
+        </choose>
     </select>
 
     <!-- 전체 장소 개수 조회 쿼리 -->

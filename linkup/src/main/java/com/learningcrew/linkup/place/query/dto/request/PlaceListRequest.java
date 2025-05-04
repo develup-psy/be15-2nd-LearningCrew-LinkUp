@@ -12,6 +12,8 @@ public class PlaceListRequest {
     private String address;
     private Integer ownerId;
     private boolean isActive;
+    private Double latitude;
+    private Double longitude;
 
     public int getOffset(){
         return (page - 1) * size;
