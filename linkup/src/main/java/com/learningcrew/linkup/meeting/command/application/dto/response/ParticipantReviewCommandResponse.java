@@ -1,16 +1,13 @@
 package com.learningcrew.linkup.meeting.command.application.dto.response;
 
+import com.learningcrew.linkup.meeting.query.dto.response.ParticipantReviewDTO;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Builder
 public class ParticipantReviewCommandResponse {
-    private long reviewId;
-    private int revieweeId;
-    private int meetingId;
-    private int score;
-    private LocalDateTime createdAt;
+    List<ParticipantReviewDTO> reviews;
 }

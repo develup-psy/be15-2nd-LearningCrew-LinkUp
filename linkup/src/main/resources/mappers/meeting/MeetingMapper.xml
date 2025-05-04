@@ -311,4 +311,10 @@
         WHERE m.leader_id = #{userId}
     </select>
 
+<!--    <select id="selectHistoriesByMeetingId" resultType="MeetingParticipationDTO">-->
+<!--        SELECT participation_id, status_id, meeting_id, member_id, participated_at-->
+<!--        FROM meeting_participation_history-->
+<!--        WHERE meeting_id = #{meetingId}-->
+<!--    </select>-->
+
 </mapper>

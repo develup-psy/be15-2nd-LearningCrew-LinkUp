@@ -69,4 +69,9 @@ public class FeignCommunicationTestController {
     public ApiResponse<MeetingMemberDto> testGetMeetingMember(@PathVariable int memberId) {
         return memberQueryClient.getMemberById(memberId);
     }
+
+    @PostMapping("/{memberId}/manner-temperature")
+    public ApiResponse<Void> testUpdateMannerTemperature(@PathVariable int memberId, @RequestParam double mannerTemperature) {
+        return memberQueryClient.updateMannerTemperature(memberId, mannerTemperature);
+    }
 }

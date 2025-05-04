@@ -9,4 +9,7 @@ public interface ParticipantReviewRepository {
     boolean existsByMeetingIdAndReviewerIdAndRevieweeId(int meetingId, int reviewerId, int revieweeId);
 
     List<ParticipantReview> findAllByMeetingId(int meetingId);
+
+    boolean existsByMeetingIdAndReviewerId(int meetingId, int reviewerId);
+
 }

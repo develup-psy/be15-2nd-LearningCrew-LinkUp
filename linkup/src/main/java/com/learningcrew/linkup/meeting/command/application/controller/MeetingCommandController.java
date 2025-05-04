@@ -24,15 +24,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "모임 관리", description = "모임 개설자 기능 API")
 public class MeetingCommandController {
 
     private final MeetingCommandService meetingCommandService;
-    private final MeetingParticipationCommandService participationService;
+    private final MeetingParticipationCommandService meetingParticipationCommandService;
     private final ReservationCommandService reservationCommandService;
     private final MeetingRepository meetingRepository;
 
@@ -75,7 +73,7 @@ public class MeetingCommandController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
         // 2. 참가 승인
-        long participationId = participationService.acceptParticipation(meeting, memberId);
+        long participationId = meetingParticipationCommandService.acceptParticipation(meeting, memberId);
 
         return ResponseEntity.ok(ApiResponse.success(
                 ManageParticipationResponse.builder()
@@ -99,7 +97,7 @@ public class MeetingCommandController {
         }
 
         // 2. 참가 거절
-        long participationId = participationService.rejectParticipation(meeting, memberId);
+        long participationId = meetingParticipationCommandService.rejectParticipation(meeting, memberId);
 
         return ResponseEntity.ok(ApiResponse.success(
                 ManageParticipationResponse.builder()
@@ -133,7 +131,7 @@ public class MeetingCommandController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
-        meetingCommandService.deleteMeeting(meetingId);
+        meetingCommandService.cancelMeetingByLeader(meetingId);
         return ResponseEntity.ok(ApiResponse.success(new MeetingCommandResponse(meetingId)));
     }
 
