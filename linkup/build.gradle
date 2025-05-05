@@ -28,7 +28,7 @@ repositories {
 }
 
 dependencies {
-
+	implementation 'org.json:json:20230227'
 
 	/* SMTP */
 	implementation 'org.springframework.boot:spring-boot-starter-mail'

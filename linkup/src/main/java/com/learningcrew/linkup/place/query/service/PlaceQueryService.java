@@ -1,3 +1,4 @@
+// 3. PlaceQueryService.java
 package com.learningcrew.linkup.place.query.service;
 
 import com.learningcrew.linkup.common.dto.Pagination;
@@ -20,9 +21,12 @@ public class PlaceQueryService {
 
     @Transactional(readOnly = true)
     public PlaceListResponse getPlaces(PlaceListRequest placeListRequest) {
+        List<PlaceDto> places =
+                placeListRequest.getLatitude() != null && placeListRequest.getLongitude() != null
+                ? placeMapper.selectAllPlaces(placeListRequest)  // 거리 기반 조회
+                : placeMapper.selectAllPlaces(placeListRequest); // 기본 조회 (기존과 동일한 메서드로 처리)
 
-        List<PlaceDto> places = placeMapper.selectAllPlaces(placeListRequest);
-        long totalItems = placeMapper.countPlaces(placeListRequest);
+        int totalItems = places.size(); // 거리 기반일 경우 count 쿼리 생략 가능
         int page = placeListRequest.getPage();
         int size = placeListRequest.getSize();
         int totalPage = (int) Math.ceil((double) totalItems / size);
@@ -67,7 +71,6 @@ public class PlaceQueryService {
         return detail;
     }
 
-
     @Transactional(readOnly = true)
     public PlaceListResponse getPlacesByOwner(PlaceListRequest request) {
         List<PlaceDto> places = placeMapper.selectPlacesByOwner(request);
@@ -85,6 +88,7 @@ public class PlaceQueryService {
                         .build())
                 .build();
     }
+
     public Place getPlaceById(int placeId) {
         return placeMapper.selectPlaceById(placeId);
     }
@@ -106,5 +110,4 @@ public class PlaceQueryService {
                         .build())
                 .build();
     }
-
 }
