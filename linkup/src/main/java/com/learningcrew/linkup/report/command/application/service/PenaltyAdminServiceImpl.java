@@ -136,7 +136,7 @@ public class PenaltyAdminServiceImpl implements PenaltyAdminService {
             throw new BusinessException(ErrorCode.PENALTY_ALREADY_CONFIRMED);
         }
 
-        review.setStatusId(3); // 제재 확정
+        review.setStatusId(2); // 제재 확정
 
         penaltyRepository.findByReviewId(reviewId)
                 .ifPresent(p -> p.setStatusId(2)); // 제재 확정 처리
@@ -153,11 +153,11 @@ public class PenaltyAdminServiceImpl implements PenaltyAdminService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.PENALTY_NOT_FOUND));
 
         Integer statusId = penalty.getStatusId();
-        if (statusId != null && statusId == 2) {
+        if (statusId != null && statusId == 3) {
             throw new BusinessException(ErrorCode.PENALTY_ALREADY_CANCELED);
         }
 
-        penalty.setStatusId(3);
+        penalty.setStatusId(2);
 
         switch (penalty.getPenaltyType()) {
             case POST -> {
