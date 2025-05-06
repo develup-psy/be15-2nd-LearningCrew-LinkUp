@@ -12,13 +12,13 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigInteger;
 
 @RestController
-@RequestMapping("posts/{postId}/comments")
+@RequestMapping("/posts/{postId}/comments")
 @RequiredArgsConstructor
 public class PostCommentController {
 
     private final PostCommentService postCommentService;
 
-    @PostMapping("/{userId}")
+    @PostMapping("")
     public ResponseEntity<ApiResponse<PostCommentResponse>> createComment
             (@PathVariable int postId,
             @RequestBody PostCommentCreateRequest commentRequest) {
@@ -29,8 +29,8 @@ public class PostCommentController {
 
     @PutMapping("/{commentId}/delete")
         public ResponseEntity<ApiResponse<PostCommentResponse>> deleteComment(
-        @PathVariable int postId,
-        @PathVariable BigInteger commentId,
+        @PathVariable("postId") int postId,
+        @PathVariable("commentId") BigInteger commentId,
         @RequestParam  int userId) {
         postCommentService.softDeleteComment(postId, commentId, userId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT)

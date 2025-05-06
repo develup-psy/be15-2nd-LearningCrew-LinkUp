@@ -5,6 +5,7 @@ import com.learningcrew.linkup.meeting.command.application.dto.request.Intereste
 import com.learningcrew.linkup.meeting.command.application.dto.response.InterestedMeetingCommandResponse;
 import com.learningcrew.linkup.meeting.command.application.service.InterestedMeetingCommandService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,14 +14,12 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
+@Tag(name = "모임 찜 관리", description = "모임 찜 등록 및 삭제 API")
 public class InterestedMeetingCommandController {
 
-    private final InterestedMeetingCommandService service;
+    private final InterestedMeetingCommandService interestedMeetingCommandService;
 
-    @Operation(
-            summary = "모임 찜 등록",
-            description = "관심 있는 모임을 모임 찜에 등록한다."
-    )
+    @Operation(summary = "모임 찜 등록", description = "회원이 관심 있는 모임을 모임 찜에 등록한다.")
     @PostMapping("/members/{memberId}/interested-meetings")
     public ResponseEntity<ApiResponse<InterestedMeetingCommandResponse>> createInterestedMeeting(
             @PathVariable int memberId,
@@ -30,7 +29,7 @@ public class InterestedMeetingCommandController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        int meetingId = service.createInterestedMeeting(request);
+        int meetingId = interestedMeetingCommandService.createInterestedMeeting(request);
         InterestedMeetingCommandResponse response
                 = InterestedMeetingCommandResponse
                 .builder()
@@ -42,21 +41,25 @@ public class InterestedMeetingCommandController {
                 .body(ApiResponse.success(response));
     }
 
-    @Operation(
-            summary = "모임 찜 취소",
-            description = "모임 찜에 등록한 모임을 찜 취소한다."
-    )
-    @DeleteMapping("/members/{memberId}/interested-meetings")
+    @Operation(summary = "모임 찜 취소", description = "회원이 모임 찜에 등록한 모임을 찜 취소한다.")
+    @DeleteMapping("/members/{memberId}/interested-meetings/{meetingId}")
     public ResponseEntity<ApiResponse<InterestedMeetingCommandResponse>> deleteInterestedMeeting(
             @PathVariable int memberId,
-            @RequestBody @Validated InterestedMeetingCommandRequest request
+            @PathVariable int meetingId,
+            @RequestParam int requesterId
     ) {
-        if (memberId != request.getMemberId()) {
+        if (memberId != requesterId) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        service.deleteInterestedMeeting(request);
+        interestedMeetingCommandService.deleteInterestedMeeting(memberId, meetingId, requesterId);
 
-        return ResponseEntity.ok(ApiResponse.success(null));
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        InterestedMeetingCommandResponse.builder()
+                                .meetingId(meetingId)
+                                .build()
+                )
+        );
     }
 }

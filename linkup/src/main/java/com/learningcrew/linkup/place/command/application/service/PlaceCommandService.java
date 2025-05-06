@@ -12,6 +12,7 @@ import com.learningcrew.linkup.place.command.domain.aggregate.entity.PlaceImage;
 import com.learningcrew.linkup.place.command.domain.repository.OperationTimeRepository;
 import com.learningcrew.linkup.place.command.domain.repository.PlaceImageRepository;
 import com.learningcrew.linkup.place.command.domain.repository.PlaceRepository;
+import com.learningcrew.linkup.place.query.service.GeocodingService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,6 +30,7 @@ public class PlaceCommandService {
     private final OperationTimeRepository operationTimeRepository;
     private final PlaceImageRepository placeImageRepository;
     private final FileStorage fileStorage;
+    private final GeocodingService geocodingService;
     private final ModelMapper modelMapper;
 
     @Value("${image.image-url}")
@@ -38,24 +40,29 @@ public class PlaceCommandService {
     @Transactional
     public int createPlace(PlaceCreateRequest placeCreateRequest, List<MultipartFile> placeImgs) {
         String mainImageFilename = "";
-        // 이미지 파일 리스트가 있다면
+
+        // 대표 이미지 저장
         if (placeImgs != null && !placeImgs.isEmpty()) {
-            // 대표 이미지로 첫 번째 파일 선택 (원하는 방식에 따라 다르게 처리 가능)
             MultipartFile mainFile = placeImgs.get(0);
             if (!mainFile.isEmpty()) {
                 mainImageFilename = fileStorage.storeFile(mainFile);
             }
         }
 
-        // Place 엔티티 생성 (DTO -> Entity 매핑)
+        // DTO → Entity
         Place newPlace = modelMapper.map(placeCreateRequest, Place.class);
 
+        geocodingService.getCoordinates(placeCreateRequest.getAddress())
+                .ifPresent(coords -> {
+                    newPlace.setLatitude(coords[0]);  // 위도
+                    newPlace.setLongitude(coords[1]); // 경도
+                });
 
-        // 장소 INSERT 및 생성된 placeId 획득
+        // 저장 및 생성된 PK 획득
         Place savedPlace = placeRepository.save(newPlace);
         int generatedPlaceId = savedPlace.getPlaceId();
 
-        // 운영시간 정보가 있다면 operation_time 테이블에 삽입
+        // 운영 시간 저장
         if (placeCreateRequest.getOperationTimes() != null && !placeCreateRequest.getOperationTimes().isEmpty()) {
             for (OperationTimeRequest opReq : placeCreateRequest.getOperationTimes()) {
                 OperationTime opEntity = new OperationTime();
@@ -67,11 +74,10 @@ public class PlaceCommandService {
             }
         }
 
-        // 모든 이미지 파일에 대해 place_image 테이블에 저장
+        // 이미지 저장
         if (placeImgs != null && !placeImgs.isEmpty()) {
             for (MultipartFile file : placeImgs) {
                 if (!file.isEmpty()) {
-                    // 파일 저장 (대표 이미지는 이미 저장되어 있을 수 있으므로, 중복 저장을 피하고 싶으면 조건 처리 가능)
                     String storedFilename = fileStorage.storeFile(file);
                     PlaceImage placeImage = new PlaceImage();
                     placeImage.setPlaceId(generatedPlaceId);
@@ -84,11 +90,12 @@ public class PlaceCommandService {
         return generatedPlaceId;
     }
 
-    /*장소 수정*/
+    /* 장소 수정 */
     @Transactional
     public void updatePlace(int placeId, PlaceUpdateRequest placeUpdateRequest) {
         Place place = placeRepository.findById(placeId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.PLACE_NOT_FOUND));
+
         place.updatePlaceDetails(
                 placeUpdateRequest.getSportId(),
                 placeUpdateRequest.getPlaceName(),
@@ -98,5 +105,11 @@ public class PlaceCommandService {
                 placeUpdateRequest.getIsActive(),
                 placeUpdateRequest.getRentalCost()
         );
-        }
+
+        geocodingService.getCoordinates(placeUpdateRequest.getAddress())
+                .ifPresent(coords -> {
+                    place.setLatitude(coords[0]);
+                    place.setLongitude(coords[1]);
+                });
+    }
 }

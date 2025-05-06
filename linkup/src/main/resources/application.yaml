@@ -32,6 +32,10 @@ spring:
 
   main:
     allow-bean-definition-overriding: true
+kakao:
+  api:
+    key: 2bf1d1444db961a99670547b5f8e5c7c
+
 
 mybatis:
   configuration:

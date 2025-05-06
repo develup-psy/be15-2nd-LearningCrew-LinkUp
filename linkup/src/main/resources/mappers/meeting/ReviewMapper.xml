@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.learningcrew.linkup.meeting.query.mapper.ReviewMapper">
+
+    <select id="selectParticipantReviews" resultType="com.learningcrew.linkup.meeting.query.dto.response.ParticipantReviewDTO">
+        SELECT
+        r.review_id AS reviewId,
+        r.score,
+        r.created_at AS createdAt,
+        r.reviewer_id,
+        r.reviewee_id,
+        rv.nickname AS reviewerNickname,
+        re.nickname AS revieweeNickname,
+        m.meeting_id AS meetingId
+<!--        m.meeting_title AS meetingTitle,-->
+<!--        m.date AS meetingDate-->
+        FROM participant_review r
+        JOIN member rv ON r.reviewer_id = rv.member_id
+        JOIN member re ON r.reviewee_id = re.member_id
+        JOIN meeting m ON r.meeting_id = m.meeting_id
+        WHERE 1=1
+        <if test="reviewerId != null"> AND r.reviewer_id = #{reviewerId} </if>
+        <if test="revieweeId != null"> AND r.reviewee_id = #{revieweeId} </if>
+        <if test="meetingId != null"> AND r.meeting_id = #{meetingId} </if>
+        ORDER BY r.created_at DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="countParticipantReviews" resultType="long">
+        SELECT
+        COUNT(*)
+        FROM participant_review r
+<!--        JOIN member rv ON r.reviewer_id = rv.member_id-->
+<!--        JOIN member re ON r.reviewee_id = re.member_id-->
+<!--        JOIN meeting m ON r.meeting_id = m.meeting_id-->
+        WHERE 1=1
+        <if test="reviewerId != null"> AND r.reviewer_id = #{reviewerId} </if>
+        <if test="revieweeId != null"> AND r.reviewee_id = #{revieweeId} </if>
+        <if test="meetingId != null"> AND r.meeting_id = #{meetingId} </if>
+    </select>
+
+</mapper>

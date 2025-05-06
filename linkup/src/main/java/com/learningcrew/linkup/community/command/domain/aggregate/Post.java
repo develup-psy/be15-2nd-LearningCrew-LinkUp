@@ -44,6 +44,9 @@ public class Post {
     @Column(name = "updated_at")
     private LocalDateTime postUpdatedAt;
 
+    @Column(name = "deleted_at")
+    private LocalDateTime postDeletedAt;
+
     public void updatePostDetails(String title, String content, String isNotice) {
         this.title = title;
         this.content = content;

@@ -1,6 +1,7 @@
 package com.learningcrew.linkup.report.query.controller;
 
 import com.learningcrew.linkup.report.query.dto.request.PenaltySearchRequest;
+import com.learningcrew.linkup.report.query.dto.response.PenaltyDTO;
 import com.learningcrew.linkup.report.query.dto.response.PenaltyListResponse;
 import com.learningcrew.linkup.report.query.service.PenaltyQueryService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,42 +13,29 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/penalty")
+@RequestMapping("/penalty")  // 전체 URL 경로 설정
 @RequiredArgsConstructor
 @Tag(name = "사용자 제재 조회", description = "관리자 전용 사용자 제재 내역 조회 API")
 public class PenaltyQueryController {
 
     private final PenaltyQueryService penaltyQueryService;
 
+    // 제재 내역 조회 (필터링 및 페이징 포함)
     @GetMapping
-    @Operation(summary = "전체 제재 내역 조회", description = "관리자가 모든 제재 이력을 페이징하여 조회합니다.")
+    @Operation(summary = "전체 제재 내역 조회", description = "상태, 사용자 ID, 패널티 유형으로 필터링하여 제재 내역을 조회한다.")
     public ResponseEntity<PenaltyListResponse> getPenalties(@ParameterObject @ModelAttribute PenaltySearchRequest request) {
-        return ResponseEntity.ok(penaltyQueryService.getPenalties(request));
+        // 페이징 및 필터링된 제재 내역 조회
+        PenaltyListResponse response = penaltyQueryService.getPenalties(request);
+        return ResponseEntity.ok(response);  // 조회된 제재 내역과 페이징 정보 반환
     }
 
-    @GetMapping("/{penaltyType}")
-    @Operation(summary = "유형별 제재 내역 조회", description = "관리자가 제재 유형(post, comment, review)별로 제재 이력을 조회합니다.")
-    public ResponseEntity<PenaltyListResponse> getPenaltiesByType(@PathVariable String penaltyType,
-                                                                   @Parameter(hidden = true) PenaltySearchRequest request) {
-        request.setPenaltyType(penaltyType);
-        return ResponseEntity.ok(penaltyQueryService.getPenalties(request));
+    // 제재 상세 조회
+    @GetMapping("/{penaltyId}")
+    @Operation(summary = "제재 상세 조회", description = "제재 ID를 기준으로 제재 내역을 조회한다.")
+    public ResponseEntity<PenaltyDTO> getPenaltyById(@PathVariable Long penaltyId) {
+        // 제재 ID를 기준으로 상세 조회
+        PenaltyDTO penaltyDTO = penaltyQueryService.getPenaltyById(penaltyId);
+        return ResponseEntity.ok(penaltyDTO);  // 조회된 제재 상세 내역 반환
     }
-
-    @GetMapping("/user/{userId}")
-    @Operation(summary = "사용자별 제재 내역 조회", description = "관리자 또는 사용자가 특정 사용자(memberId)의 모든 제재 이력을 조회합니다.")
-    public ResponseEntity<PenaltyListResponse> getPenaltiesByUser(@PathVariable Long userId,
-                                                                   @Parameter(hidden = true) PenaltySearchRequest request) {
-        request.setUserId(userId);
-        return ResponseEntity.ok(penaltyQueryService.getPenalties(request));
-    }
-
-    @GetMapping("/user/{userId}/{penaltyType}")
-    @Operation(summary = "사용자별 + 유형별 제재 내역 조회", description = "특정 사용자의 특정 유형(post, comment, review)의 제재 이력을 조회합니다.")
-    public ResponseEntity<PenaltyListResponse> getPenaltiesByUserAndType(@PathVariable Long userId,
-                                                                         @PathVariable String penaltyType,
-                                                                         @Parameter(hidden = true) PenaltySearchRequest request) {
-        return ResponseEntity.ok(penaltyQueryService.getPenaltiesByMemberAndType(userId, penaltyType, request));
-    }
-
 
 }
