@@ -87,7 +87,7 @@ public enum ErrorCode {
     MEETING_ALREADY_JOINED(HttpStatus.BAD_REQUEST, "이미 참여 중인 모임입니다."),
     MEETING_CREATOR_CANNOT_EXIT(HttpStatus.BAD_REQUEST, "모임 생성자는 모임을 나갈 수 없습니다."),
     INVALID_MEETING_DATE_FILTER(HttpStatus.BAD_REQUEST, "유효하지 않은 날짜입니다."),
-    POINT_INCREASE_FAILED(HttpStatus.BAD_REQUEST,"복수 실패" ),
+    POINT_INCREASE_FAILED(HttpStatus.BAD_REQUEST,"복구 실패" ),
 
     // 장소 예약
     RESERVATION_NOT_FOUND(HttpStatus.NOT_FOUND, "예약 정보를 찾을 수 없습니다."),
