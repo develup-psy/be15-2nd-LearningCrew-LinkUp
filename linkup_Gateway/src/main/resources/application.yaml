@@ -1,79 +1,51 @@
 server:
-  port: 0
+  port: 8000
 
 spring:
   application:
-    name: LINKUPUSER
-
-  datasource:
-    driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://${DB_HOST}:${DB_PORT}/${DB_NAME}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
-
-  jpa:
-    hibernate:
-      ddl-auto: none
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-
-  mail:
-    host: ${STMP_HOST}
-    port: ${STMP_PORT}
-    username: ${STMP_USERNAME}
-    password: ${STMP_PASSWORD}
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
-
-mybatis:
-  configuration:
-    map-underscore-to-camel-case: true
-  mapper-locations: classpath:/mappers/**/*.xml
-  type-aliases-package: com.learningcrew.linkupuser.query.dto
-
-jwt:
-  secret: ${JWT_SECRET}
-  expiration: ${JWT_ACCESS_EXPIRATION}
-  refresh-expiration: ${JWT_REFRESH_EXPIRATION}
+    name: gateway-server
+  cloud:
+    gateway:
+      default-filters:
+        # 중복된 Access-Control-Allow-Origin 및 Access-Control-Allow-Credentials 헤더를 제거
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
+      globalcors:
+        cors-configurations:
+          '[/**]': # 모든 경로에 대해 CORS 설정
+            #            allowedOrigins: ${CORS_ALLOWED_DOMAIN}  # 허용할 출처 (CORS 요청을 보낼 수 있는 도메인)
+            allowedOrigins:
+              - http://localhost:5173  # 허용할 출처 (개발용)
+              - http://localhost:5174
+            allow-credentials: true  # 자격 증명(예: 쿠키 등)을 허용할지 여부
+            allowedHeaders: '*'  # 허용할 요청 헤더 (모든 헤더 허용)
+            allowedMethods: # 허용할 HTTP 메서드
+              - PUT  # PUT 메서드 허용
+              - GET  # GET 메서드 허용
+              - POST # POST 메서드 허용
+              - DELETE  # DELETE 메서드 허용
+              - OPTIONS  # OPTIONS 메서드 허용 (사전 요청에 사용)
+      routes:
+        - id: LINKUPUSER
+          uri: lb://LINKUPUSER
+          predicates:
+            - Path=/api/v1/user-service/**
+          filters:
+            - RewritePath=/api/v1/user-service/(?<segment>.*), /${segment}
+        - id: LINKUPCOMMON
+          uri: lb://LINKUPCOMMON
+          predicates:
+            - Path=/api/v1/common-service/**
+          filters:
+            - RewritePath=/api/v1/common-service/(?<segment>.*), /${segment}
 
 eureka:
-  instance:
-    instance-id: ${spring.application.name}:${spring.instance.instance-id:${random.value}}
   client:
     fetch-registry: true
     register-with-eureka: true
     service-url:
       defaultZone: http://localhost:8761/eureka
 
-image:
-  image-dir: ${IMAGE_DIR}
-  image-url: ${IMAGE_URL}
-  default-profile: ${DEFAULT_PROFILE_IMAGE}
-
-springdoc:
-  swagger-ui:
-    path: /swagger-ui.html
-    tags-sorter: alpha
-    operations-sorter: method
-    display-request-duration: true
-  api-docs:
-    path: /v3/api-docs
-
-logging:
-  level:
-    com.learningcrew.linkupuser.client.com.learningcrew.linkupuser.client.CommunityClient: DEBUG
-    feign.Logger: DEBUG
-    feign.Request: DEBUG
-    feign.Response: DEBUG
-
-pagehelper:
-  helper-dialect: mariadb
-  reasonable: true        # 페이지 번호가 0보다 작으면 0으로
-  support-methods-arguments: true # 메서드 파라미터로 pageNum/pageSize를 받을 수 있도록
-  params: count=countSql
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: ${JWT_ACCESS_EXPIRATION}
+  refresh-expiration: ${JWT_REFRESH_EXPIRATION}
