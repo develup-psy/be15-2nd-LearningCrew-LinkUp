@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/accounts")
 @RequiredArgsConstructor
 @Tag(name = "계좌", description = "계좌 Command API")
-public class PointAccountCommandController {
+public class AccountCommandController {
 
     private final PointAccountCommandService accountService;
 

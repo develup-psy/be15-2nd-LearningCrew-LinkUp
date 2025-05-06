@@ -5,11 +5,13 @@ import com.learningcrew.linkupuser.command.application.dto.request.LoginRequest;
 import com.learningcrew.linkupuser.command.application.dto.request.RefreshTokenRequest;
 import com.learningcrew.linkupuser.command.application.dto.request.ResetPasswordRequest;
 import com.learningcrew.linkupuser.command.application.dto.response.TokenResponse;
+import com.learningcrew.linkupuser.command.domain.aggregate.Member;
 import com.learningcrew.linkupuser.command.domain.aggregate.RefreshToken;
 import com.learningcrew.linkupuser.command.domain.aggregate.User;
 import com.learningcrew.linkupuser.command.domain.aggregate.VerificationToken;
 import com.learningcrew.linkupuser.command.domain.constants.EmailTokenType;
 import com.learningcrew.linkupuser.command.domain.constants.LinkerStatusType;
+import com.learningcrew.linkupuser.command.domain.repository.MemberRepository;
 import com.learningcrew.linkupuser.command.domain.repository.RefreshtokenRepository;
 import com.learningcrew.linkupuser.command.domain.repository.UserRepository;
 import com.learningcrew.linkupuser.command.domain.repository.VerificationTokenRepository;
@@ -37,6 +39,7 @@ public class AuthCommandServiceImpl implements AuthCommandService {
     private final UserRepository userRepository;
     private final VerificationTokenRepository verificationTokenRepository;
     private final UserDomainServiceImpl userDomainService;
+    private final MemberRepository memberRepository;
     private final EmailService emailService;
 
     /* 로그인 기능 */
@@ -62,10 +65,16 @@ public class AuthCommandServiceImpl implements AuthCommandService {
         //refresh token 저장
         tokenDomainService.saveRefreshToken(user.getUserId(),user.getEmail(), refreshToken);
 
+        Member member = memberRepository.findById(user.getUserId()).orElseThrow(
+                () -> new BusinessException(ErrorCode.USER_NOT_FOUND)
+        );
+
         return TokenResponse
                 .builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
+                .nickname(member.getNickname())
+                .profileImageUrl(member.getProfileImageUrl())
                 .build();
     }
 
@@ -95,7 +104,7 @@ public class AuthCommandServiceImpl implements AuthCommandService {
 
         //refresh token 저장
         tokenDomainService.saveRefreshToken(user.getUserId(), user.getEmail(), refreshToken);
-
+        
         return TokenResponse
                 .builder()
                 .accessToken(accessToken)
@@ -105,10 +114,9 @@ public class AuthCommandServiceImpl implements AuthCommandService {
 
     /* 로그아웃 */
     @Transactional
-    public void logout(RefreshTokenRequest request) {
-        String token = request.getRefreshToken();
-        jwtTokenProvider.validateToken(request.getRefreshToken());
-        String userId = jwtTokenProvider.getUserIdFromJWt(token);
+    public void logout(String refreshToken) {
+        jwtTokenProvider.validateToken(refreshToken);
+        String userId = jwtTokenProvider.getUserIdFromJWt(refreshToken);
         refreshtokenRepository.deleteById(Integer.parseInt(userId));
     }
 

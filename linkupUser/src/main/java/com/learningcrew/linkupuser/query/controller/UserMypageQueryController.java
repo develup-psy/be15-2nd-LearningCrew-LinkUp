@@ -9,7 +9,6 @@ import com.learningcrew.linkupuser.query.service.MeetingQueryService;
 import com.learningcrew.linkupuser.query.service.PaymentQueryService;
 import com.learningcrew.linkupuser.query.service.UserQueryServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,14 +25,14 @@ import java.util.List;
 @RequestMapping("/users/me")
 @RequiredArgsConstructor
 @Tag(name = "유저 활동 조회", description = "유저의 프로필, 게시글, 댓글, 모임, 포인트, 친구 관련 이력을 조회합니다.")
-public class UserActivityQueryController {
+public class UserMypageQueryController {
     private final UserQueryServiceImpl userQueryService;
     private final CommunityQueryService communityQueryService;
     private final MeetingQueryService meetingQueryService;
     private final PaymentQueryService paymentQueryService;
 
     /* 프로필 조회 */
-    @GetMapping
+    @GetMapping("/profile")
     @Operation(summary = "프로필 조회", description = "사용자가 자신의 프로필 정보를 조회합니다.")
     public ResponseEntity<ApiResponse<UserProfileResponse>> getUserProfile(
             @AuthenticationPrincipal String userId
@@ -81,11 +80,15 @@ public class UserActivityQueryController {
 
 
     /* 매너 온도 조회 */
-    @GetMapping("/ manner")
+    @GetMapping("/manner")
     @Operation(summary = "매너온도 조회", description = "사용자의 매너온도를 조회합니다.")
     public ResponseEntity<ApiResponse<UserMannerTemperatureDto>> getMannerTemperature(@AuthenticationPrincipal String userId) {
         UserMannerTemperatureDto manner = userQueryService.getMannerTemperature(Integer.parseInt(userId));
         return ResponseEntity.ok(ApiResponse.success(manner, "매너 온도 조회에 성공했습니다. "));
     }
+
+    /* 회원 마이페이지 조회 */
+
+    /* 사업자 마이페이지 조회 */
 
 }

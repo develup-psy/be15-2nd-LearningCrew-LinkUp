@@ -3,7 +3,6 @@ package com.learningcrew.linkupuser.query.controller;
 
 import com.learningcrew.linkupuser.common.dto.ApiResponse;
 import com.learningcrew.linkupuser.query.dto.query.MeetingMemberDto;
-import com.learningcrew.linkupuser.query.dto.query.UserInfoResponse;
 import com.learningcrew.linkupuser.query.dto.response.UserStatusResponse;
 import com.learningcrew.linkupuser.query.service.UserQueryService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,14 +16,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Optional;
-
 @Slf4j
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
 @Tag(name = "유저 조회", description = "유저의 프로필, 게시글, 댓글, 모임, 포인트, 친구 관련 이력을 조회합니다.")
-public class UserQueryController {
+public class UserInternalQueryController {
     private final UserQueryService userQueryService;
 
     @GetMapping("/me/meetings/{memberId}")
@@ -62,4 +59,6 @@ public class UserQueryController {
         UserStatusResponse response = userQueryService.getUserStatus(userId);
         return ResponseEntity.ok(ApiResponse.success(response, "유저 상태 조회 성공"));
     }
+
+
 }
