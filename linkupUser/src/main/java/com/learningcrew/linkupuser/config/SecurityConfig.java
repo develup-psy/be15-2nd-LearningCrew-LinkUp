@@ -83,7 +83,8 @@ public class SecurityConfig {
                 "/users/me/point",
                 "/accounts/**",
                 "/auth/logout",
-                "/users/withdraw"
+                "/users/withdraw",
+                "users/me/mypage"
         ).hasAuthority("USER");
 
         auths.requestMatchers(
@@ -99,6 +100,10 @@ public class SecurityConfig {
 
     /* 사업자 api */
     private void businessEndpoints(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auths) {
+        auths.requestMatchers(
+                "/users/me/mypage/business"
+        ).hasAuthority("BUSINESS");
+
         auths.requestMatchers(
                 HttpMethod.PUT, "/businesses"
         ).hasAuthority("BUSINESS");
