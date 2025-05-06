@@ -12,12 +12,7 @@
         tu.user_name AS target_name,
         rh.report_type_id,
         rt.report_type AS report_type,
-        CASE rh.status_id
-        WHEN 1 THEN '처리중'
-        WHEN 2 THEN '처리완료'
-        WHEN 3 THEN '거절됨'
-        ELSE '알 수 없음'
-        END AS statusId,
+        rh.status_id AS statusId,
         rh.reason,
         rh.post_id,
         rh.comment_id,
@@ -72,12 +67,7 @@
         tu.user_name AS target_name,
         rh.report_type_id,
         rt.report_type AS report_type,
-        CASE rh.status_id
-        WHEN 1 THEN '처리중'
-        WHEN 2 THEN '처리완료'
-        WHEN 3 THEN '거절됨'
-        ELSE '알 수 없음'
-        END AS status,
+        rh.status_id AS statusId,
         rh.reason,
         rh.post_id,
         rh.comment_id,
@@ -254,12 +244,7 @@
         ru.user_name AS reporterName,
         rt.report_type AS reportType,
         rh.created_at AS createdAt,
-        CASE rh.status_id
-        WHEN 1 THEN '처리중'
-        WHEN 2 THEN '처리완료'
-        WHEN 3 THEN '거절됨'
-        ELSE '알 수 없음'
-        END AS status,
+        rh.status_id AS statusId,
         CASE
         WHEN rh.post_id IS NOT NULL THEN
         (SELECT cp.is_deleted FROM community_post cp WHERE cp.post_id = rh.post_id)

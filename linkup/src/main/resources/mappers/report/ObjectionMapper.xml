@@ -10,12 +10,7 @@
         o.penalty_id AS penaltyId,
         o.member_id AS memberId,
         u.user_name AS userName,
-        CASE
-        WHEN o.status_id = 1 THEN '처리중'
-        WHEN o.status_id = 2 THEN '처리완료'
-        WHEN o.status_id = 3 THEN '거절됨'
-        ELSE '알 수 없음'
-        END AS statusId,
+        o.status_id AS statusId,
         o.reason,
         o.created_at AS createdAt
         FROM objection o
@@ -77,12 +72,7 @@
         o.penalty_id AS penaltyId,
         o.member_id AS memberId,
         u.user_name AS userName,
-        CASE
-        WHEN o.status_id = 1 THEN '처리중'
-        WHEN o.status_id = 2 THEN '처리완료'
-        WHEN o.status_id = 3 THEN '거절됨'
-        ELSE '알 수 없음'
-        END AS statusId,
+        o.status_id AS statusId,
         o.reason AS reason,
         o.created_at AS createdAt,
 
@@ -91,7 +81,6 @@
         p.comment_id   AS comment_id,
         p.review_id    AS review_id,
         p.reason       AS penalty_reason,
-        p.is_active    AS is_active,
         p.created_at   AS penalty_created_at
 
         FROM objection o

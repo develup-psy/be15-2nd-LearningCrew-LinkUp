@@ -11,12 +11,7 @@
         ph.penalty_type AS penaltyType,
         ph.reason,
         ph.created_at,
-        CASE ph.status_id
-        WHEN 1 THEN '처리중'
-        WHEN 2 THEN '처리완료'
-        WHEN 3 THEN '거절됨'
-        ELSE '알 수 없음'
-        END AS statusId,
+        ph.status_id AS statusId,
         ph.post_id,
         ph.comment_id,
         ph.review_id
@@ -62,12 +57,7 @@
         ph.penalty_type AS penaltyType,
         ph.reason,
         ph.created_at,
-        CASE ph.status_id
-        WHEN 1 THEN '처리중'
-        WHEN 2 THEN '처리완료'
-        WHEN 3 THEN '거절됨'
-        ELSE '알 수 없음'
-        END AS statusId,
+        ph.status_id AS statusId,
         ph.post_id,
         ph.comment_id,
         ph.review_id

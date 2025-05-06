@@ -28,7 +28,7 @@ public class PenaltyDTO {
     private String createdAt;
 
     @Schema(description = "제재 상태 (PENDING, APPROVED, REJECTED)", example = "1")
-    private String statusId;
+    private Integer statusId;
 
     @Schema(description = "관련 게시글 ID (해당되는 경우만)", example = "301", nullable = true)
     private Long postId;

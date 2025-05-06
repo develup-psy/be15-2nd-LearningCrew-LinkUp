@@ -28,7 +28,7 @@ public class PenaltyInfoDTO {
     private String reason;
 
     @Schema(description = "제재 상태 (PENDING, APPROVED, REJECTED)", example = "1")
-    private String statusId;
+    private Integer statusId;
 
     @Schema(description = "제재 생성 일시", example = "2025-04-30T10:15:30")
     private LocalDateTime createdAt;

@@ -19,4 +19,5 @@ public interface UserPenaltyHistoryRepository {
     boolean existsByCommentId(Long commentId);
     boolean existsByReviewId(Integer reviewId);
 
+    Optional<UserPenaltyHistory> findByReviewId(Integer reviewId);
 }
