@@ -55,7 +55,7 @@
         <result property="penaltyId" column="penaltyId"/>
         <result property="memberId" column="memberId"/>
         <result property="userName" column="userName"/>
-        <result property="status" column="status"/>
+        <result property="statusId" column="statusId"/>
         <result property="reason" column="reason"/>
         <result property="createdAt" column="createdAt"/>
 
@@ -65,7 +65,7 @@
             <result property="commentId" column="comment_id"/>
             <result property="reviewId" column="review_id"/>
             <result property="reason" column="penalty_reason"/>
-            <result property="isActive" column="is_active"/>
+            <result property="statusId" column="statusId"/>
             <result property="createdAt" column="penalty_created_at"/>
         </association>
     </resultMap>

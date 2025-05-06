@@ -17,7 +17,7 @@
         WHEN 2 THEN '처리완료'
         WHEN 3 THEN '거절됨'
         ELSE '알 수 없음'
-        END AS status,
+        END AS statusId,
         rh.reason,
         rh.post_id,
         rh.comment_id,
@@ -87,6 +87,13 @@
         JOIN user ru ON rh.reporter_member_id = ru.user_id
         JOIN user tu ON rh.target_member_id = tu.user_id
         WHERE rh.report_id = #{reportId}
+    </select>
+
+    <!-- 신고 종류 조회 -->
+    <select id="selectAllReportTypes" resultType="com.learningcrew.linkup.report.query.dto.response.ReportTypeDTO">
+        SELECT report_type_id, report_type, report_level
+        FROM report_type
+        ORDER BY report_level DESC, report_type_id ASC
     </select>
 
     <!-- 신고 대상 별 목록 조회 -->
