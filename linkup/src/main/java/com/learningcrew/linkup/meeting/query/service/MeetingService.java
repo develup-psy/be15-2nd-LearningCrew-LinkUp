@@ -52,6 +52,16 @@ public class MeetingService {
         // 모임 정보 조회
         MeetingDTO meeting = meetingMapper.selectMeetingById(meetingId);
         meeting.setLeader(memberQueryClient.getMemberById(meeting.getLeaderId()).getData());
+
+        Integer placeId = meeting.getPlaceId();
+        if (placeId != null) {
+            meeting.setPlace(placeQueryService.getPlaceDetails(placeId));
+            meeting.setParticipationFee((double) meeting.getPlace().getRentalCost() / meeting.getMinUser());
+        }
+        if (placeId == null) {
+            meeting.setParticipationFee(0);
+        }
+
         if (meeting == null) {
             throw new BusinessException(ErrorCode.MEETING_NOT_FOUND);
         }
